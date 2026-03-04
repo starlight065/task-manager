@@ -1,8 +1,13 @@
+import { Routes, Route, useNavigate } from "react-router-dom";
 import "./App.css";
 import calendarIcon from "./assets/calendar.svg";
 import fileIcon from "./assets/file-icon.svg";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
 
-function App() {
+function HomePage() {
+  const navigate = useNavigate();
+
   return (
     <>
       <header className="header">
@@ -12,13 +17,13 @@ function App() {
           <div className="button-group">
             <button
               className="button button--primary"
-              onClick={() => (window.location.href = "/frontend/login.html")}
+              onClick={() => navigate("/login")}
             >
               Login
             </button>
             <button
-              className="button button--primary"
-              onClick={() => (window.location.href = "/frontend/signup.html")}
+              className="button button--secondary"
+              onClick={() => navigate("/signup")}
             >
               Sign Up
             </button>
@@ -99,7 +104,7 @@ function App() {
           <div className="button-group">
             <button
               className="button button--secondary"
-              onClick={() => (window.location.href = "/frontend/signup.html")}
+              onClick={() => navigate("/signup")}
             >
               Sign Up Now
             </button>
@@ -107,6 +112,16 @@ function App() {
         </section>
       </main>
     </>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+    </Routes>
   );
 }
 
