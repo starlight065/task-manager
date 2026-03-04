@@ -6,7 +6,6 @@
   align-items: center;
   justify-content: center;
   background-color: var(--background-color);
-  padding: 1rem;
   position: relative;
 }
 
@@ -38,7 +37,7 @@
   border-radius: 12px;
   box-shadow: var(--shadow);
   width: 100%;
-  max-width: 420px;
+  max-width: 350px;
 }
 
 .auth__title {

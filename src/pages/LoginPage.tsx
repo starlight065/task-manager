@@ -2,11 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import "./AuthPages.css";
-
-interface User {
-  email: string;
-  password: string;
-}
+import type { User } from "../types";
+import { AUTH_ERRORS, AUTH_SUCCESS, PASSWORD_RULES } from "../constants/messages";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -24,7 +21,7 @@ function LoginPage() {
     setTouched({ email: true, password: true });
 
     if (!isEmailValid || !isPasswordValid) {
-      console.log("Login failed: invalid email or password format");
+      console.log(AUTH_ERRORS.INVALID_FORMAT_LOGIN);
       return;
     }
 
@@ -36,12 +33,12 @@ function LoginPage() {
       );
 
       if (user) {
-        console.log("Login successful! Welcome,", user.email);
+        console.log(AUTH_SUCCESS.LOGIN(user.email));
       } else {
-        console.log("Login failed: invalid email or password");
+        console.log(AUTH_ERRORS.INVALID_CREDENTIALS);
       }
     } catch {
-      console.log("Login failed: could not fetch users");
+      console.log(AUTH_ERRORS.FETCH_FAILED_LOGIN);
     }
   };
 
@@ -68,7 +65,7 @@ function LoginPage() {
             onBlur={() => setTouched((t) => ({ ...t, email: true }))}
           />
           {touched.email && !isEmailValid && (
-            <span className="auth__error">Please enter a valid email</span>
+            <span className="auth__error">{AUTH_ERRORS.EMAIL_INVALID}</span>
           )}
         </div>
 
@@ -90,7 +87,6 @@ function LoginPage() {
               type="button"
               className="auth__eye"
               onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
@@ -99,12 +95,12 @@ function LoginPage() {
             <span
               className={`auth__rule ${hasMinLength ? "auth__rule--valid" : ""}`}
             >
-              At least 14 characters
+              {PASSWORD_RULES.MIN_LENGTH}
             </span>
             <span
               className={`auth__rule ${hasSpecialChar ? "auth__rule--valid" : ""}`}
             >
-              Minimum 1 special character
+              {PASSWORD_RULES.SPECIAL_CHAR}
             </span>
           </div>
         </div>
