@@ -19,13 +19,6 @@ body {
   line-height: 1.6;
 }
 
-.container {
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem 0;
-}
-
 /* ── Header ── */
 
 .header {
@@ -36,40 +29,55 @@ body {
   box-shadow: var(--shadow);
 }
 
-.logo {
+.header__container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header__logo {
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0;
   color: var(--text-color);
 }
 
-.tagline {
+.header__tagline {
   font-size: 1.2rem;
   color: var(--light-text);
   margin: 0.5rem 0 1.5rem;
 }
 
-/* ── Sections ── */
+/* ── Main ── */
 
-section {
+.main {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 0;
+}
+
+/* ── Section ── */
+
+.section {
   padding: 3rem 1rem;
   text-align: center;
   border-bottom: 1px solid #eee;
 }
 
-section:last-of-type {
+.section--last {
   border-bottom: none;
 }
 
-h2 {
+.section__title {
   font-size: 2rem;
   color: var(--text-color);
   margin-bottom: 1rem;
 }
 
-/* ── Features grid ── */
+/* ── Features ── */
 
-.features-grid {
+.features {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
@@ -77,7 +85,7 @@ h2 {
   margin-top: 3rem;
 }
 
-.feature-item {
+.features__item {
   background: white;
   padding: 2rem;
   border-radius: 8px;
@@ -87,25 +95,25 @@ h2 {
     box-shadow var(--transition-speed);
 }
 
-.feature-item:hover {
+.features__item:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
-.feature-item h3 {
+.features__title {
   margin-top: 0;
   font-size: 1.3rem;
   color: var(--primary-color);
 }
 
-.feature-icon {
+.features__icon {
   width: 120px;
   height: 120px;
   margin: 2rem auto 0;
   display: block;
 }
 
-/* ── Buttons ── */
+/* ── Button group ── */
 
 .button-group {
   display: flex;
@@ -114,7 +122,9 @@ h2 {
   margin-top: 2rem;
 }
 
-button {
+/* ── Button ── */
+
+.button {
   padding: 14px 28px;
   font-size: 1rem;
   font-weight: 600;
@@ -129,25 +139,25 @@ button {
   letter-spacing: 0.5px;
 }
 
-button:hover {
+.button:hover {
   transform: translateY(-2px);
 }
 
-button:first-of-type {
+.button--primary {
   background-color: var(--primary-color);
   color: white;
 }
 
-button:first-of-type:hover {
+.button--primary:hover {
   background-color: var(--primary-hover);
 }
 
-.call-to-action button {
+.button--secondary {
   background-color: var(--secondary-color);
   color: white;
 }
 
-.call-to-action button:hover {
+.button--secondary:hover {
   background-color: var(--secondary-hover);
 }
 
@@ -161,18 +171,16 @@ button:first-of-type:hover {
   margin-top: 2rem;
 }
 
-/* ── Priority badges ── */
+/* ── Priority ── */
 
-.priority-list {
+.priority {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   margin-top: 1rem;
 }
 
-.priority-high,
-.priority-medium,
-.priority-low {
+.priority__item {
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
   font-size: 1rem;
@@ -182,19 +190,19 @@ button:first-of-type:hover {
   display: block;
 }
 
-.priority-high {
+.priority__item--high {
   background: #ffeaea;
   color: #e53935;
   border-color: #e53935;
 }
 
-.priority-medium {
+.priority__item--medium {
   background: #fff8e1;
   color: #ff9800;
   border-color: #ff9800;
 }
 
-.priority-low {
+.priority__item--low {
   background: #e8f5e9;
   color: #43a047;
   border-color: #43a047;
@@ -203,15 +211,15 @@ button:first-of-type:hover {
 /* ── Responsive ── */
 
 @media (max-width: 768px) {
-  .logo {
+  .header__logo {
     font-size: 2rem;
   }
 
-  h2 {
+  .section__title {
     font-size: 1.8rem;
   }
 
-  .features-grid {
+  .features {
     grid-template-columns: 1fr;
   }
 }
@@ -221,7 +229,7 @@ button:first-of-type:hover {
     flex-direction: column;
   }
 
-  button {
+  .button {
     width: 100%;
   }
 }
