@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, X, AlertCircle } from "lucide-react";
 import "../styles/AuthPages.css";
 import { AUTH_ERRORS, PASSWORD_RULES } from "../constants/messages";
 import { login } from "../api/auth";
@@ -12,6 +13,7 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [touched, setTouched] = useState({ email: false, password: false });
   const [serverError, setServerError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const hasMinLength = password.length >= 14;
@@ -28,11 +30,16 @@ function LoginPage() {
     }
 
     try {
+      setIsLoading(true);
       await login(email, password);
       sessionStorage.setItem("authenticated", "true");
       navigate("/tasks");
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : AUTH_ERRORS.FETCH_FAILED_LOGIN);
+      setServerError(
+        err instanceof Error ? err.message : AUTH_ERRORS.FETCH_FAILED_LOGIN,
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -99,12 +106,8 @@ function LoginPage() {
           </div>
         </div>
 
-        {serverError && (
-          <span className="auth__error">{serverError}</span>
-        )}
-
-        <button type="submit" className="auth__submit">
-          Login
+        <button type="submit" className="auth__submit" disabled={isLoading}>
+          {isLoading ? "Loading..." : "Login"}
         </button>
 
         <p className="auth__footer">
@@ -114,6 +117,39 @@ function LoginPage() {
           </Link>
         </p>
       </form>
+
+      {serverError &&
+        createPortal(
+          <div
+            className="auth-modal__overlay"
+            onClick={() => setServerError("")}
+          >
+            <div
+              className="auth-modal"
+              onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside it
+            >
+              <div className="auth-modal__icon">
+                <AlertCircle size={32} />
+              </div>
+              <h2 className="auth-modal__title">Login failed</h2>
+              <p className="auth-modal__message">{serverError}</p>
+              <button
+                className="auth-modal__close-btn"
+                onClick={() => setServerError("")}
+              >
+                Try again
+              </button>
+              <button
+                className="auth-modal__dismiss"
+                onClick={() => setServerError("")}
+                aria-label="Dismiss"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

@@ -196,6 +196,103 @@
   color: var(--primary-hover);
 }
 
+/* ── Error modal ── */
+
+.auth-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: auth-modal-fade-in 0.2s ease;
+}
+
+@keyframes auth-modal-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.auth-modal {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem 2rem 2rem;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: auth-modal-slide-up 0.25s ease;
+}
+
+@keyframes auth-modal-slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.auth-modal__icon {
+  color: #e53935;
+  display: flex;
+}
+
+.auth-modal__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.auth-modal__message {
+  font-size: 0.95rem;
+  color: var(--light-text);
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.auth-modal__close-btn {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: "Exo 2", sans-serif;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.auth-modal__close-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+.auth-modal__dismiss {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--light-text);
+  display: flex;
+  align-items: center;
+  padding: 0.25rem;
+  border-radius: 6px;
+  transition: color var(--transition-speed), background-color var(--transition-speed);
+}
+
+.auth-modal__dismiss:hover {
+  color: var(--text-color);
+  background-color: var(--border-color);
+}
+
 /* ── Responsive ── */
 
 @media (max-width: 480px) {
