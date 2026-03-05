@@ -1,15 +1,17 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
-import "./AuthPages.css";
-import type { User } from "../types";
-import { AUTH_ERRORS, AUTH_SUCCESS, PASSWORD_RULES } from "../constants/messages";
+import "../styles/AuthPages.css";
+import { AUTH_ERRORS, PASSWORD_RULES } from "../constants/messages";
+import { login } from "../api/auth";
 
 function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [touched, setTouched] = useState({ email: false, password: false });
+  const [serverError, setServerError] = useState("");
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const hasMinLength = password.length >= 14;
@@ -19,26 +21,18 @@ function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched({ email: true, password: true });
+    setServerError("");
 
     if (!isEmailValid || !isPasswordValid) {
-      console.log(AUTH_ERRORS.INVALID_FORMAT_LOGIN);
       return;
     }
 
     try {
-      const response = await fetch("/users.json");
-      const users: User[] = await response.json();
-      const user = users.find(
-        (u) => u.email === email && u.password === password
-      );
-
-      if (user) {
-        console.log(AUTH_SUCCESS.LOGIN(user.email));
-      } else {
-        console.log(AUTH_ERRORS.INVALID_CREDENTIALS);
-      }
-    } catch {
-      console.log(AUTH_ERRORS.FETCH_FAILED_LOGIN);
+      await login(email, password);
+      sessionStorage.setItem("authenticated", "true");
+      navigate("/tasks");
+    } catch (err) {
+      setServerError(err instanceof Error ? err.message : AUTH_ERRORS.FETCH_FAILED_LOGIN);
     }
   };
 
@@ -104,6 +98,10 @@ function LoginPage() {
             </span>
           </div>
         </div>
+
+        {serverError && (
+          <span className="auth__error">{serverError}</span>
+        )}
 
         <button type="submit" className="auth__submit">
           Login

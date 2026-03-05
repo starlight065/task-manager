@@ -1,9 +1,17 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
-import "./App.css";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import "./styles/App.css";
 import calendarIcon from "./assets/calendar.svg";
 import fileIcon from "./assets/file-icon.svg";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import TasksPage from "./pages/TasksPage";
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  if (!sessionStorage.getItem("authenticated")) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+}
 
 function HomePage() {
   const navigate = useNavigate();
@@ -121,6 +129,7 @@ function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/tasks" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
     </Routes>
   );
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
-import "./AuthPages.css";
+import "../styles/AuthPages.css";
 import type { User } from "../types";
 import { AUTH_ERRORS, AUTH_SUCCESS, PASSWORD_RULES } from "../constants/messages";
 
