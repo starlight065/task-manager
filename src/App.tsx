@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import "./styles/App.css";
 import calendarIcon from "./assets/calendar.svg";
@@ -5,11 +6,43 @@ import fileIcon from "./assets/file-icon.svg";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import TasksPage from "./pages/TasksPage";
+import { getCurrentUser } from "./api/auth";
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  if (!sessionStorage.getItem("authenticated")) {
+type AuthStatus = "loading" | "authenticated" | "unauthenticated";
+
+function ProtectedRoute({
+  children,
+  authStatus,
+}: {
+  children: React.ReactNode;
+  authStatus: AuthStatus;
+}) {
+  if (authStatus === "loading") {
+    return null;
+  }
+
+  if (authStatus === "unauthenticated") {
     return <Navigate to="/login" replace />;
   }
+
+  return <>{children}</>;
+}
+
+function PublicRoute({
+  children,
+  authStatus,
+}: {
+  children: React.ReactNode;
+  authStatus: AuthStatus;
+}) {
+  if (authStatus === "loading") {
+    return null;
+  }
+
+  if (authStatus === "authenticated") {
+    return <Navigate to="/tasks" replace />;
+  }
+
   return <>{children}</>;
 }
 
@@ -124,12 +157,57 @@ function HomePage() {
 }
 
 function App() {
+  const [authStatus, setAuthStatus] = useState<AuthStatus>("loading");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    // Re-check the server session on reload so auth survives closing the tab.
+    void (async () => {
+      try {
+        const user = await getCurrentUser();
+        if (isMounted) {
+          setAuthStatus(user ? "authenticated" : "unauthenticated");
+        }
+      } catch {
+        if (isMounted) {
+          setAuthStatus("unauthenticated");
+        }
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-      <Route path="/tasks" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
+      <Route
+        path="/login"
+        element={
+          <PublicRoute authStatus={authStatus}>
+            <LoginPage onAuthenticated={() => setAuthStatus("authenticated")} />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <PublicRoute authStatus={authStatus}>
+            <SignupPage onAuthenticated={() => setAuthStatus("authenticated")} />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/tasks"
+        element={
+          <ProtectedRoute authStatus={authStatus}>
+            <TasksPage />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }

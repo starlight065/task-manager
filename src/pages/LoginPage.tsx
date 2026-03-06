@@ -6,7 +6,11 @@ import "../styles/AuthPages.css";
 import { AUTH_ERRORS, PASSWORD_RULES } from "../constants/messages";
 import { login } from "../api/auth";
 
-function LoginPage() {
+interface LoginPageProps {
+  onAuthenticated: () => void;
+}
+
+function LoginPage({ onAuthenticated }: LoginPageProps) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,11 +36,13 @@ function LoginPage() {
     try {
       setIsLoading(true);
       await login(email, password);
-      sessionStorage.setItem("authenticated", "true");
+      onAuthenticated();
       navigate("/tasks");
     } catch (err) {
       setServerError(
-        err instanceof Error ? err.message : AUTH_ERRORS.FETCH_FAILED_LOGIN,
+        err instanceof Error && err.message
+          ? err.message
+          : AUTH_ERRORS.FETCH_FAILED_LOGIN,
       );
     } finally {
       setIsLoading(false);

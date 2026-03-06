@@ -1,15 +1,23 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { createPortal } from "react-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, ArrowLeft, X, AlertCircle } from "lucide-react";
 import "../styles/AuthPages.css";
-import type { User } from "../types";
-import { AUTH_ERRORS, AUTH_SUCCESS, PASSWORD_RULES } from "../constants/messages";
+import { AUTH_ERRORS, PASSWORD_RULES } from "../constants/messages";
+import { register } from "../api/auth";
 
-function SignupPage() {
+interface SignupPageProps {
+  onAuthenticated: () => void;
+}
+
+function SignupPage({ onAuthenticated }: SignupPageProps) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [touched, setTouched] = useState({ email: false, password: false });
+  const [serverError, setServerError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const hasMinLength = password.length >= 14;
@@ -19,24 +27,25 @@ function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched({ email: true, password: true });
+    setServerError("");
 
     if (!isEmailValid || !isPasswordValid) {
-      console.log(AUTH_ERRORS.INVALID_FORMAT_SIGNUP);
       return;
     }
 
     try {
-      const response = await fetch("/users.json");
-      const users: User[] = await response.json();
-      const exists = users.some((u) => u.email === email);
-
-      if (exists) {
-        console.log(AUTH_ERRORS.EMAIL_ALREADY_EXISTS);
-      } else {
-        console.log(AUTH_SUCCESS.SIGNUP(email));
-      }
-    } catch {
-      console.log(AUTH_ERRORS.FETCH_FAILED_SIGNUP);
+      setIsLoading(true);
+      await register(email, password);
+      onAuthenticated();
+      navigate("/tasks");
+    } catch (err) {
+      setServerError(
+        err instanceof Error && err.message
+          ? err.message
+          : AUTH_ERRORS.FETCH_FAILED_SIGNUP,
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -103,8 +112,8 @@ function SignupPage() {
           </div>
         </div>
 
-        <button type="submit" className="auth__submit">
-          Sign Up
+        <button type="submit" className="auth__submit" disabled={isLoading}>
+          {isLoading ? "Loading..." : "Sign Up"}
         </button>
 
         <p className="auth__footer">
@@ -114,6 +123,36 @@ function SignupPage() {
           </Link>
         </p>
       </form>
+
+      {serverError &&
+        createPortal(
+          <div
+            className="auth-modal__overlay"
+            onClick={() => setServerError("")}
+          >
+            <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="auth-modal__icon">
+                <AlertCircle size={32} />
+              </div>
+              <h2 className="auth-modal__title">Signup failed</h2>
+              <p className="auth-modal__message">{serverError}</p>
+              <button
+                className="auth-modal__close-btn"
+                onClick={() => setServerError("")}
+              >
+                Try again
+              </button>
+              <button
+                className="auth-modal__dismiss"
+                onClick={() => setServerError("")}
+                aria-label="Dismiss"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

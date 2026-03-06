@@ -4,17 +4,25 @@ const sequelize = require("../db");
 const User = sequelize.define(
   "User",
   {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     email: {
       type: DataTypes.STRING,
-      primaryKey: true,
+      allowNull: false,
+      unique: true,
     },
     password_hash: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
   },
   {
     tableName: "users",
-    timestamps: false,
+    createdAt: "created_at",
+    updatedAt: false,
   }
 );
 

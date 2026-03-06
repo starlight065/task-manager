@@ -1,6 +1,5 @@
-export interface User {
+export interface AuthUser {
   id: number;
   email: string;
-  passwordHash: string;
   createdAt: string;
 }

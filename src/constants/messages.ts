@@ -4,13 +4,8 @@ export const AUTH_ERRORS = {
   INVALID_CREDENTIALS: "Login failed: invalid email or password",
   INVALID_FORMAT_LOGIN: "Login failed: invalid email or password format",
   INVALID_FORMAT_SIGNUP: "Signup failed: invalid email or password format",
-  FETCH_FAILED_LOGIN: "Login failed: could not fetch users",
-  FETCH_FAILED_SIGNUP: "Signup failed: could not fetch users",
-} as const;
-
-export const AUTH_SUCCESS = {
-  LOGIN: (email: string) => `Login successful! Welcome, ${email}`,
-  SIGNUP: (email: string) => `Signup successful! Welcome, ${email}`,
+  FETCH_FAILED_LOGIN: "Login failed: could not reach server",
+  FETCH_FAILED_SIGNUP: "Signup failed: could not reach server",
 } as const;
 
 export const PASSWORD_RULES = {
