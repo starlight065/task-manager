@@ -1,3 +1,72 @@
+# API Endpoints
+
+All endpoints are prefixed with `/api`. Authentication is managed via HTTP-only session cookies.
+
+---
+
+### `POST /api/register`
+
+Register a new user.
+
+**Request body:**
+```json
+{ "email": "user@example.com", "password": "yourPassword123!" }
+```
+
+**Responses:**
+| Status | Description |
+|--------|-------------|
+| `201`  | User created, session started. Returns `{ success: true, user }` |
+| `400`  | Missing fields or invalid email/password format |
+| `409`  | Email already in use |
+| `500`  | Server error |
+
+---
+
+### `POST /api/login`
+
+Login with existing credentials.
+
+**Request body:**
+```json
+{ "email": "user@example.com", "password": "yourPassword123!" }
+```
+
+**Responses:**
+| Status | Description |
+|--------|-------------|
+| `200`  | Login successful. Returns `{ success: true, user }` |
+| `400`  | Missing fields or invalid email/password format |
+| `401`  | Invalid credentials |
+| `500`  | Server error |
+
+---
+
+### `GET /api/me`
+
+Get the currently authenticated user.
+
+**Responses:**
+| Status | Description |
+|--------|-------------|
+| `200`  | Returns `{ user }` |
+| `401`  | Not authenticated |
+| `500`  | Server error |
+
+---
+
+### `POST /api/logout`
+
+Destroy the current session.
+
+**Responses:**
+| Status | Description |
+|--------|-------------|
+| `200`  | Returns `{ success: true }` |
+| `500`  | Server error |
+
+---
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
