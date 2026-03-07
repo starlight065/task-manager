@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import classNames from "classnames";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import "./styles/App.css";
 import calendarIcon from "./assets/calendar.svg";
@@ -57,13 +58,13 @@ function HomePage() {
           <p className="header__tagline">Your Personal Productivity Partner</p>
           <div className="button-group">
             <button
-              className="button button--primary"
+              className={classNames("button", "button--primary")}
               onClick={() => navigate("/login")}
             >
               Login
             </button>
             <button
-              className="button button--secondary"
+              className={classNames("button", "button--secondary")}
               onClick={() => navigate("/signup")}
             >
               Sign Up
@@ -106,9 +107,11 @@ function HomePage() {
                 Assign priorities to focus on what&apos;s most important:
               </p>
               <div className="priority">
-                <span className="priority__item priority__item--high">High</span>
-                <span className="priority__item priority__item--medium">Medium</span>
-                <span className="priority__item priority__item--low">Low</span>
+                <span className={classNames("priority__item", "priority__item--high")}>High</span>
+                <span className={classNames("priority__item", "priority__item--medium")}>
+                  Medium
+                </span>
+                <span className={classNames("priority__item", "priority__item--low")}>Low</span>
               </div>
             </div>
             <div className="features__item">
@@ -136,7 +139,7 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="section section--last">
+        <section className={classNames("section", "section--last")}>
           <h2 className="section__title">Ready to Get Started?</h2>
           <p>
             Sign up for a free account today and take the first step towards a
@@ -144,7 +147,7 @@ function HomePage() {
           </p>
           <div className="button-group">
             <button
-              className="button button--secondary"
+              className={classNames("button", "button--secondary")}
               onClick={() => navigate("/signup")}
             >
               Sign Up Now

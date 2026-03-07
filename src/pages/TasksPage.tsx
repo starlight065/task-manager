@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import "../styles/TasksPage.css";
 import type { Task } from "../types/Task";
 import MOCK_TASKS from "../data/mockTasks";
@@ -24,7 +25,11 @@ function TaskCard({ task }: { task: Task }) {
         readOnly
       />
       <div className="task-card__content">
-        <div className={`task-card__title${task.completed ? " task-card__title--completed" : ""}`}>
+        <div
+          className={classNames("task-card__title", {
+            "task-card__title--completed": task.completed,
+          })}
+        >
           {task.title}
         </div>
         <div className="task-card__description">{task.description}</div>
@@ -38,10 +43,15 @@ function TaskCard({ task }: { task: Task }) {
         </button>
       </div>
       <div className="task-card__meta">
-        <span className={`priority-badge priority-badge--${task.priority}`}>
+        <span className={classNames("priority-badge", `priority-badge--${task.priority}`)}>
           {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
         </span>
-        <span className={`task-card__due-date ${task.completed ? "task-card__due-date--overdue" : dueDateClass(task.dueDate)}`}>
+        <span
+          className={classNames(
+            "task-card__due-date",
+            task.completed ? "task-card__due-date--overdue" : dueDateClass(task.dueDate),
+          )}
+        >
           {task.dueDate}
         </span>
         <span className="tag-badge">{task.tag}</span>
@@ -67,15 +77,33 @@ function TasksPage() {
         </h1>
         <div className="tasks-page__stats">
           <div className="tasks-page__stat">
-            <span className="tasks-page__stat-value tasks-page__stat-value--pending">{pending}</span>
+            <span
+              className={classNames(
+                "tasks-page__stat-value",
+                "tasks-page__stat-value--pending",
+              )}
+            >
+              {pending}
+            </span>
             <span className="tasks-page__stat-label">pending</span>
           </div>
           <div className="tasks-page__stat">
-            <span className="tasks-page__stat-value tasks-page__stat-value--done">{done}</span>
+            <span
+              className={classNames("tasks-page__stat-value", "tasks-page__stat-value--done")}
+            >
+              {done}
+            </span>
             <span className="tasks-page__stat-label">done</span>
           </div>
           <div className="tasks-page__stat">
-            <span className="tasks-page__stat-value tasks-page__stat-value--total">{total}</span>
+            <span
+              className={classNames(
+                "tasks-page__stat-value",
+                "tasks-page__stat-value--total",
+              )}
+            >
+              {total}
+            </span>
             <span className="tasks-page__stat-label">total</span>
           </div>
         </div>
@@ -122,9 +150,15 @@ function TasksPage() {
       <div className="tasks-page__col-headers">
         <div className="tasks-page__col-headers-check" />
         <div className="tasks-page__col-headers-content" />
-        <div className="tasks-page__col-header tasks-page__col-header--priority">Priority</div>
-        <div className="tasks-page__col-header tasks-page__col-header--date">Due Date</div>
-        <div className="tasks-page__col-header tasks-page__col-header--tag">Tag</div>
+        <div className={classNames("tasks-page__col-header", "tasks-page__col-header--priority")}>
+          Priority
+        </div>
+        <div className={classNames("tasks-page__col-header", "tasks-page__col-header--date")}>
+          Due Date
+        </div>
+        <div className={classNames("tasks-page__col-header", "tasks-page__col-header--tag")}>
+          Tag
+        </div>
         <div className="tasks-page__col-headers-actions" />
       </div>
 

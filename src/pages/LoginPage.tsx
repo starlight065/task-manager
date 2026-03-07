@@ -1,4 +1,5 @@
 import { useState } from "react";
+import classNames from "classnames";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft, X, AlertCircle } from "lucide-react";
@@ -64,7 +65,9 @@ function LoginPage({ onAuthenticated }: LoginPageProps) {
           </label>
           <input
             id="email"
-            className={`auth__input ${touched.email && !isEmailValid ? "auth__input--error" : ""}`}
+            className={classNames("auth__input", {
+              "auth__input--error": touched.email && !isEmailValid,
+            })}
             type="email"
             placeholder="example@gmail.com"
             value={email}
@@ -83,7 +86,9 @@ function LoginPage({ onAuthenticated }: LoginPageProps) {
           <div className="auth__input-wrapper">
             <input
               id="password"
-              className={`auth__input ${touched.password && !isPasswordValid ? "auth__input--error" : ""}`}
+              className={classNames("auth__input", {
+                "auth__input--error": touched.password && !isPasswordValid,
+              })}
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
               value={password}
@@ -100,12 +105,16 @@ function LoginPage({ onAuthenticated }: LoginPageProps) {
           </div>
           <div className="auth__rules">
             <span
-              className={`auth__rule ${hasMinLength ? "auth__rule--valid" : ""}`}
+              className={classNames("auth__rule", {
+                "auth__rule--valid": hasMinLength,
+              })}
             >
               {PASSWORD_RULES.MIN_LENGTH}
             </span>
             <span
-              className={`auth__rule ${hasSpecialChar ? "auth__rule--valid" : ""}`}
+              className={classNames("auth__rule", {
+                "auth__rule--valid": hasSpecialChar,
+              })}
             >
               {PASSWORD_RULES.SPECIAL_CHAR}
             </span>
