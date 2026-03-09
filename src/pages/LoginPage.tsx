@@ -2,10 +2,16 @@ import { useState } from "react";
 import classNames from "classnames";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, ArrowLeft, X, AlertCircle } from "lucide-react";
 import "../styles/AuthPages.css";
 import { AUTH_ERRORS, PASSWORD_RULES } from "../constants/messages";
 import { login } from "../api/auth";
+import {
+  AlertCircleIcon,
+  ArrowLeftIcon,
+  CloseIcon,
+  EyeIcon,
+  EyeOffIcon,
+} from "../components/AuthIcons";
 
 interface LoginPageProps {
   onAuthenticated: () => void;
@@ -53,7 +59,7 @@ function LoginPage({ onAuthenticated }: LoginPageProps) {
   return (
     <div className="auth">
       <Link to="/" className="auth__home">
-        <ArrowLeft size={20} />
+        <ArrowLeftIcon size={20} />
         Home
       </Link>
       <form className="auth__form" onSubmit={handleSubmit}>
@@ -100,7 +106,11 @@ function LoginPage({ onAuthenticated }: LoginPageProps) {
               className="auth__eye"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              {showPassword ? (
+                <EyeOffIcon size={20} />
+              ) : (
+                <EyeIcon size={20} />
+              )}
             </button>
           </div>
           <div className="auth__rules">
@@ -144,7 +154,7 @@ function LoginPage({ onAuthenticated }: LoginPageProps) {
               onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking inside it
             >
               <div className="auth-modal__icon">
-                <AlertCircle size={32} />
+                <AlertCircleIcon size={32} />
               </div>
               <h2 className="auth-modal__title">Login failed</h2>
               <p className="auth-modal__message">{serverError}</p>
@@ -159,7 +169,7 @@ function LoginPage({ onAuthenticated }: LoginPageProps) {
                 onClick={() => setServerError("")}
                 aria-label="Dismiss"
               >
-                <X size={18} />
+                <CloseIcon size={18} />
               </button>
             </div>
           </div>,
