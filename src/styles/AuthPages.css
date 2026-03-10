@@ -29,6 +29,26 @@
   color: var(--primary-color);
 }
 
+.auth__icon {
+  display: block;
+  flex-shrink: 0;
+}
+
+.auth__icon--lg {
+  width: 32px;
+  height: 32px;
+}
+
+.auth__icon--sm {
+  width: 20px;
+  height: 20px;
+}
+
+.auth__icon--xs {
+  width: 18px;
+  height: 18px;
+}
+
 /* ── Form card ── */
 
 .auth__form {
@@ -106,7 +126,7 @@
 }
 
 .auth__eye:hover {
-  color: var(--text-color);
+  opacity: 0.8;
 }
 
 /* ── Validation rules ── */
@@ -235,7 +255,6 @@
 }
 
 .auth-modal__icon {
-  color: #e53935;
   display: flex;
 }
 
@@ -289,7 +308,7 @@
 }
 
 .auth-modal__dismiss:hover {
-  color: var(--text-color);
+  opacity: 0.8;
   background-color: var(--border-color);
 }
 

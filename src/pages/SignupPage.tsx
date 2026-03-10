@@ -5,13 +5,11 @@ import { Link, useNavigate } from "react-router-dom";
 import "../styles/AuthPages.css";
 import { AUTH_ERRORS, PASSWORD_RULES } from "../constants/messages";
 import { register } from "../api/auth";
-import {
-  AlertCircleIcon,
-  ArrowLeftIcon,
-  CloseIcon,
-  EyeIcon,
-  EyeOffIcon,
-} from "../components/AuthIcons";
+import alertCircleIcon from "../assets/auth-alert-circle.svg";
+import arrowLeftIcon from "../assets/auth-arrow-left.svg";
+import closeIcon from "../assets/auth-close.svg";
+import eyeIcon from "../assets/auth-eye.svg";
+import eyeOffIcon from "../assets/auth-eye-off.svg";
 
 interface SignupPageProps {
   onAuthenticated: () => void;
@@ -59,7 +57,7 @@ function SignupPage({ onAuthenticated }: SignupPageProps) {
   return (
     <div className="auth">
       <Link to="/" className="auth__home">
-        <ArrowLeftIcon size={20} />
+        <img className="auth__icon auth__icon--sm" src={arrowLeftIcon} alt="" />
         Home
       </Link>
       <form className="auth__form" onSubmit={handleSubmit}>
@@ -106,11 +104,11 @@ function SignupPage({ onAuthenticated }: SignupPageProps) {
               className="auth__eye"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? (
-                <EyeOffIcon size={20} />
-              ) : (
-                <EyeIcon size={20} />
-              )}
+              <img
+                className="auth__icon auth__icon--sm"
+                src={showPassword ? eyeOffIcon : eyeIcon}
+                alt=""
+              />
             </button>
           </div>
           <div className="auth__rules">
@@ -151,7 +149,11 @@ function SignupPage({ onAuthenticated }: SignupPageProps) {
           >
             <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
               <div className="auth-modal__icon">
-                <AlertCircleIcon size={32} />
+                <img
+                  className="auth__icon auth__icon--lg"
+                  src={alertCircleIcon}
+                  alt=""
+                />
               </div>
               <h2 className="auth-modal__title">Signup failed</h2>
               <p className="auth-modal__message">{serverError}</p>
@@ -166,7 +168,7 @@ function SignupPage({ onAuthenticated }: SignupPageProps) {
                 onClick={() => setServerError("")}
                 aria-label="Dismiss"
               >
-                <CloseIcon size={18} />
+                <img className="auth__icon auth__icon--xs" src={closeIcon} alt="" />
               </button>
             </div>
           </div>,
