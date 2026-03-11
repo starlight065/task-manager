@@ -1,10 +1,11 @@
+import { useEffect, useState } from "react";
 import classNames from "classnames";
 import "../styles/TasksPage.css";
 import type { Task } from "../types/Task";
-import MOCK_TASKS from "../data/mockTasks";
 import editIcon from "../assets/icon-edit.svg";
 import trashIcon from "../assets/icon-trash.svg";
 import searchIcon from "../assets/icon-search.svg";
+import { getTasks } from "../api/tasks";
 
 function dueDateClass(dateStr: string): string {
   const date = new Date(dateStr);
@@ -61,12 +62,60 @@ function TaskCard({ task }: { task: Task }) {
 }
 
 function TasksPage() {
-  const activeTasks = MOCK_TASKS.filter((t) => !t.completed);
-  const completedTasks = MOCK_TASKS.filter((t) => t.completed);
-  const total = MOCK_TASKS.length;
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    void (async () => {
+      try {
+        const nextTasks = await getTasks();
+        if (!isMounted) {
+          return;
+        }
+
+        setTasks(nextTasks);
+        setError(null);
+      } catch (err) {
+        if (!isMounted) {
+          return;
+        }
+
+        setError(err instanceof Error ? err.message : "Failed to load tasks");
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const activeTasks = tasks.filter((t) => !t.completed);
+  const completedTasks = tasks.filter((t) => t.completed);
+  const total = tasks.length;
   const done = completedTasks.length;
   const pending = activeTasks.length;
-  const progressPct = Math.round((done / total) * 100);
+  const progressPct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+  if (isLoading) {
+    return (
+      <div className="tasks-page">
+        <div className="tasks-page__header">
+          <h1 className="tasks-page__title">
+            Task manager <span>• March 2026</span>
+          </h1>
+        </div>
+        <hr className="tasks-page__header-divider" />
+        <div className="tasks-page__section-heading">Loading tasks...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="tasks-page">
@@ -110,6 +159,8 @@ function TasksPage() {
       </div>
 
       <hr className="tasks-page__header-divider" />
+
+      {error ? <div className="tasks-page__section-heading">{error}</div> : null}
 
       {/* Toolbar */}
       <div className="tasks-page__toolbar">

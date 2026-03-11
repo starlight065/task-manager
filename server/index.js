@@ -1,5 +1,6 @@
 require("dotenv").config({ path: require("path").resolve(__dirname, "../.env") });
 const sequelize = require("./db");
+require("./models/Task");
 const { createSessionStore } = require("./config/session");
 const { createApp } = require("./app");
 

@@ -3,10 +3,12 @@ const bcrypt = require("bcrypt");
 const { UniqueConstraintError } = require("sequelize");
 const { AUTH_ERRORS } = require("../constants/messages");
 const User = require("../models/User");
+const Task = require("../models/Task");
 const {
   getCredentialsFromRequest,
   hasValidCredentials,
 } = require("../utils/authValidation");
+const { serializeTask } = require("../utils/serializeTask");
 const { serializeUser } = require("../utils/serializeUser");
 const {
   clearSessionCookie,
@@ -69,6 +71,29 @@ router.post("/login", async (req, res) => {
     signInUser(req, user);
 
     return res.json({ success: true, user: serializeUser(user) });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: AUTH_ERRORS.SERVER_ERROR });
+  }
+});
+
+router.get("/tasks", async (req, res) => {
+  try {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return res.status(401).json({ error: AUTH_ERRORS.UNAUTHORIZED });
+    }
+
+    const tasks = await Task.findAll({
+      where: { user_id: user.id },
+      order: [
+        ["completed", "ASC"],
+        ["due_date", "ASC"],
+        ["id", "ASC"],
+      ],
+    });
+
+    return res.json({ tasks: tasks.map(serializeTask) });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: AUTH_ERRORS.SERVER_ERROR });
