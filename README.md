@@ -1,6 +1,16 @@
 # API Endpoints
 
 All endpoints are prefixed with `/api`. Authentication is managed via HTTP-only session cookies.
+Session data is persisted in the MySQL database through Sequelize. The server uses `express-session` for session management and `connect-session-sequelize` to store sessions in the database.
+
+The server reads its database configuration from the root `.env` file:
+- `DB_HOST`
+- `DB_PORT`
+- `DB_NAME`
+- `DB_USER`
+- `DB_PASSWORD`
+- `SESSION_SECRET`
+- `SERVER_PORT`
 
 ---
 

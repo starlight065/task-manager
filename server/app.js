@@ -3,12 +3,16 @@ const cors = require("cors");
 const { createSessionMiddleware } = require("./config/session");
 const authRoutes = require("./routes/authRoutes");
 
-function createApp() {
+function createApp({ sessionStore }) {
   const app = express();
+
+  if (!sessionStore) {
+    throw new Error("Session store is required");
+  }
 
   app.use(express.json());
   app.use(cors({ origin: "http://localhost:5173", credentials: true }));
-  app.use(createSessionMiddleware());
+  app.use(createSessionMiddleware(sessionStore));
   app.use("/api", authRoutes);
 
   return app;
