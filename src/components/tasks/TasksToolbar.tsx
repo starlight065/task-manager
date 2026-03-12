@@ -63,7 +63,7 @@ function TasksToolbar({
         </span>
       </div>
 
-      <div className="tasks-page__select-group">
+      <div className="tasks-page__select-group tasks-page__select-group--sort">
         <label className="tasks-page__select-label" htmlFor="tasks-sort-select">
           Sort
         </label>
@@ -76,7 +76,7 @@ function TasksToolbar({
         />
       </div>
 
-      <div className="tasks-page__select-group">
+      <div className="tasks-page__select-group tasks-page__select-group--priority">
         <label className="tasks-page__select-label" htmlFor="tasks-priority-select">
           Priority
         </label>
@@ -89,7 +89,7 @@ function TasksToolbar({
         />
       </div>
 
-      <div className="tasks-page__select-group">
+      <div className="tasks-page__select-group tasks-page__select-group--status">
         <label className="tasks-page__select-label" htmlFor="tasks-status-select">
           Status
         </label>

@@ -122,6 +122,14 @@
   min-width: 0;
 }
 
+.tasks-page__select-group--sort {
+  flex-basis: 150px;
+}
+
+.tasks-page__select-group--status {
+  flex-basis: 160px;
+}
+
 .tasks-page__select-label {
   font-size: 0.78rem;
   color: var(--light-text);
@@ -854,6 +862,18 @@
   .tasks-page__select-group {
     flex: 0 0 150px;
     order: 2;
+  }
+
+  .tasks-page__select-group--sort {
+    flex-basis: 170px;
+  }
+
+  .tasks-page__select-group--priority {
+    flex-basis: 155px;
+  }
+
+  .tasks-page__select-group--status {
+    flex-basis: 195px;
   }
 
   .tasks-page__new-task-btn {
