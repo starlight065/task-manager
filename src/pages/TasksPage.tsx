@@ -1,70 +1,27 @@
 import { useEffect, useState } from "react";
-import classNames from "classnames";
 import "../styles/TasksPage.css";
 import type { Task } from "../types/Task";
-import editIcon from "../assets/icon-edit.svg";
-import trashIcon from "../assets/icon-trash.svg";
-import searchIcon from "../assets/icon-search.svg";
 import { getTasks } from "../api/tasks";
-
-function dueDateClass(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffDays = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  if (diffDays < 0) return "task-card__due-date--overdue";
-  if (diffDays <= 4) return "task-card__due-date--soon";
-  return "task-card__due-date--normal";
-}
-
-function TaskCard({ task }: { task: Task }) {
-  return (
-    <div className="task-card">
-      <input
-        type="checkbox"
-        className="task-card__checkbox"
-        defaultChecked={task.completed}
-        readOnly
-      />
-      <div className="task-card__content">
-        <div
-          className={classNames("task-card__title", {
-            "task-card__title--completed": task.completed,
-          })}
-        >
-          {task.title}
-        </div>
-        <div className="task-card__description">{task.description}</div>
-      </div>
-      <div className="task-card__actions">
-        <button className="task-card__action" aria-label="Edit task">
-          <img src={editIcon} alt="" width="16" height="16" />
-        </button>
-        <button className="task-card__action" aria-label="Delete task">
-          <img src={trashIcon} alt="" width="16" height="16" />
-        </button>
-      </div>
-      <div className="task-card__meta">
-        <span className={classNames("priority-badge", `priority-badge--${task.priority}`)}>
-          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-        </span>
-        <span
-          className={classNames(
-            "task-card__due-date",
-            task.completed ? "task-card__due-date--overdue" : dueDateClass(task.dueDate),
-          )}
-        >
-          {task.dueDate}
-        </span>
-        <span className="tag-badge">{task.tag}</span>
-      </div>
-    </div>
-  );
-}
+import TaskListSection from "../components/tasks/TaskListSection";
+import TasksColumnHeaders from "../components/tasks/TasksColumnHeaders";
+import TasksHeader from "../components/tasks/TasksHeader";
+import TasksProgress from "../components/tasks/TasksProgress";
+import TasksToolbar from "../components/tasks/TasksToolbar";
+import {
+  getFilteredTasks,
+  type PriorityFilter,
+  type SortOption,
+  type StatusFilter,
+} from "../features/tasks/taskFilters";
 
 function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("due-date");
+  const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   useEffect(() => {
     let isMounted = true;
@@ -96,21 +53,25 @@ function TasksPage() {
     };
   }, []);
 
-  const activeTasks = tasks.filter((t) => !t.completed);
-  const completedTasks = tasks.filter((t) => t.completed);
+  const filteredTasks = getFilteredTasks(
+    tasks,
+    searchQuery,
+    statusFilter,
+    priorityFilter,
+    sortBy,
+  );
+  const activeTasks = filteredTasks.filter((task) => !task.completed);
+  const completedTasks = filteredTasks.filter((task) => task.completed);
   const total = tasks.length;
-  const done = completedTasks.length;
-  const pending = activeTasks.length;
+  const done = tasks.filter((task) => task.completed).length;
+  const pending = tasks.filter((task) => !task.completed).length;
   const progressPct = total === 0 ? 0 : Math.round((done / total) * 100);
+  const visibleCount = filteredTasks.length;
 
   if (isLoading) {
     return (
       <div className="tasks-page">
-        <div className="tasks-page__header">
-          <h1 className="tasks-page__title">
-            Task manager <span>• March 2026</span>
-          </h1>
-        </div>
+        <TasksHeader pending={0} done={0} total={0} />
         <hr className="tasks-page__header-divider" />
         <div className="tasks-page__section-heading">Loading tasks...</div>
       </div>
@@ -119,128 +80,34 @@ function TasksPage() {
 
   return (
     <div className="tasks-page">
-      {/* Header */}
-      <div className="tasks-page__header">
-        <h1 className="tasks-page__title">
-          Task manager <span>• March 2026</span>
-        </h1>
-        <div className="tasks-page__stats">
-          <div className="tasks-page__stat">
-            <span
-              className={classNames(
-                "tasks-page__stat-value",
-                "tasks-page__stat-value--pending",
-              )}
-            >
-              {pending}
-            </span>
-            <span className="tasks-page__stat-label">pending</span>
-          </div>
-          <div className="tasks-page__stat">
-            <span
-              className={classNames("tasks-page__stat-value", "tasks-page__stat-value--done")}
-            >
-              {done}
-            </span>
-            <span className="tasks-page__stat-label">done</span>
-          </div>
-          <div className="tasks-page__stat">
-            <span
-              className={classNames(
-                "tasks-page__stat-value",
-                "tasks-page__stat-value--total",
-              )}
-            >
-              {total}
-            </span>
-            <span className="tasks-page__stat-label">total</span>
-          </div>
-        </div>
-      </div>
-
+      <TasksHeader pending={pending} done={done} total={total} />
       <hr className="tasks-page__header-divider" />
 
       {error ? <div className="tasks-page__section-heading">{error}</div> : null}
 
-      {/* Toolbar */}
-      <div className="tasks-page__toolbar">
-        <div className="tasks-page__search-wrapper">
-          <input
-            type="text"
-            className="tasks-page__search"
-            placeholder="Search tasks..."
-          />
-          <span className="tasks-page__search-icon">
-            <img src={searchIcon} alt="" width="15" height="15" />
-          </span>
-        </div>
+      <TasksToolbar
+        searchQuery={searchQuery}
+        sortBy={sortBy}
+        priorityFilter={priorityFilter}
+        statusFilter={statusFilter}
+        onSearchQueryChange={setSearchQuery}
+        onSortByChange={setSortBy}
+        onPriorityFilterChange={setPriorityFilter}
+        onStatusFilterChange={setStatusFilter}
+      />
 
-        <div className="tasks-page__select-group">
-          <span className="tasks-page__select-label">Sort</span>
-          <select className="tasks-page__select" defaultValue="due-date">
-            <option value="due-date">Due date</option>
-            <option value="priority">Priority</option>
-            <option value="created">Created</option>
-          </select>
-        </div>
+      <TasksColumnHeaders />
 
-        <div className="tasks-page__select-group">
-          <span className="tasks-page__select-label">Priority</span>
-          <select className="tasks-page__select" defaultValue="all">
-            <option value="all">All</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
-        </div>
+      <TaskListSection title="Active" tasks={activeTasks} />
+      <TaskListSection title="Completed" tasks={completedTasks} />
 
-        <button className="tasks-page__new-task-btn">New task</button>
-      </div>
-
-      {/* Column headers — visible on desktop only via CSS */}
-      <div className="tasks-page__col-headers">
-        <div className="tasks-page__col-headers-check" />
-        <div className="tasks-page__col-headers-content" />
-        <div className={classNames("tasks-page__col-header", "tasks-page__col-header--priority")}>
-          Priority
+      {visibleCount === 0 ? (
+        <div className="tasks-page__empty-state">
+          No tasks match your current search and filters.
         </div>
-        <div className={classNames("tasks-page__col-header", "tasks-page__col-header--date")}>
-          Due Date
-        </div>
-        <div className={classNames("tasks-page__col-header", "tasks-page__col-header--tag")}>
-          Tag
-        </div>
-        <div className="tasks-page__col-headers-actions" />
-      </div>
+      ) : null}
 
-      {/* Active tasks */}
-      <div className="tasks-page__section-heading">
-        Active: {activeTasks.length} tasks
-      </div>
-      {activeTasks.map((task) => (
-        <TaskCard key={task.id} task={task} />
-      ))}
-
-      {/* Completed tasks */}
-      <div className="tasks-page__section-heading">
-        Completed: {completedTasks.length} tasks
-      </div>
-      {completedTasks.map((task) => (
-        <TaskCard key={task.id} task={task} />
-      ))}
-
-      {/* Progress */}
-      <div className="tasks-page__progress">
-        <span className="tasks-page__progress-label">
-          {done} / {total} completed
-        </span>
-        <div className="tasks-page__progress-bar-track">
-          <div
-            className="tasks-page__progress-bar-fill"
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-      </div>
+      <TasksProgress done={done} total={total} progressPct={progressPct} />
     </div>
   );
 }
