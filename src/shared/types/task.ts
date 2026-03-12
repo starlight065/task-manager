@@ -18,3 +18,7 @@ export interface CreateTaskDto {
   dueDate: string;
   tag: string;
 }
+
+export interface UpdateTaskCompletionDto {
+  completed: boolean;
+}

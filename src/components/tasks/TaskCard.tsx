@@ -21,16 +21,20 @@ function dueDateClass(dateStr: string): string {
 
 interface TaskCardProps {
   task: TaskDto;
+  onCompletionChange: (taskId: number, completed: boolean) => void;
 }
 
-function TaskCard({ task }: TaskCardProps) {
+function TaskCard({ task, onCompletionChange }: TaskCardProps) {
   return (
     <div className="task-card">
       <input
         type="checkbox"
         className="task-card__checkbox"
-        defaultChecked={task.completed}
-        readOnly
+        checked={task.completed}
+        onChange={(event) => {
+          onCompletionChange(task.id, event.target.checked);
+        }}
+        aria-label={`Mark ${task.title} as ${task.completed ? "incomplete" : "completed"}`}
       />
       <div className="task-card__content">
         <div
@@ -57,7 +61,7 @@ function TaskCard({ task }: TaskCardProps) {
         <span
           className={classNames(
             "task-card__due-date",
-            task.completed ? "task-card__due-date--overdue" : dueDateClass(task.dueDate),
+            task.completed ? "task-card__due-date--completed" : dueDateClass(task.dueDate),
           )}
         >
           {task.dueDate}

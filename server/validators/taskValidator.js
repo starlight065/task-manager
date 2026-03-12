@@ -37,6 +37,19 @@ function validateCreateTaskPayload(payload) {
   };
 }
 
+function validateTaskCompletionPayload(payload) {
+  if (typeof payload?.completed !== "boolean") {
+    return { error: "Completed must be a boolean" };
+  }
+
+  return {
+    value: {
+      completed: payload.completed,
+    },
+  };
+}
+
 module.exports = {
   validateCreateTaskPayload,
+  validateTaskCompletionPayload,
 };

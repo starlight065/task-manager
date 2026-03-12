@@ -22,7 +22,24 @@ function createTask({ userId, title, description, priority, dueDate, tag }) {
   });
 }
 
+function findTaskByIdForUser(taskId, userId) {
+  return Task.findOne({
+    where: {
+      id: taskId,
+      user_id: userId,
+    },
+  });
+}
+
+async function updateTaskCompletion(task, completed) {
+  task.completed = completed;
+  await task.save();
+  return task;
+}
+
 module.exports = {
   createTask,
   findTasksByUserId,
+  findTaskByIdForUser,
+  updateTaskCompletion,
 };

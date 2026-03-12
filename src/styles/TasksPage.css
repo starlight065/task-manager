@@ -309,6 +309,7 @@
 .task-card__due-date--overdue { color: #e05c00; }
 .task-card__due-date--soon    { color: #ff0000; }
 .task-card__due-date--normal  { color: var(--text-color); }
+.task-card__due-date--completed { color: #999; }
 
 /* ── Tag Badge ── */
 

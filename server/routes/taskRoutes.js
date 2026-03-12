@@ -2,11 +2,16 @@ const express = require("express");
 const {
   createTask,
   findTasksByUserId,
+  findTaskByIdForUser,
+  updateTaskCompletion,
 } = require("../repositories/taskRepository");
 const { serializeTask } = require("../utils/serializeTask");
 const { getAuthenticatedUser } = require("../services/sessionService");
 const { AUTH_MESSAGES } = require("../validators/authValidator");
-const { validateCreateTaskPayload } = require("../validators/taskValidator");
+const {
+  validateCreateTaskPayload,
+  validateTaskCompletionPayload,
+} = require("../validators/taskValidator");
 
 const router = express.Router();
 
@@ -49,6 +54,37 @@ router.post("/tasks", async (req, res) => {
     });
 
     return res.status(201).json({ task: serializeTask(task) });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: AUTH_MESSAGES.serverError });
+  }
+});
+
+router.patch("/tasks/:taskId", async (req, res) => {
+  try {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return res.status(401).json({ error: AUTH_MESSAGES.unauthorized });
+    }
+
+    const taskId = Number.parseInt(req.params.taskId, 10);
+    if (!Number.isInteger(taskId) || taskId <= 0) {
+      return res.status(400).json({ error: "Task id must be a positive integer" });
+    }
+
+    const result = validateTaskCompletionPayload(req.body);
+    if (result.error) {
+      return res.status(400).json({ error: result.error });
+    }
+
+    const task = await findTaskByIdForUser(taskId, user.id);
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    const updatedTask = await updateTaskCompletion(task, result.value.completed);
+
+    return res.json({ task: serializeTask(updatedTask) });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: AUTH_MESSAGES.serverError });

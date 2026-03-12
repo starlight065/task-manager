@@ -10,7 +10,7 @@ import { useTaskFilters } from "../features/tasks/hooks/useTaskFilters";
 import { useTasksQuery } from "../features/tasks/hooks/useTasksQuery";
 
 function TasksPage() {
-  const { tasks, isLoading, error, addTask } = useTasksQuery();
+  const { tasks, isLoading, error, addTask, toggleTaskCompletion } = useTasksQuery();
   const filters = useTaskFilters(tasks);
   const createModal = useCreateTaskModal({ onTaskCreated: addTask });
 
@@ -49,8 +49,16 @@ function TasksPage() {
 
       <TasksColumnHeaders />
 
-      <TaskListSection title="Active" tasks={filters.activeTasks} />
-      <TaskListSection title="Completed" tasks={filters.completedTasks} />
+      <TaskListSection
+        title="Active"
+        tasks={filters.activeTasks}
+        onTaskCompletionChange={toggleTaskCompletion}
+      />
+      <TaskListSection
+        title="Completed"
+        tasks={filters.completedTasks}
+        onTaskCompletionChange={toggleTaskCompletion}
+      />
 
       {filters.visibleCount === 0 ? (
         <div className="tasks-page__empty-state">
