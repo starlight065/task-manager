@@ -1,72 +1,14 @@
-import { useEffect, useState } from "react";
 import "../styles/TasksPage.css";
-import type { Task } from "../types/Task";
-import { getTasks } from "../api/tasks";
+import CreateTaskModal from "../components/tasks/CreateTaskModal";
 import TaskListSection from "../components/tasks/TaskListSection";
 import TasksColumnHeaders from "../components/tasks/TasksColumnHeaders";
 import TasksHeader from "../components/tasks/TasksHeader";
 import TasksProgress from "../components/tasks/TasksProgress";
 import TasksToolbar from "../components/tasks/TasksToolbar";
-import {
-  getFilteredTasks,
-  type PriorityFilter,
-  type SortOption,
-  type StatusFilter,
-} from "../features/tasks/taskFilters";
+import { useTasksPageState } from "../features/tasks/useTasksPageState";
 
 function TasksPage() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<SortOption>("due-date");
-  const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>("all");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-
-  useEffect(() => {
-    let isMounted = true;
-
-    void (async () => {
-      try {
-        const nextTasks = await getTasks();
-        if (!isMounted) {
-          return;
-        }
-
-        setTasks(nextTasks);
-        setError(null);
-      } catch (err) {
-        if (!isMounted) {
-          return;
-        }
-
-        setError(err instanceof Error ? err.message : "Failed to load tasks");
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    })();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const filteredTasks = getFilteredTasks(
-    tasks,
-    searchQuery,
-    statusFilter,
-    priorityFilter,
-    sortBy,
-  );
-  const activeTasks = filteredTasks.filter((task) => !task.completed);
-  const completedTasks = filteredTasks.filter((task) => task.completed);
-  const total = tasks.length;
-  const done = tasks.filter((task) => task.completed).length;
-  const pending = tasks.filter((task) => !task.completed).length;
-  const progressPct = total === 0 ? 0 : Math.round((done / total) * 100);
-  const visibleCount = filteredTasks.length;
+  const { isLoading, error, summary, filters, createModal } = useTasksPageState();
 
   if (isLoading) {
     return (
@@ -80,34 +22,52 @@ function TasksPage() {
 
   return (
     <div className="tasks-page">
-      <TasksHeader pending={pending} done={done} total={total} />
+      <TasksHeader pending={summary.pending} done={summary.done} total={summary.total} />
       <hr className="tasks-page__header-divider" />
 
       {error ? <div className="tasks-page__section-heading">{error}</div> : null}
 
       <TasksToolbar
-        searchQuery={searchQuery}
-        sortBy={sortBy}
-        priorityFilter={priorityFilter}
-        statusFilter={statusFilter}
-        onSearchQueryChange={setSearchQuery}
-        onSortByChange={setSortBy}
-        onPriorityFilterChange={setPriorityFilter}
-        onStatusFilterChange={setStatusFilter}
+        searchQuery={filters.searchQuery}
+        sortBy={filters.sortBy}
+        priorityFilter={filters.priorityFilter}
+        statusFilter={filters.statusFilter}
+        onCreateTaskClick={createModal.open}
+        onSearchQueryChange={filters.setSearchQuery}
+        onSortByChange={filters.setSortBy}
+        onPriorityFilterChange={filters.setPriorityFilter}
+        onStatusFilterChange={filters.setStatusFilter}
       />
 
       <TasksColumnHeaders />
 
-      <TaskListSection title="Active" tasks={activeTasks} />
-      <TaskListSection title="Completed" tasks={completedTasks} />
+      <TaskListSection title="Active" tasks={filters.activeTasks} />
+      <TaskListSection title="Completed" tasks={filters.completedTasks} />
 
-      {visibleCount === 0 ? (
+      {filters.visibleCount === 0 ? (
         <div className="tasks-page__empty-state">
           No tasks match your current search and filters.
         </div>
       ) : null}
 
-      <TasksProgress done={done} total={total} progressPct={progressPct} />
+      <TasksProgress
+        done={summary.done}
+        total={summary.total}
+        progressPct={summary.progressPct}
+      />
+
+      {createModal.isOpen ? (
+        <CreateTaskModal
+          formValues={createModal.formValues}
+          fieldErrors={createModal.fieldErrors}
+          formError={createModal.formError}
+          isSubmitting={createModal.isSubmitting}
+          isClosing={createModal.isClosing}
+          onCloseComplete={createModal.close}
+          onFieldChange={createModal.onFieldChange}
+          onSubmit={createModal.onSubmit}
+        />
+      ) : null}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type SubmitEvent } from "react";
 import classNames from "classnames";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
@@ -29,7 +29,7 @@ function LoginPage({ onAuthenticated }: LoginPageProps) {
   const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
   const isPasswordValid = hasMinLength && hasSpecialChar;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTouched({ email: true, password: true });
     setServerError("");

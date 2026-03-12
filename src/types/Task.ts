@@ -10,3 +10,11 @@ export interface Task {
   tag: string;
   completed: boolean;
 }
+
+export interface CreateTaskPayload {
+  title: string;
+  description: string;
+  priority: Priority;
+  dueDate: string;
+  tag: string;
+}

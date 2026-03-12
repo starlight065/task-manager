@@ -100,6 +100,60 @@ router.get("/tasks", async (req, res) => {
   }
 });
 
+router.post("/tasks", async (req, res) => {
+  try {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return res.status(401).json({ error: AUTH_ERRORS.UNAUTHORIZED });
+    }
+
+    const { title, description, priority, dueDate, tag } = req.body ?? {};
+    const trimmedTitle = typeof title === "string" ? title.trim() : "";
+    const trimmedDescription = typeof description === "string" ? description.trim() : "";
+    const trimmedTag = typeof tag === "string" ? tag.trim() : "";
+    const allowedPriorities = ["high", "medium", "low"];
+    const today = new Date().toISOString().slice(0, 10);
+    const hasValidDueDateFormat =
+      typeof dueDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dueDate);
+
+    if (
+      !trimmedTitle ||
+      !trimmedDescription ||
+      !trimmedTag ||
+      typeof dueDate !== "string" ||
+      !dueDate
+    ) {
+      return res.status(400).json({ error: "All task fields are required" });
+    }
+
+    if (!allowedPriorities.includes(priority)) {
+      return res.status(400).json({ error: "Priority must be high, medium, or low" });
+    }
+
+    if (!hasValidDueDateFormat) {
+      return res.status(400).json({ error: "Due date must use YYYY-MM-DD format" });
+    }
+
+    if (dueDate < today) {
+      return res.status(400).json({ error: "Due date cannot be in the past" });
+    }
+
+    const task = await Task.create({
+      user_id: user.id,
+      title: trimmedTitle,
+      description: trimmedDescription,
+      priority,
+      due_date: dueDate,
+      tag: trimmedTag,
+    });
+
+    return res.status(201).json({ task: serializeTask(task) });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: AUTH_ERRORS.SERVER_ERROR });
+  }
+});
+
 router.get("/me", async (req, res) => {
   try {
     const user = await getAuthenticatedUser(req);

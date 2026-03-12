@@ -10,6 +10,7 @@ interface TasksToolbarProps {
   sortBy: SortOption;
   priorityFilter: PriorityFilter;
   statusFilter: StatusFilter;
+  onCreateTaskClick: () => void;
   onSearchQueryChange: (value: string) => void;
   onSortByChange: (value: SortOption) => void;
   onPriorityFilterChange: (value: PriorityFilter) => void;
@@ -21,6 +22,7 @@ function TasksToolbar({
   sortBy,
   priorityFilter,
   statusFilter,
+  onCreateTaskClick,
   onSearchQueryChange,
   onSortByChange,
   onPriorityFilterChange,
@@ -81,7 +83,9 @@ function TasksToolbar({
         </select>
       </div>
 
-      <button className="tasks-page__new-task-btn">New task</button>
+      <button type="button" className="tasks-page__new-task-btn" onClick={onCreateTaskClick}>
+        New task
+      </button>
     </div>
   );
 }
