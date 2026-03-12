@@ -1,7 +1,14 @@
 import closeIcon from "../../assets/icon-close.svg";
 import { useState, type ChangeEvent, type MouseEvent, type SubmitEvent } from "react";
+import AppSelect, { type SelectOption } from "../shared/AppSelect";
 import type { CreateTaskDto } from "../../shared/types";
 import type { TaskFormErrors } from "../../features/tasks/taskForm";
+
+const PRIORITY_OPTIONS: SelectOption<CreateTaskDto["priority"]>[] = [
+  { value: "high", label: "High" },
+  { value: "medium", label: "Medium" },
+  { value: "low", label: "Low" },
+];
 
 interface CreateTaskModalProps {
   formValues: CreateTaskDto;
@@ -46,9 +53,7 @@ function CreateTaskModal({
   }
 
   function handleChange(field: keyof CreateTaskDto) {
-    return (
-      event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-    ) => {
+    return (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       onFieldChange(field, event.target.value);
     };
   }
@@ -118,22 +123,21 @@ function CreateTaskModal({
           </label>
 
           <div className="task-modal__row">
-            <label className="task-modal__field">
-              <span className="task-modal__label">Priority</span>
-              <select
-                className="task-modal__input"
+            <div className="task-modal__field">
+              <label className="task-modal__label" htmlFor="create-task-priority">
+                Priority
+              </label>
+              <AppSelect
+                inputId="create-task-priority"
+                isDisabled={isSubmitting}
+                options={PRIORITY_OPTIONS}
                 value={formValues.priority}
-                onChange={handleChange("priority")}
-                disabled={isSubmitting}
-              >
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
-              </select>
+                onChange={(value) => onFieldChange("priority", value)}
+              />
               {fieldErrors.priority ? (
                 <span className="task-modal__error">{fieldErrors.priority}</span>
               ) : null}
-            </label>
+            </div>
 
             <label className="task-modal__field">
               <span className="task-modal__label">Due date</span>

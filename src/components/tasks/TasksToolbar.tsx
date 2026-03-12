@@ -1,4 +1,5 @@
 import searchIcon from "../../assets/icon-search.svg";
+import AppSelect, { type SelectOption } from "../shared/AppSelect";
 import type {
   PriorityFilter,
   SortOption,
@@ -16,6 +17,25 @@ interface TasksToolbarProps {
   onPriorityFilterChange: (value: PriorityFilter) => void;
   onStatusFilterChange: (value: StatusFilter) => void;
 }
+
+const SORT_OPTIONS: SelectOption<SortOption>[] = [
+  { value: "due-date", label: "Due date" },
+  { value: "priority", label: "Priority" },
+  { value: "created", label: "Created" },
+];
+
+const PRIORITY_FILTER_OPTIONS: SelectOption<PriorityFilter>[] = [
+  { value: "all", label: "All" },
+  { value: "high", label: "High" },
+  { value: "medium", label: "Medium" },
+  { value: "low", label: "Low" },
+];
+
+const STATUS_FILTER_OPTIONS: SelectOption<StatusFilter>[] = [
+  { value: "all", label: "All" },
+  { value: "active", label: "Active" },
+  { value: "completed", label: "Completed" },
+];
 
 function TasksToolbar({
   searchQuery,
@@ -44,43 +64,42 @@ function TasksToolbar({
       </div>
 
       <div className="tasks-page__select-group">
-        <span className="tasks-page__select-label">Sort</span>
-        <select
-          className="tasks-page__select"
+        <label className="tasks-page__select-label" htmlFor="tasks-sort-select">
+          Sort
+        </label>
+        <AppSelect
+          inputId="tasks-sort-select"
+          options={SORT_OPTIONS}
+          size="compact"
           value={sortBy}
-          onChange={(event) => onSortByChange(event.target.value as SortOption)}
-        >
-          <option value="due-date">Due date</option>
-          <option value="priority">Priority</option>
-          <option value="created">Created</option>
-        </select>
+          onChange={onSortByChange}
+        />
       </div>
 
       <div className="tasks-page__select-group">
-        <span className="tasks-page__select-label">Priority</span>
-        <select
-          className="tasks-page__select"
+        <label className="tasks-page__select-label" htmlFor="tasks-priority-select">
+          Priority
+        </label>
+        <AppSelect
+          inputId="tasks-priority-select"
+          options={PRIORITY_FILTER_OPTIONS}
+          size="compact"
           value={priorityFilter}
-          onChange={(event) => onPriorityFilterChange(event.target.value as PriorityFilter)}
-        >
-          <option value="all">All</option>
-          <option value="high">High</option>
-          <option value="medium">Medium</option>
-          <option value="low">Low</option>
-        </select>
+          onChange={onPriorityFilterChange}
+        />
       </div>
 
       <div className="tasks-page__select-group">
-        <span className="tasks-page__select-label">Status</span>
-        <select
-          className="tasks-page__select"
+        <label className="tasks-page__select-label" htmlFor="tasks-status-select">
+          Status
+        </label>
+        <AppSelect
+          inputId="tasks-status-select"
+          options={STATUS_FILTER_OPTIONS}
+          size="compact"
           value={statusFilter}
-          onChange={(event) => onStatusFilterChange(event.target.value as StatusFilter)}
-        >
-          <option value="all">All</option>
-          <option value="active">Active</option>
-          <option value="completed">Completed</option>
-        </select>
+          onChange={onStatusFilterChange}
+        />
       </div>
 
       <button type="button" className="tasks-page__new-task-btn" onClick={onCreateTaskClick}>

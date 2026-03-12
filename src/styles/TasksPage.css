@@ -117,7 +117,7 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  flex: 1;
+  flex: 1 1 140px;
   order: 2;
   min-width: 0;
 }
@@ -128,26 +128,122 @@
   white-space: nowrap;
 }
 
-.tasks-page__select {
+.tasks-page__select-group .app-select {
   flex: 1;
   min-width: 0;
-  padding: 0.5rem 1.6rem 0.5rem 0.6rem;
+}
+
+.app-select {
+  min-width: 0;
+}
+
+.app-select__control {
+  display: flex;
+  align-items: center;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: 12px;
   font-family: "Exo 2", sans-serif;
   font-size: 0.875rem;
   color: var(--text-color);
   background: white;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.4rem center;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
   cursor: pointer;
 }
 
-.tasks-page__select:focus {
-  outline: none;
-  border-color: #aaa;
+.app-select__control--is-focused {
+  border-color: #3a8ef6;
+  box-shadow: 0 0 0 3px rgba(58, 142, 246, 0.12);
+}
+
+.app-select__control--is-disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.app-select__value-container {
+  flex: 1;
+  min-width: 0;
+  padding: 0.75rem 0.85rem;
+}
+
+.app-select__single-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-select__indicators {
+  display: flex;
+  align-items: center;
+  padding-right: 0.5rem;
+}
+
+.app-select__indicator {
+  display: flex;
+  align-items: center;
+  color: #64748b;
+}
+
+.app-select__indicator svg {
+  display: block;
+}
+
+.app-select__indicator-separator {
+  width: 1px;
+  align-self: stretch;
+  margin: 0.4rem 0.3rem;
+  background: #e2e8f0;
+}
+
+.app-select__menu {
+  margin-top: 0.35rem;
+  width: max-content;
+  min-width: 100%;
+  max-width: min(280px, calc(100vw - 1.5rem));
+  overflow: hidden;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+}
+
+.app-select__menu-list {
+  padding: 0.35rem;
+  overflow-x: hidden;
+}
+
+.app-select__option {
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.app-select__option--is-focused {
+  background: #f1f6ff;
+}
+
+.app-select__option--is-selected {
+  background: #3a8ef6;
+  color: white;
+}
+
+.app-select--compact .app-select__control {
+  border-radius: 6px;
+}
+
+.app-select--compact .app-select__value-container {
+  padding: 0.5rem 0.6rem;
+}
+
+.app-select--compact .app-select__indicators {
+  padding-right: 0.25rem;
+}
+
+.app-select--compact .app-select__indicator-separator {
+  margin: 0.3rem 0.2rem;
 }
 
 .tasks-page__new-task-btn {
@@ -555,6 +651,10 @@
   border-color: #3a8ef6;
 }
 
+.task-modal__field .app-select__control {
+  min-height: 49px;
+}
+
 .task-modal__error,
 .task-modal__form-error {
   color: #c53030;
@@ -752,7 +852,7 @@
   }
 
   .tasks-page__select-group {
-    flex: none;
+    flex: 0 0 150px;
     order: 2;
   }
 
