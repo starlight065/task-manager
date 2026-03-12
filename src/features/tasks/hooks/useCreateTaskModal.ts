@@ -14,7 +14,6 @@ interface UseCreateTaskModalOptions {
 
 export function useCreateTaskModal({ onTaskCreated }: UseCreateTaskModalOptions) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
   const [formValues, setFormValues] = useState<CreateTaskDto>(EMPTY_TASK_FORM);
   const [fieldErrors, setFieldErrors] = useState<TaskFormErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -24,13 +23,12 @@ export function useCreateTaskModal({ onTaskCreated }: UseCreateTaskModalOptions)
     setFormValues(EMPTY_TASK_FORM);
     setFieldErrors({});
     setFormError(null);
-    setIsClosing(false);
     setIsOpen(true);
   }
 
   function close() {
     setIsOpen(false);
-    setIsClosing(false);
+    setFormValues(EMPTY_TASK_FORM);
     setFieldErrors({});
     setFormError(null);
   }
@@ -74,8 +72,7 @@ export function useCreateTaskModal({ onTaskCreated }: UseCreateTaskModalOptions)
       const createdTask = await createTask(trimmedValues);
 
       onTaskCreated(createdTask);
-      setFormValues(EMPTY_TASK_FORM);
-      setIsClosing(true);
+      close();
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Failed to create task");
     } finally {
@@ -85,7 +82,6 @@ export function useCreateTaskModal({ onTaskCreated }: UseCreateTaskModalOptions)
 
   return {
     isOpen,
-    isClosing,
     formValues,
     fieldErrors,
     formError,

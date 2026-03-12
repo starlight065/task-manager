@@ -1,30 +1,37 @@
-import { createPortal } from "react-dom";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 
 interface TaskErrorModalProps {
+  open: boolean;
   message: string;
   onClose: () => void;
 }
 
-function TaskErrorModal({ message, onClose }: TaskErrorModalProps) {
-  return createPortal(
-    <div className="task-error-modal" onClick={onClose}>
-      <div
-        className="task-error-modal__dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="task-error-modal-title"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <h2 id="task-error-modal-title" className="task-error-modal__title">
-          Could not update task
-        </h2>
-        <p className="task-error-modal__message">{message}</p>
-        <button type="button" className="task-error-modal__button" onClick={onClose}>
+function TaskErrorModal({ open, message, onClose }: TaskErrorModalProps) {
+  return (
+    <Dialog
+      aria-labelledby="task-error-modal-title"
+      fullWidth
+      maxWidth="xs"
+      open={open}
+      onClose={(_, __) => onClose()}
+    >
+      <DialogTitle id="task-error-modal-title">Could not update task</DialogTitle>
+      <DialogContent>
+        <DialogContentText>{message}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button type="button" variant="contained" onClick={onClose}>
           Close
-        </button>
-      </div>
-    </div>,
-    document.body,
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }
 

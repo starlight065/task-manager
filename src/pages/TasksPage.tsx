@@ -110,22 +110,22 @@ function TasksPage() {
         progressPct={filters.summary.progressPct}
       />
 
-      {createModal.isOpen ? (
-        <CreateTaskModal
-          formValues={createModal.formValues}
-          fieldErrors={createModal.fieldErrors}
-          formError={createModal.formError}
-          isSubmitting={createModal.isSubmitting}
-          isClosing={createModal.isClosing}
-          onCloseComplete={createModal.close}
-          onFieldChange={createModal.onFieldChange}
-          onSubmit={createModal.onSubmit}
-        />
-      ) : null}
+      <CreateTaskModal
+        isOpen={createModal.isOpen}
+        formValues={createModal.formValues}
+        fieldErrors={createModal.fieldErrors}
+        formError={createModal.formError}
+        isSubmitting={createModal.isSubmitting}
+        onClose={createModal.close}
+        onFieldChange={createModal.onFieldChange}
+        onSubmit={createModal.onSubmit}
+      />
 
-      {completionError ? (
-        <TaskErrorModal message={completionError} onClose={dismissCompletionError} />
-      ) : null}
+      <TaskErrorModal
+        open={completionError !== null}
+        message={completionError ?? ""}
+        onClose={dismissCompletionError}
+      />
     </div>
   );
 }

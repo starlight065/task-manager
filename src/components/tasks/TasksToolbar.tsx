@@ -1,5 +1,5 @@
+import { InputAdornment, MenuItem, TextField } from "@mui/material";
 import searchIcon from "../../assets/icon-search.svg";
-import AppSelect, { type SelectOption } from "../shared/AppSelect";
 import type {
   PriorityFilter,
   SortOption,
@@ -18,24 +18,24 @@ interface TasksToolbarProps {
   onStatusFilterChange: (value: StatusFilter) => void;
 }
 
-const SORT_OPTIONS: SelectOption<SortOption>[] = [
+const SORT_OPTIONS = [
   { value: "due-date", label: "Due date" },
   { value: "priority", label: "Priority" },
   { value: "created", label: "Created" },
-];
+] satisfies ReadonlyArray<{ label: string; value: SortOption }>;
 
-const PRIORITY_FILTER_OPTIONS: SelectOption<PriorityFilter>[] = [
+const PRIORITY_FILTER_OPTIONS = [
   { value: "all", label: "All" },
   { value: "high", label: "High" },
   { value: "medium", label: "Medium" },
   { value: "low", label: "Low" },
-];
+] satisfies ReadonlyArray<{ label: string; value: PriorityFilter }>;
 
-const STATUS_FILTER_OPTIONS: SelectOption<StatusFilter>[] = [
+const STATUS_FILTER_OPTIONS = [
   { value: "all", label: "All" },
   { value: "active", label: "Active" },
   { value: "completed", label: "Completed" },
-];
+] satisfies ReadonlyArray<{ label: string; value: StatusFilter }>;
 
 function TasksToolbar({
   searchQuery,
@@ -51,55 +51,80 @@ function TasksToolbar({
   return (
     <div className="tasks-page__toolbar">
       <div className="tasks-page__search-wrapper">
-        <input
-          type="text"
-          className="tasks-page__search"
-          placeholder="Search tasks..."
+        <TextField
+          fullWidth
+          id="tasks-search"
+          label="Search"
+          size="small"
           value={searchQuery}
           onChange={(event) => onSearchQueryChange(event.target.value)}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <img src={searchIcon} alt="" width="15" height="15" />
+                </InputAdornment>
+              ),
+            },
+          }}
         />
-        <span className="tasks-page__search-icon">
-          <img src={searchIcon} alt="" width="15" height="15" />
-        </span>
       </div>
 
       <div className="tasks-page__select-group tasks-page__select-group--sort">
-        <label className="tasks-page__select-label" htmlFor="tasks-sort-select">
-          Sort
-        </label>
-        <AppSelect
-          inputId="tasks-sort-select"
-          options={SORT_OPTIONS}
-          size="compact"
+        <TextField
+          className="tasks-page__select-control"
+          fullWidth
+          id="tasks-sort-select"
+          label="Sort"
+          select
+          size="small"
           value={sortBy}
-          onChange={onSortByChange}
-        />
+          onChange={(event) => onSortByChange(event.target.value as SortOption)}
+        >
+          {SORT_OPTIONS.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
       </div>
 
       <div className="tasks-page__select-group tasks-page__select-group--priority">
-        <label className="tasks-page__select-label" htmlFor="tasks-priority-select">
-          Priority
-        </label>
-        <AppSelect
-          inputId="tasks-priority-select"
-          options={PRIORITY_FILTER_OPTIONS}
-          size="compact"
+        <TextField
+          className="tasks-page__select-control"
+          fullWidth
+          id="tasks-priority-select"
+          label="Priority"
+          select
+          size="small"
           value={priorityFilter}
-          onChange={onPriorityFilterChange}
-        />
+          onChange={(event) => onPriorityFilterChange(event.target.value as PriorityFilter)}
+        >
+          {PRIORITY_FILTER_OPTIONS.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
       </div>
 
       <div className="tasks-page__select-group tasks-page__select-group--status">
-        <label className="tasks-page__select-label" htmlFor="tasks-status-select">
-          Status
-        </label>
-        <AppSelect
-          inputId="tasks-status-select"
-          options={STATUS_FILTER_OPTIONS}
-          size="compact"
+        <TextField
+          className="tasks-page__select-control"
+          fullWidth
+          id="tasks-status-select"
+          label="Status"
+          select
+          size="small"
           value={statusFilter}
-          onChange={onStatusFilterChange}
-        />
+          onChange={(event) => onStatusFilterChange(event.target.value as StatusFilter)}
+        >
+          {STATUS_FILTER_OPTIONS.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
       </div>
 
       <button type="button" className="tasks-page__new-task-btn" onClick={onCreateTaskClick}>
