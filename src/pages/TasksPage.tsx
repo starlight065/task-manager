@@ -5,10 +5,14 @@ import TasksColumnHeaders from "../components/tasks/TasksColumnHeaders";
 import TasksHeader from "../components/tasks/TasksHeader";
 import TasksProgress from "../components/tasks/TasksProgress";
 import TasksToolbar from "../components/tasks/TasksToolbar";
-import { useTasksPageState } from "../features/tasks/useTasksPageState";
+import { useCreateTaskModal } from "../features/tasks/hooks/useCreateTaskModal";
+import { useTaskFilters } from "../features/tasks/hooks/useTaskFilters";
+import { useTasksQuery } from "../features/tasks/hooks/useTasksQuery";
 
 function TasksPage() {
-  const { isLoading, error, summary, filters, createModal } = useTasksPageState();
+  const { tasks, isLoading, error, addTask } = useTasksQuery();
+  const filters = useTaskFilters(tasks);
+  const createModal = useCreateTaskModal({ onTaskCreated: addTask });
 
   if (isLoading) {
     return (
@@ -22,7 +26,11 @@ function TasksPage() {
 
   return (
     <div className="tasks-page">
-      <TasksHeader pending={summary.pending} done={summary.done} total={summary.total} />
+      <TasksHeader
+        pending={filters.summary.pending}
+        done={filters.summary.done}
+        total={filters.summary.total}
+      />
       <hr className="tasks-page__header-divider" />
 
       {error ? <div className="tasks-page__section-heading">{error}</div> : null}
@@ -51,9 +59,9 @@ function TasksPage() {
       ) : null}
 
       <TasksProgress
-        done={summary.done}
-        total={summary.total}
-        progressPct={summary.progressPct}
+        done={filters.summary.done}
+        total={filters.summary.total}
+        progressPct={filters.summary.progressPct}
       />
 
       {createModal.isOpen ? (

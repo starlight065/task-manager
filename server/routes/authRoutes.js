@@ -1,14 +1,15 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const { UniqueConstraintError } = require("sequelize");
-const { AUTH_ERRORS } = require("../constants/messages");
-const User = require("../models/User");
-const Task = require("../models/Task");
 const {
+  createUser,
+  findUserByEmail,
+} = require("../repositories/userRepository");
+const {
+  AUTH_MESSAGES,
   getCredentialsFromRequest,
   hasValidCredentials,
-} = require("../utils/authValidation");
-const { serializeTask } = require("../utils/serializeTask");
+} = require("../validators/authValidator");
 const { serializeUser } = require("../utils/serializeUser");
 const {
   clearSessionCookie,
@@ -23,26 +24,26 @@ router.post("/register", async (req, res) => {
   const { email, password } = getCredentialsFromRequest(req);
 
   if (!email || !password) {
-    return res.status(400).json({ error: AUTH_ERRORS.MISSING_FIELDS });
+    return res.status(400).json({ error: AUTH_MESSAGES.missingFields });
   }
 
   if (!hasValidCredentials(email, password)) {
-    return res.status(400).json({ error: AUTH_ERRORS.INVALID_FORMAT });
+    return res.status(400).json({ error: AUTH_MESSAGES.invalidFormat });
   }
 
   try {
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await User.create({ email, password_hash: passwordHash });
+    const user = await createUser({ email, passwordHash });
     signInUser(req, user);
 
     return res.status(201).json({ success: true, user: serializeUser(user) });
   } catch (err) {
     if (err instanceof UniqueConstraintError) {
-      return res.status(409).json({ error: AUTH_ERRORS.EMAIL_ALREADY_EXISTS });
+      return res.status(409).json({ error: AUTH_MESSAGES.emailAlreadyExists });
     }
 
     console.error(err);
-    return res.status(500).json({ error: AUTH_ERRORS.SERVER_ERROR });
+    return res.status(500).json({ error: AUTH_MESSAGES.serverError });
   }
 });
 
@@ -50,22 +51,22 @@ router.post("/login", async (req, res) => {
   const { email, password } = getCredentialsFromRequest(req);
 
   if (!email || !password) {
-    return res.status(400).json({ error: AUTH_ERRORS.MISSING_FIELDS });
+    return res.status(400).json({ error: AUTH_MESSAGES.missingFields });
   }
 
   if (!hasValidCredentials(email, password)) {
-    return res.status(400).json({ error: AUTH_ERRORS.INVALID_FORMAT });
+    return res.status(400).json({ error: AUTH_MESSAGES.invalidFormat });
   }
 
   try {
-    const user = await User.findOne({ where: { email } });
+    const user = await findUserByEmail(email);
     if (!user) {
-      return res.status(401).json({ error: AUTH_ERRORS.INVALID_CREDENTIALS });
+      return res.status(401).json({ error: AUTH_MESSAGES.invalidCredentials });
     }
 
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) {
-      return res.status(401).json({ error: AUTH_ERRORS.INVALID_CREDENTIALS });
+      return res.status(401).json({ error: AUTH_MESSAGES.invalidCredentials });
     }
 
     signInUser(req, user);
@@ -73,84 +74,7 @@ router.post("/login", async (req, res) => {
     return res.json({ success: true, user: serializeUser(user) });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: AUTH_ERRORS.SERVER_ERROR });
-  }
-});
-
-router.get("/tasks", async (req, res) => {
-  try {
-    const user = await getAuthenticatedUser(req);
-    if (!user) {
-      return res.status(401).json({ error: AUTH_ERRORS.UNAUTHORIZED });
-    }
-
-    const tasks = await Task.findAll({
-      where: { user_id: user.id },
-      order: [
-        ["completed", "ASC"],
-        ["due_date", "ASC"],
-        ["id", "ASC"],
-      ],
-    });
-
-    return res.json({ tasks: tasks.map(serializeTask) });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: AUTH_ERRORS.SERVER_ERROR });
-  }
-});
-
-router.post("/tasks", async (req, res) => {
-  try {
-    const user = await getAuthenticatedUser(req);
-    if (!user) {
-      return res.status(401).json({ error: AUTH_ERRORS.UNAUTHORIZED });
-    }
-
-    const { title, description, priority, dueDate, tag } = req.body ?? {};
-    const trimmedTitle = typeof title === "string" ? title.trim() : "";
-    const trimmedDescription = typeof description === "string" ? description.trim() : "";
-    const trimmedTag = typeof tag === "string" ? tag.trim() : "";
-    const allowedPriorities = ["high", "medium", "low"];
-    const today = new Date().toISOString().slice(0, 10);
-    const hasValidDueDateFormat =
-      typeof dueDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dueDate);
-
-    if (
-      !trimmedTitle ||
-      !trimmedDescription ||
-      !trimmedTag ||
-      typeof dueDate !== "string" ||
-      !dueDate
-    ) {
-      return res.status(400).json({ error: "All task fields are required" });
-    }
-
-    if (!allowedPriorities.includes(priority)) {
-      return res.status(400).json({ error: "Priority must be high, medium, or low" });
-    }
-
-    if (!hasValidDueDateFormat) {
-      return res.status(400).json({ error: "Due date must use YYYY-MM-DD format" });
-    }
-
-    if (dueDate < today) {
-      return res.status(400).json({ error: "Due date cannot be in the past" });
-    }
-
-    const task = await Task.create({
-      user_id: user.id,
-      title: trimmedTitle,
-      description: trimmedDescription,
-      priority,
-      due_date: dueDate,
-      tag: trimmedTag,
-    });
-
-    return res.status(201).json({ task: serializeTask(task) });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: AUTH_ERRORS.SERVER_ERROR });
+    return res.status(500).json({ error: AUTH_MESSAGES.serverError });
   }
 });
 
@@ -158,13 +82,13 @@ router.get("/me", async (req, res) => {
   try {
     const user = await getAuthenticatedUser(req);
     if (!user) {
-      return res.status(401).json({ error: AUTH_ERRORS.UNAUTHORIZED });
+      return res.status(401).json({ error: AUTH_MESSAGES.unauthorized });
     }
 
     return res.json({ user: serializeUser(user) });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: AUTH_ERRORS.SERVER_ERROR });
+    return res.status(500).json({ error: AUTH_MESSAGES.serverError });
   }
 });
 
@@ -175,7 +99,7 @@ router.post("/logout", async (req, res) => {
     return res.json({ success: true });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: AUTH_ERRORS.SERVER_ERROR });
+    return res.status(500).json({ error: AUTH_MESSAGES.serverError });
   }
 });
 

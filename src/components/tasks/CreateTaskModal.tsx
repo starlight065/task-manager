@@ -1,16 +1,16 @@
 import closeIcon from "../../assets/icon-close.svg";
 import { useState, type ChangeEvent, type MouseEvent, type SubmitEvent } from "react";
-import type { CreateTaskPayload } from "../../types";
+import type { CreateTaskDto } from "../../shared/types";
 import type { TaskFormErrors } from "../../features/tasks/taskForm";
 
 interface CreateTaskModalProps {
-  formValues: CreateTaskPayload;
+  formValues: CreateTaskDto;
   fieldErrors: TaskFormErrors;
   formError: string | null;
   isSubmitting: boolean;
   isClosing: boolean;
   onCloseComplete: () => void;
-  onFieldChange: (field: keyof CreateTaskPayload, value: string) => void;
+  onFieldChange: (field: keyof CreateTaskDto, value: string) => void;
   onSubmit: (event: SubmitEvent<HTMLFormElement>) => void;
 }
 
@@ -45,7 +45,7 @@ function CreateTaskModal({
     }
   }
 
-  function handleChange(field: keyof CreateTaskPayload) {
+  function handleChange(field: keyof CreateTaskDto) {
     return (
       event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
     ) => {

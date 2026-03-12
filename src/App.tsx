@@ -1,28 +1,24 @@
-import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import "./styles/App.css";
 import calendarIcon from "./assets/calendar.svg";
-import fileIcon from "./assets/file-icon.svg";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import TasksPage from "./pages/TasksPage";
-import { getCurrentUser } from "./api/auth";
-
-type AuthStatus = "loading" | "authenticated" | "unauthenticated";
+import { useAuth } from "./features/auth/AuthProvider";
 
 function ProtectedRoute({
   children,
-  authStatus,
 }: {
   children: React.ReactNode;
-  authStatus: AuthStatus;
 }) {
-  if (authStatus === "loading") {
+  const { status } = useAuth();
+
+  if (status === "loading") {
     return null;
   }
 
-  if (authStatus === "unauthenticated") {
+  if (status === "unauthenticated") {
     return <Navigate to="/login" replace />;
   }
 
@@ -31,16 +27,16 @@ function ProtectedRoute({
 
 function PublicRoute({
   children,
-  authStatus,
 }: {
   children: React.ReactNode;
-  authStatus: AuthStatus;
 }) {
-  if (authStatus === "loading") {
+  const { status } = useAuth();
+
+  if (status === "loading") {
     return null;
   }
 
-  if (authStatus === "authenticated") {
+  if (status === "authenticated") {
     return <Navigate to="/tasks" replace />;
   }
 
@@ -115,12 +111,11 @@ function HomePage() {
               </div>
             </div>
             <div className="features__item">
-              <h3 className="features__title">File Attachments</h3>
+              <h3 className="features__title">Progress Tracking</h3>
               <p>
-                Attach files to your tasks to keep all relevant information in
-                one place.
+                Stay on top of momentum with active and completed task sections
+                plus a clear progress summary.
               </p>
-              <img src={fileIcon} alt="File" className="features__icon" />
             </div>
             <div className="features__item">
               <h3 className="features__title">Secure Authentication</h3>
@@ -160,53 +155,29 @@ function HomePage() {
 }
 
 function App() {
-  const [authStatus, setAuthStatus] = useState<AuthStatus>("loading");
-
-  useEffect(() => {
-    let isMounted = true;
-
-    // Re-check the server session on reload so auth survives closing the tab.
-    void (async () => {
-      try {
-        const user = await getCurrentUser();
-        if (isMounted) {
-          setAuthStatus(user ? "authenticated" : "unauthenticated");
-        }
-      } catch {
-        if (isMounted) {
-          setAuthStatus("unauthenticated");
-        }
-      }
-    })();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route
         path="/login"
         element={
-          <PublicRoute authStatus={authStatus}>
-            <LoginPage onAuthenticated={() => setAuthStatus("authenticated")} />
+          <PublicRoute>
+            <LoginPage />
           </PublicRoute>
         }
       />
       <Route
         path="/signup"
         element={
-          <PublicRoute authStatus={authStatus}>
-            <SignupPage onAuthenticated={() => setAuthStatus("authenticated")} />
+          <PublicRoute>
+            <SignupPage />
           </PublicRoute>
         }
       />
       <Route
         path="/tasks"
         element={
-          <ProtectedRoute authStatus={authStatus}>
+          <ProtectedRoute>
             <TasksPage />
           </ProtectedRoute>
         }

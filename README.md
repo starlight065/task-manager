@@ -1,9 +1,23 @@
-# API Endpoints
+# Task Manager
 
-All endpoints are prefixed with `/api`. Authentication is managed via HTTP-only session cookies.
-Session data is persisted in the MySQL database through Sequelize. The server uses `express-session` for session management and `connect-session-sequelize` to store sessions in the database.
+Task Manager is a React + TypeScript frontend backed by an Express + Sequelize API. Authentication uses HTTP-only session cookies, and task data is stored per user in MySQL.
 
-The server reads its database configuration from the root `.env` file:
+## Project Structure
+
+- `src/features/auth`: auth UI, provider, validation helpers, and auth API calls
+- `src/features/tasks`: task hooks, task API calls, and task form/filter logic
+- `src/shared/api`: shared `fetch` wrapper with credentials, error parsing, and 401 handling
+- `src/shared/types`: API-facing DTO types used by the client
+- `server/routes`: Express route handlers split by domain
+- `server/repositories`: Sequelize data access helpers
+- `server/services`: session helpers
+- `server/validators`: auth and task request validation helpers
+- `shared/auth.json`: shared auth rules and auth-facing messages used by both client and server
+
+## Environment
+
+The server reads these values from the root `.env` file:
+
 - `DB_HOST`
 - `DB_PORT`
 - `DB_NAME`
@@ -12,141 +26,110 @@ The server reads its database configuration from the root `.env` file:
 - `SESSION_SECRET`
 - `SERVER_PORT`
 
----
+## Running Locally
+
+Install dependencies in both packages:
+
+```bash
+npm install
+cd server
+npm install
+```
+
+Start the frontend from the repository root:
+
+```bash
+npm run dev
+```
+
+Start the backend from `server/`:
+
+```bash
+npm run dev
+```
+
+## Shared Auth Rules
+
+Both the client and server read auth rules from `shared/auth.json`.
+
+- Email must match the shared email pattern
+- Password must be at least 14 characters
+- Password must include at least 1 special character
+
+## API
+
+All endpoints are prefixed with `/api`.
 
 ### `POST /api/register`
 
-Register a new user.
+Request body:
 
-**Request body:**
 ```json
 { "email": "user@example.com", "password": "yourPassword123!" }
 ```
 
-**Responses:**
-| Status | Description |
-|--------|-------------|
-| `201`  | User created, session started. Returns `{ success: true, user }` |
-| `400`  | Missing fields or invalid email/password format |
-| `409`  | Email already in use |
-| `500`  | Server error |
+Responses:
 
----
+- `201`: `{ success: true, user }`
+- `400`: missing fields or invalid email/password format
+- `409`: email already registered
+- `500`: server error
 
 ### `POST /api/login`
 
-Login with existing credentials.
+Request body:
 
-**Request body:**
 ```json
 { "email": "user@example.com", "password": "yourPassword123!" }
 ```
 
-**Responses:**
-| Status | Description |
-|--------|-------------|
-| `200`  | Login successful. Returns `{ success: true, user }` |
-| `400`  | Missing fields or invalid email/password format |
-| `401`  | Invalid credentials |
-| `500`  | Server error |
+Responses:
 
----
+- `200`: `{ success: true, user }`
+- `400`: missing fields or invalid email/password format
+- `401`: invalid credentials
+- `500`: server error
 
 ### `GET /api/me`
 
-Get the currently authenticated user.
+Responses:
 
-**Responses:**
-| Status | Description |
-|--------|-------------|
-| `200`  | Returns `{ user }` |
-| `401`  | Not authenticated |
-| `500`  | Server error |
-
----
+- `200`: `{ user }`
+- `401`: unauthenticated
+- `500`: server error
 
 ### `POST /api/logout`
 
-Destroy the current session.
+Responses:
 
-**Responses:**
-| Status | Description |
-|--------|-------------|
-| `200`  | Returns `{ success: true }` |
-| `500`  | Server error |
+- `200`: `{ success: true }`
+- `500`: server error
 
----
+### `GET /api/tasks`
 
-# React + TypeScript + Vite
+Responses:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- `200`: `{ tasks }`
+- `401`: unauthenticated
+- `500`: server error
 
-Currently, two official plugins are available:
+### `POST /api/tasks`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Request body:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```json
+{
+  "title": "Draft roadmap",
+  "description": "Prepare Q2 planning notes",
+  "priority": "high",
+  "dueDate": "2026-03-20",
+  "tag": "planning"
+}
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Responses:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- `201`: `{ task }`
+- `400`: invalid task payload
+- `401`: unauthenticated
+- `500`: server error

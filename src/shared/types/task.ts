@@ -1,6 +1,6 @@
 export type Priority = "high" | "medium" | "low";
 
-export interface Task {
+export interface TaskDto {
   id: number;
   title: string;
   description: string;
@@ -11,7 +11,7 @@ export interface Task {
   completed: boolean;
 }
 
-export interface CreateTaskPayload {
+export interface CreateTaskDto {
   title: string;
   description: string;
   priority: Priority;

@@ -1,9 +1,9 @@
-import type { Task } from "../../types/Task";
+import type { TaskDto } from "../../shared/types";
 import TaskCard from "./TaskCard";
 
 interface TaskListSectionProps {
   title: string;
-  tasks: Task[];
+  tasks: TaskDto[];
 }
 
 function TaskListSection({ title, tasks }: TaskListSectionProps) {

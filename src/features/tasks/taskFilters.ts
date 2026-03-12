@@ -1,4 +1,4 @@
-import type { Priority, Task } from "../../types/Task";
+import type { Priority, TaskDto } from "../../shared/types";
 
 export type SortOption = "due-date" | "priority" | "created";
 export type StatusFilter = "all" | "active" | "completed";
@@ -15,7 +15,7 @@ function getDateValue(value: string): number {
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
-function matchesSearch(task: Task, query: string): boolean {
+function matchesSearch(task: TaskDto, query: string): boolean {
   const normalizedQuery = query.trim().toLowerCase();
 
   if (!normalizedQuery) {
@@ -27,7 +27,7 @@ function matchesSearch(task: Task, query: string): boolean {
   );
 }
 
-function matchesStatus(task: Task, statusFilter: StatusFilter): boolean {
+function matchesStatus(task: TaskDto, statusFilter: StatusFilter): boolean {
   if (statusFilter === "active") {
     return !task.completed;
   }
@@ -39,17 +39,17 @@ function matchesStatus(task: Task, statusFilter: StatusFilter): boolean {
   return true;
 }
 
-function matchesPriority(task: Task, priorityFilter: PriorityFilter): boolean {
+function matchesPriority(task: TaskDto, priorityFilter: PriorityFilter): boolean {
   return priorityFilter === "all" || task.priority === priorityFilter;
 }
 
 export function getFilteredTasks(
-  tasks: Task[],
+  tasks: TaskDto[],
   searchQuery: string,
   statusFilter: StatusFilter,
   priorityFilter: PriorityFilter,
   sortBy: SortOption,
-): Task[] {
+): TaskDto[] {
   return sortTasks(
     tasks.filter(
       (task) =>
@@ -61,7 +61,7 @@ export function getFilteredTasks(
   );
 }
 
-function sortTasks(tasks: Task[], sortBy: SortOption): Task[] {
+function sortTasks(tasks: TaskDto[], sortBy: SortOption): TaskDto[] {
   const sortedTasks = [...tasks];
 
   sortedTasks.sort((left, right) => {

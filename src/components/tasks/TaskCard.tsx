@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import type { Task } from "../../types/Task";
+import type { TaskDto } from "../../shared/types";
 import editIcon from "../../assets/icon-edit.svg";
 import trashIcon from "../../assets/icon-trash.svg";
 
@@ -20,7 +20,7 @@ function dueDateClass(dateStr: string): string {
 }
 
 interface TaskCardProps {
-  task: Task;
+  task: TaskDto;
 }
 
 function TaskCard({ task }: TaskCardProps) {

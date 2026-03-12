@@ -7,10 +7,15 @@ interface TasksHeaderProps {
 }
 
 function TasksHeader({ pending, done, total }: TasksHeaderProps) {
+  const currentMonth = new Intl.DateTimeFormat(undefined, {
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
+
   return (
     <div className="tasks-page__header">
       <h1 className="tasks-page__title">
-        Task manager <span>• March 2026</span>
+        Task manager <span>• {currentMonth}</span>
       </h1>
       <div className="tasks-page__stats">
         <div className="tasks-page__stat">

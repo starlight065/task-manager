@@ -1,5 +1,5 @@
 const { sessionCookieConfig } = require("../config/session");
-const User = require("../models/User");
+const { findUserById } = require("../repositories/userRepository");
 
 function destroySession(req) {
   return new Promise((resolve, reject) => {
@@ -32,7 +32,7 @@ async function getAuthenticatedUser(req) {
     return null;
   }
 
-  return User.findByPk(userId);
+  return findUserById(userId);
 }
 
 function clearSessionCookie(res) {
