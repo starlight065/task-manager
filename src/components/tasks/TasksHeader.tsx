@@ -7,7 +7,7 @@ interface TasksHeaderProps {
 }
 
 function TasksHeader({ pending, done, total }: TasksHeaderProps) {
-  const currentMonth = new Intl.DateTimeFormat(undefined, {
+  const currentMonth = new Intl.DateTimeFormat("en-US", {
     month: "long",
     year: "numeric",
   }).format(new Date());

@@ -223,6 +223,16 @@
   border-radius: 10px;
   padding: 0.75rem 0.85rem;
   margin-bottom: 0.55rem;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.task-card--updating {
+  background: #f0f0f0;
+  border-color: #d5d5d5;
+  opacity: 0.85;
 }
 
 .task-card__checkbox {
@@ -347,6 +357,15 @@
 
 .task-card__action:hover img {
   opacity: 0.7;
+}
+
+.task-card__action:disabled,
+.task-card__checkbox:disabled {
+  cursor: not-allowed;
+}
+
+.task-card__action:disabled img {
+  opacity: 0.2;
 }
 
 /* ── Progress Footer ── */
@@ -607,6 +626,52 @@
     opacity: 0;
     transform: scale(0.97);
   }
+}
+
+.task-error-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.task-error-modal__dialog {
+  width: min(100%, 360px);
+  margin: 1rem;
+  padding: 1.5rem;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+}
+
+.task-error-modal__title {
+  margin: 0 0 0.65rem;
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+.task-error-modal__message {
+  margin: 0 0 1rem;
+  color: var(--light-text);
+  line-height: 1.45;
+}
+
+.task-error-modal__button {
+  min-width: 96px;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary-color);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.task-error-modal__button:hover {
+  background: var(--primary-hover);
 }
 
 @media (prefers-reduced-motion: reduce) {

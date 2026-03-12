@@ -2,6 +2,7 @@ import "../styles/TasksPage.css";
 import CreateTaskModal from "../components/tasks/CreateTaskModal";
 import TaskListSection from "../components/tasks/TaskListSection";
 import TasksColumnHeaders from "../components/tasks/TasksColumnHeaders";
+import TaskErrorModal from "../components/tasks/TaskErrorModal";
 import TasksHeader from "../components/tasks/TasksHeader";
 import TasksProgress from "../components/tasks/TasksProgress";
 import TasksToolbar from "../components/tasks/TasksToolbar";
@@ -10,7 +11,16 @@ import { useTaskFilters } from "../features/tasks/hooks/useTaskFilters";
 import { useTasksQuery } from "../features/tasks/hooks/useTasksQuery";
 
 function TasksPage() {
-  const { tasks, isLoading, error, addTask, toggleTaskCompletion } = useTasksQuery();
+  const {
+    tasks,
+    isLoading,
+    error,
+    completionError,
+    pendingTaskIds,
+    addTask,
+    toggleTaskCompletion,
+    dismissCompletionError,
+  } = useTasksQuery();
   const filters = useTaskFilters(tasks);
   const createModal = useCreateTaskModal({ onTaskCreated: addTask });
 
@@ -52,11 +62,13 @@ function TasksPage() {
       <TaskListSection
         title="Active"
         tasks={filters.activeTasks}
+        pendingTaskIds={pendingTaskIds}
         onTaskCompletionChange={toggleTaskCompletion}
       />
       <TaskListSection
         title="Completed"
         tasks={filters.completedTasks}
+        pendingTaskIds={pendingTaskIds}
         onTaskCompletionChange={toggleTaskCompletion}
       />
 
@@ -83,6 +95,10 @@ function TasksPage() {
           onFieldChange={createModal.onFieldChange}
           onSubmit={createModal.onSubmit}
         />
+      ) : null}
+
+      {completionError ? (
+        <TaskErrorModal message={completionError} onClose={dismissCompletionError} />
       ) : null}
     </div>
   );

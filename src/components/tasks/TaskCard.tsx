@@ -21,16 +21,22 @@ function dueDateClass(dateStr: string): string {
 
 interface TaskCardProps {
   task: TaskDto;
+  isUpdating: boolean;
   onCompletionChange: (taskId: number, completed: boolean) => void;
 }
 
-function TaskCard({ task, onCompletionChange }: TaskCardProps) {
+function TaskCard({ task, isUpdating, onCompletionChange }: TaskCardProps) {
   return (
-    <div className="task-card">
+    <div
+      className={classNames("task-card", {
+        "task-card--updating": isUpdating,
+      })}
+    >
       <input
         type="checkbox"
         className="task-card__checkbox"
         checked={task.completed}
+        disabled={isUpdating}
         onChange={(event) => {
           onCompletionChange(task.id, event.target.checked);
         }}
@@ -47,10 +53,10 @@ function TaskCard({ task, onCompletionChange }: TaskCardProps) {
         <div className="task-card__description">{task.description}</div>
       </div>
       <div className="task-card__actions">
-        <button className="task-card__action" aria-label="Edit task">
+        <button className="task-card__action" aria-label="Edit task" disabled={isUpdating}>
           <img src={editIcon} alt="" width="16" height="16" />
         </button>
-        <button className="task-card__action" aria-label="Delete task">
+        <button className="task-card__action" aria-label="Delete task" disabled={isUpdating}>
           <img src={trashIcon} alt="" width="16" height="16" />
         </button>
       </div>

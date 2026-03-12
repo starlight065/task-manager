@@ -4,12 +4,14 @@ import TaskCard from "./TaskCard";
 interface TaskListSectionProps {
   title: string;
   tasks: TaskDto[];
+  pendingTaskIds: number[];
   onTaskCompletionChange: (taskId: number, completed: boolean) => void;
 }
 
 function TaskListSection({
   title,
   tasks,
+  pendingTaskIds,
   onTaskCompletionChange,
 }: TaskListSectionProps) {
   return (
@@ -21,6 +23,7 @@ function TaskListSection({
         <TaskCard
           key={task.id}
           task={task}
+          isUpdating={pendingTaskIds.includes(task.id)}
           onCompletionChange={onTaskCompletionChange}
         />
       ))}

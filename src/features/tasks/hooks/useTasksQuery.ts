@@ -6,6 +6,8 @@ export function useTasksQuery() {
   const [tasks, setTasks] = useState<TaskDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [completionError, setCompletionError] = useState<string | null>(null);
+  const [pendingTaskIds, setPendingTaskIds] = useState<number[]>([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -43,15 +45,49 @@ export function useTasksQuery() {
   }
 
   async function toggleTaskCompletion(taskId: number, completed: boolean) {
+    const previousTask = tasks.find((task) => task.id === taskId);
+
+    if (!previousTask) {
+      return;
+    }
+
+    setTasks((currentTasks) =>
+      currentTasks.map((task) => (task.id === taskId ? { ...task, completed } : task)),
+    );
+    setPendingTaskIds((currentTaskIds) =>
+      currentTaskIds.includes(taskId) ? currentTaskIds : [...currentTaskIds, taskId],
+    );
+
     try {
       const updatedTask = await updateTaskCompletion(taskId, { completed });
 
       setTasks((currentTasks) =>
-        currentTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)),
+        currentTasks.map((task) => {
+          if (task.id !== updatedTask.id) {
+            return task;
+          }
+
+          return updatedTask;
+        }),
       );
-      setError(null);
+      setCompletionError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update task");
+      setTasks((currentTasks) =>
+        currentTasks.map((task) => {
+          if (task.id !== previousTask.id) {
+            return task;
+          }
+
+          return previousTask;
+        }),
+      );
+      setCompletionError(err instanceof Error ? err.message : "Failed to update task");
+    } finally {
+      setPendingTaskIds((currentTaskIds) =>
+        currentTaskIds.filter((currentTaskId) => {
+          return currentTaskId !== taskId;
+        }),
+      );
     }
   }
 
@@ -59,7 +95,10 @@ export function useTasksQuery() {
     tasks,
     isLoading,
     error,
+    completionError,
+    pendingTaskIds,
     addTask,
     toggleTaskCompletion,
+    dismissCompletionError: () => setCompletionError(null),
   };
 }
