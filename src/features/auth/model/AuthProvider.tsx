@@ -1,31 +1,18 @@
 import {
-  createContext,
-  useContext,
   useEffect,
   useState,
   type ReactNode,
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import type { AuthCredentials, AuthUserDto } from "../../shared/types";
-import { setUnauthorizedHandler } from "../../shared/api/apiClient";
+import type { AuthCredentials, AuthUserDto } from "../../../shared/types";
+import { setUnauthorizedHandler } from "../../../shared/api/apiClient";
 import {
   getCurrentUser,
   login as loginRequest,
   logout as logoutRequest,
   register as registerRequest,
-} from "./api/authApi";
-
-export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
-
-interface AuthContextValue {
-  status: AuthStatus;
-  user: AuthUserDto | null;
-  login: (credentials: AuthCredentials) => Promise<void>;
-  register: (credentials: AuthCredentials) => Promise<void>;
-  logout: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextValue | null>(null);
+} from "../api/authApi";
+import { AuthContext, type AuthStatus } from "./AuthContext";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -113,14 +100,4 @@ export function AuthProvider({ children }: AuthProviderProps) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-
-  return context;
 }

@@ -1,7 +1,7 @@
 import classNames from "classnames";
-import type { TaskDto } from "../../shared/types";
-import editIcon from "../../assets/icon-edit.svg";
-import trashIcon from "../../assets/icon-trash.svg";
+import type { TaskDto } from "../../../shared/types";
+import editIcon from "../../../assets/icon-edit.svg";
+import trashIcon from "../../../assets/icon-trash.svg";
 
 function dueDateClass(dateStr: string): string {
   const date = new Date(dateStr);

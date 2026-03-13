@@ -1,4 +1,4 @@
-import type { Priority, TaskDto } from "../../shared/types";
+import type { Priority, TaskDto } from "../../../shared/types";
 
 export type SortOption = "due-date" | "priority" | "created";
 export type StatusFilter = "all" | "active" | "completed";

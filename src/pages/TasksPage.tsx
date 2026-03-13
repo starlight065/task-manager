@@ -1,30 +1,17 @@
 import "../styles/TasksPage.css";
-import CreateTaskModal from "../components/tasks/CreateTaskModal";
-import TaskListSection from "../components/tasks/TaskListSection";
-import TasksColumnHeaders from "../components/tasks/TasksColumnHeaders";
-import TaskErrorModal from "../components/tasks/TaskErrorModal";
-import TasksHeader from "../components/tasks/TasksHeader";
-import TasksProgress from "../components/tasks/TasksProgress";
-import TasksToolbar from "../components/tasks/TasksToolbar";
-import { useCreateTaskModal } from "../features/tasks/hooks/useCreateTaskModal";
-import { useTaskFilters } from "../features/tasks/hooks/useTaskFilters";
-import { useTasksQuery } from "../features/tasks/hooks/useTasksQuery";
+import CreateTaskModal from "../features/tasks/components/CreateTaskModal";
+import TaskErrorModal from "../features/tasks/components/TaskErrorModal";
+import TaskListSection from "../features/tasks/components/TaskListSection";
+import TasksColumnHeaders from "../features/tasks/components/TasksColumnHeaders";
+import TasksHeader from "../features/tasks/components/TasksHeader";
+import TasksProgress from "../features/tasks/components/TasksProgress";
+import TasksToolbar from "../features/tasks/components/TasksToolbar";
+import { useTasksPageModel } from "../features/tasks/model/useTasksPageModel";
 
 function TasksPage() {
-  const {
-    tasks,
-    isLoading,
-    error,
-    completionError,
-    pendingTaskIds,
-    addTask,
-    toggleTaskCompletion,
-    dismissCompletionError,
-  } = useTasksQuery();
-  const filters = useTaskFilters(tasks);
-  const createModal = useCreateTaskModal({ onTaskCreated: addTask });
+  const model = useTasksPageModel();
 
-  if (isLoading) {
+  if (model.isLoading) {
     return (
       <div className="tasks-page">
         <TasksHeader pending={0} done={0} total={0} />
@@ -63,68 +50,68 @@ function TasksPage() {
   return (
     <div className="tasks-page">
       <TasksHeader
-        pending={filters.summary.pending}
-        done={filters.summary.done}
-        total={filters.summary.total}
+        pending={model.summary.pending}
+        done={model.summary.done}
+        total={model.summary.total}
       />
       <hr className="tasks-page__header-divider" />
 
-      {error ? <div className="tasks-page__section-heading">{error}</div> : null}
+      {model.error ? <div className="tasks-page__section-heading">{model.error}</div> : null}
 
       <TasksToolbar
-        searchQuery={filters.searchQuery}
-        sortBy={filters.sortBy}
-        priorityFilter={filters.priorityFilter}
-        statusFilter={filters.statusFilter}
-        onCreateTaskClick={createModal.open}
-        onSearchQueryChange={filters.setSearchQuery}
-        onSortByChange={filters.setSortBy}
-        onPriorityFilterChange={filters.setPriorityFilter}
-        onStatusFilterChange={filters.setStatusFilter}
+        searchQuery={model.toolbar.searchQuery}
+        sortBy={model.toolbar.sortBy}
+        priorityFilter={model.toolbar.priorityFilter}
+        statusFilter={model.toolbar.statusFilter}
+        onCreateTaskClick={model.toolbar.openCreateTaskModal}
+        onSearchQueryChange={model.toolbar.setSearchQuery}
+        onSortByChange={model.toolbar.setSortBy}
+        onPriorityFilterChange={model.toolbar.setPriorityFilter}
+        onStatusFilterChange={model.toolbar.setStatusFilter}
       />
 
       <TasksColumnHeaders />
 
       <TaskListSection
         title="Active"
-        tasks={filters.activeTasks}
-        pendingTaskIds={pendingTaskIds}
-        onTaskCompletionChange={toggleTaskCompletion}
+        tasks={model.taskLists.activeTasks}
+        pendingTaskIds={model.taskLists.pendingTaskIds}
+        onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
       />
       <TaskListSection
         title="Completed"
-        tasks={filters.completedTasks}
-        pendingTaskIds={pendingTaskIds}
-        onTaskCompletionChange={toggleTaskCompletion}
+        tasks={model.taskLists.completedTasks}
+        pendingTaskIds={model.taskLists.pendingTaskIds}
+        onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
       />
 
-      {filters.visibleCount === 0 ? (
+      {model.taskLists.visibleCount === 0 ? (
         <div className="tasks-page__empty-state">
           No tasks match your current search and filters.
         </div>
       ) : null}
 
       <TasksProgress
-        done={filters.summary.done}
-        total={filters.summary.total}
-        progressPct={filters.summary.progressPct}
+        done={model.summary.done}
+        total={model.summary.total}
+        progressPct={model.summary.progressPct}
       />
 
       <CreateTaskModal
-        isOpen={createModal.isOpen}
-        formValues={createModal.formValues}
-        fieldErrors={createModal.fieldErrors}
-        formError={createModal.formError}
-        isSubmitting={createModal.isSubmitting}
-        onClose={createModal.close}
-        onFieldChange={createModal.onFieldChange}
-        onSubmit={createModal.onSubmit}
+        isOpen={model.createTaskModal.isOpen}
+        formValues={model.createTaskModal.formValues}
+        fieldErrors={model.createTaskModal.fieldErrors}
+        formError={model.createTaskModal.formError}
+        isSubmitting={model.createTaskModal.isSubmitting}
+        onClose={model.createTaskModal.close}
+        onFieldChange={model.createTaskModal.onFieldChange}
+        onSubmit={model.createTaskModal.onSubmit}
       />
 
       <TaskErrorModal
-        open={completionError !== null}
-        message={completionError ?? ""}
-        onClose={dismissCompletionError}
+        open={model.completionError !== null}
+        message={model.completionError ?? ""}
+        onClose={model.dismissCompletionError}
       />
     </div>
   );

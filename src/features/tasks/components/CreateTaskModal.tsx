@@ -10,10 +10,10 @@ import {
   MenuItem,
   TextField,
 } from "@mui/material";
-import closeIcon from "../../assets/icon-close.svg";
+import closeIcon from "../../../assets/icon-close.svg";
 import { type ChangeEvent, type SubmitEvent } from "react";
-import type { CreateTaskDto } from "../../shared/types";
-import type { TaskFormErrors } from "../../features/tasks/taskForm";
+import type { CreateTaskDto } from "../../../shared/types";
+import type { TaskFormErrors } from "../model/taskForm";
 
 const PRIORITY_OPTIONS = [
   { value: "high", label: "High" },
@@ -86,9 +86,7 @@ function CreateTaskModal({
             gap: 1,
           }}
         >
-          <span>
-            New task
-          </span>
+          <span>New task</span>
           <IconButton
             onClick={handleCloseRequest}
             disabled={isSubmitting}

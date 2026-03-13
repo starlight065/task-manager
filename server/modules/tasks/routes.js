@@ -4,25 +4,22 @@ const {
   findTasksByUserId,
   findTaskByIdForUser,
   updateTaskCompletion,
-} = require("../repositories/taskRepository");
-const { serializeTask } = require("../utils/serializeTask");
-const { getAuthenticatedUser } = require("../services/sessionService");
-const { AUTH_MESSAGES } = require("../validators/authValidator");
+} = require("../../repositories/taskRepository");
+const { requireAuth } = require("../../middleware/requireAuth");
+const { serializeTask } = require("../../utils/serializeTask");
+const { AUTH_MESSAGES } = require("../../validators/authValidator");
 const {
   validateCreateTaskPayload,
   validateTaskCompletionPayload,
-} = require("../validators/taskValidator");
+} = require("../../validators/taskValidator");
 
 const router = express.Router();
 
+router.use(requireAuth);
+
 router.get("/tasks", async (req, res) => {
   try {
-    const user = await getAuthenticatedUser(req);
-    if (!user) {
-      return res.status(401).json({ error: AUTH_MESSAGES.unauthorized });
-    }
-
-    const tasks = await findTasksByUserId(user.id);
+    const tasks = await findTasksByUserId(req.user.id);
 
     return res.json({ tasks: tasks.map(serializeTask) });
   } catch (err) {
@@ -33,11 +30,6 @@ router.get("/tasks", async (req, res) => {
 
 router.post("/tasks", async (req, res) => {
   try {
-    const user = await getAuthenticatedUser(req);
-    if (!user) {
-      return res.status(401).json({ error: AUTH_MESSAGES.unauthorized });
-    }
-
     const result = validateCreateTaskPayload(req.body);
 
     if (result.error) {
@@ -45,7 +37,7 @@ router.post("/tasks", async (req, res) => {
     }
 
     const task = await createTask({
-      userId: user.id,
+      userId: req.user.id,
       title: result.value.title,
       description: result.value.description,
       priority: result.value.priority,
@@ -62,11 +54,6 @@ router.post("/tasks", async (req, res) => {
 
 router.patch("/tasks/:taskId", async (req, res) => {
   try {
-    const user = await getAuthenticatedUser(req);
-    if (!user) {
-      return res.status(401).json({ error: AUTH_MESSAGES.unauthorized });
-    }
-
     const taskId = Number.parseInt(req.params.taskId, 10);
     if (!Number.isInteger(taskId) || taskId <= 0) {
       return res.status(400).json({ error: "Task id must be a positive integer" });
@@ -77,7 +64,7 @@ router.patch("/tasks/:taskId", async (req, res) => {
       return res.status(400).json({ error: result.error });
     }
 
-    const task = await findTaskByIdForUser(taskId, user.id);
+    const task = await findTaskByIdForUser(taskId, req.user.id);
     if (!task) {
       return res.status(404).json({ error: "Task not found" });
     }

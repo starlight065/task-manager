@@ -4,19 +4,19 @@ const { UniqueConstraintError } = require("sequelize");
 const {
   createUser,
   findUserByEmail,
-} = require("../repositories/userRepository");
+} = require("../../repositories/userRepository");
+const { requireAuth } = require("../../middleware/requireAuth");
 const {
   AUTH_MESSAGES,
   getCredentialsFromRequest,
   hasValidCredentials,
-} = require("../validators/authValidator");
-const { serializeUser } = require("../utils/serializeUser");
+} = require("../../validators/authValidator");
+const { serializeUser } = require("../../utils/serializeUser");
 const {
   clearSessionCookie,
   destroySession,
-  getAuthenticatedUser,
   signInUser,
-} = require("../services/sessionService");
+} = require("../../services/sessionService");
 
 const router = express.Router();
 
@@ -78,18 +78,8 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.get("/me", async (req, res) => {
-  try {
-    const user = await getAuthenticatedUser(req);
-    if (!user) {
-      return res.status(401).json({ error: AUTH_MESSAGES.unauthorized });
-    }
-
-    return res.json({ user: serializeUser(user) });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: AUTH_MESSAGES.serverError });
-  }
+router.get("/me", requireAuth, async (req, res) => {
+  return res.json({ user: serializeUser(req.user) });
 });
 
 router.post("/logout", async (req, res) => {

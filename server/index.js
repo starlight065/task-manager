@@ -1,10 +1,8 @@
-require("dotenv").config({ path: require("path").resolve(__dirname, "../.env") });
 const sequelize = require("./db");
 require("./models/Task");
+const { env } = require("./config/env");
 const { createSessionStore } = require("./config/session");
 const { createApp } = require("./app");
-
-const PORT = process.env.SERVER_PORT || 3001;
 
 sequelize
   .authenticate()
@@ -18,7 +16,7 @@ sequelize
     const app = createApp({ sessionStore });
 
     console.log("Connected to database");
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    app.listen(env.serverPort, () => console.log(`Server running on port ${env.serverPort}`));
   })
   .catch((err) => {
     console.error("Failed to connect to database:", err.message);

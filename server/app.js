@@ -1,8 +1,9 @@
 const express = require("express");
 const cors = require("cors");
+const { env } = require("./config/env");
 const { createSessionMiddleware } = require("./config/session");
-const authRoutes = require("./routes/authRoutes");
-const taskRoutes = require("./routes/taskRoutes");
+const authRoutes = require("./modules/auth/routes");
+const taskRoutes = require("./modules/tasks/routes");
 
 function createApp({ sessionStore }) {
   const app = express();
@@ -12,7 +13,7 @@ function createApp({ sessionStore }) {
   }
 
   app.use(express.json());
-  app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+  app.use(cors({ origin: env.clientOrigin, credentials: true }));
   app.use(createSessionMiddleware(sessionStore));
   app.use("/api", authRoutes);
   app.use("/api", taskRoutes);

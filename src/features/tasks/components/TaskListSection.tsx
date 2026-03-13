@@ -1,4 +1,4 @@
-import type { TaskDto } from "../../shared/types";
+import type { TaskDto } from "../../../shared/types";
 import TaskCard from "./TaskCard";
 
 interface TaskListSectionProps {

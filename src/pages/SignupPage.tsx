@@ -1,4 +1,4 @@
-import { useAuth } from "../features/auth/AuthProvider";
+import { useAuth } from "../features/auth/model/useAuth";
 import AuthForm from "../features/auth/components/AuthForm";
 
 function SignupPage() {

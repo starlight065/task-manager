@@ -1,10 +1,10 @@
 import { InputAdornment, MenuItem, TextField } from "@mui/material";
-import searchIcon from "../../assets/icon-search.svg";
+import searchIcon from "../../../assets/icon-search.svg";
 import type {
   PriorityFilter,
   SortOption,
   StatusFilter,
-} from "../../features/tasks/taskFilters";
+} from "../model/taskFilters";
 
 interface TasksToolbarProps {
   searchQuery: string;

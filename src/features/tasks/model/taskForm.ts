@@ -1,4 +1,4 @@
-import type { CreateTaskDto } from "../../shared/types";
+import type { CreateTaskDto } from "../../../shared/types";
 
 export type TaskFormErrors = Partial<Record<keyof CreateTaskDto, string>>;
 

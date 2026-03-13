@@ -1,47 +1,7 @@
 import classNames from "classnames";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import "./styles/App.css";
-import calendarIcon from "./assets/calendar.svg";
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
-import TasksPage from "./pages/TasksPage";
-import { useAuth } from "./features/auth/AuthProvider";
-
-function ProtectedRoute({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { status } = useAuth();
-
-  if (status === "loading") {
-    return null;
-  }
-
-  if (status === "unauthenticated") {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
-}
-
-function PublicRoute({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { status } = useAuth();
-
-  if (status === "loading") {
-    return null;
-  }
-
-  if (status === "authenticated") {
-    return <Navigate to="/tasks" replace />;
-  }
-
-  return <>{children}</>;
-}
+import { useNavigate } from "react-router-dom";
+import calendarIcon from "../assets/calendar.svg";
+import "../styles/App.css";
 
 function HomePage() {
   const navigate = useNavigate();
@@ -154,36 +114,4 @@ function HomePage() {
   );
 }
 
-function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <LoginPage />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <PublicRoute>
-            <SignupPage />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/tasks"
-        element={
-          <ProtectedRoute>
-            <TasksPage />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
-  );
-}
-
-export default App;
+export default HomePage;
