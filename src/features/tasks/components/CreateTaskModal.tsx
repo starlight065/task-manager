@@ -23,6 +23,7 @@ const PRIORITY_OPTIONS = [
 
 interface CreateTaskModalProps {
   isOpen: boolean;
+  mode: "create" | "edit";
   formValues: CreateTaskDto;
   fieldErrors: TaskFormErrors;
   formError: string | null;
@@ -34,6 +35,7 @@ interface CreateTaskModalProps {
 
 function CreateTaskModal({
   isOpen,
+  mode,
   formValues,
   fieldErrors,
   formError,
@@ -42,6 +44,16 @@ function CreateTaskModal({
   onFieldChange,
   onSubmit,
 }: CreateTaskModalProps) {
+  const titleId = mode === "create" ? "create-task-title" : "edit-task-title";
+  const modalTitle = mode === "create" ? "New task" : "Edit task";
+  const closeLabel =
+    mode === "create" ? "Close new task modal" : "Close edit task modal";
+  const submitLabel = isSubmitting
+    ? "Saving..."
+    : mode === "create"
+      ? "Save task"
+      : "Update task";
+
   function handleCloseRequest() {
     if (isSubmitting) {
       return;
@@ -70,7 +82,7 @@ function CreateTaskModal({
 
   return (
     <Dialog
-      aria-labelledby="create-task-title"
+      aria-labelledby={titleId}
       fullWidth
       maxWidth="sm"
       open={isOpen}
@@ -78,7 +90,7 @@ function CreateTaskModal({
     >
       <Box component="form" onSubmit={onSubmit}>
         <DialogTitle
-          id="create-task-title"
+          id={titleId}
           sx={{
             alignItems: "center",
             display: "flex",
@@ -86,11 +98,11 @@ function CreateTaskModal({
             gap: 1,
           }}
         >
-          <span>New task</span>
+          <span>{modalTitle}</span>
           <IconButton
             onClick={handleCloseRequest}
             disabled={isSubmitting}
-            aria-label="Close new task modal"
+            aria-label={closeLabel}
           >
             <img src={closeIcon} alt="" width="24" height="24" />
           </IconButton>
@@ -196,7 +208,7 @@ function CreateTaskModal({
             Cancel
           </Button>
           <Button type="submit" variant="contained" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save task"}
+            {submitLabel}
           </Button>
         </DialogActions>
       </Box>

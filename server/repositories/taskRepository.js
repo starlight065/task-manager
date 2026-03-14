@@ -22,6 +22,16 @@ function createTask({ userId, title, description, priority, dueDate, tag }) {
   });
 }
 
+async function updateTask(task, { title, description, priority, dueDate, tag }) {
+  task.title = title;
+  task.description = description;
+  task.priority = priority;
+  task.due_date = dueDate;
+  task.tag = tag;
+  await task.save();
+  return task;
+}
+
 function findTaskByIdForUser(taskId, userId) {
   return Task.findOne({
     where: {
@@ -41,5 +51,6 @@ module.exports = {
   createTask,
   findTasksByUserId,
   findTaskByIdForUser,
+  updateTask,
   updateTaskCompletion,
 };

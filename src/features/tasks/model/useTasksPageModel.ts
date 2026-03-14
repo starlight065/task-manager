@@ -1,6 +1,6 @@
 import { useEffect, useState, type SubmitEvent } from "react";
 import type { CreateTaskDto, TaskDto } from "../../../shared/types";
-import { createTask, getTasks, updateTaskCompletion } from "../api/tasksApi";
+import { createTask, getTasks, updateTask, updateTaskCompletion } from "../api/tasksApi";
 import { getTaskSummary } from "../lib/getTaskSummary";
 import {
   EMPTY_TASK_FORM,
@@ -25,7 +25,8 @@ export function useTasksPageModel() {
   const [sortBy, setSortBy] = useState<SortOption>("due-date");
   const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [formValues, setFormValues] = useState<CreateTaskDto>(EMPTY_TASK_FORM);
   const [fieldErrors, setFieldErrors] = useState<TaskFormErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -69,16 +70,34 @@ export function useTasksPageModel() {
     priorityFilter,
     sortBy,
   );
+  const taskModalMode: "create" | "edit" =
+    editingTaskId === null ? "create" : "edit";
 
   function openCreateTaskModal() {
+    setEditingTaskId(null);
     setFormValues(EMPTY_TASK_FORM);
     setFieldErrors({});
     setFormError(null);
-    setIsCreateModalOpen(true);
+    setIsTaskModalOpen(true);
   }
 
-  function closeCreateTaskModal() {
-    setIsCreateModalOpen(false);
+  function openEditTaskModal(task: TaskDto) {
+    setEditingTaskId(task.id);
+    setFormValues({
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      dueDate: task.dueDate,
+      tag: task.tag,
+    });
+    setFieldErrors({});
+    setFormError(null);
+    setIsTaskModalOpen(true);
+  }
+
+  function closeTaskModal() {
+    setIsTaskModalOpen(false);
+    setEditingTaskId(null);
     setFormValues(EMPTY_TASK_FORM);
     setFieldErrors({});
     setFormError(null);
@@ -104,7 +123,7 @@ export function useTasksPageModel() {
     setFormError(null);
   }
 
-  async function onCreateTaskSubmit(event: SubmitEvent<HTMLFormElement>) {
+  async function onTaskSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const trimmedValues = normalizeTaskFormValues(formValues);
@@ -120,12 +139,21 @@ export function useTasksPageModel() {
     setFormError(null);
 
     try {
-      const createdTask = await createTask(trimmedValues);
+      if (editingTaskId === null) {
+        const createdTask = await createTask(trimmedValues);
 
-      setTasks((currentTasks) => [...currentTasks, createdTask]);
-      closeCreateTaskModal();
+        setTasks((currentTasks) => [...currentTasks, createdTask]);
+      } else {
+        const updatedTask = await updateTask(editingTaskId, trimmedValues);
+
+        setTasks((currentTasks) =>
+          currentTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)),
+        );
+      }
+
+      closeTaskModal();
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Failed to create task");
+      setFormError(err instanceof Error ? err.message : "Failed to save task");
     } finally {
       setIsSubmitting(false);
     }
@@ -199,16 +227,18 @@ export function useTasksPageModel() {
       visibleCount: filteredTasks.length,
       pendingTaskIds,
       toggleTaskCompletion,
+      openEditTaskModal,
     },
     createTaskModal: {
-      isOpen: isCreateModalOpen,
+      isOpen: isTaskModalOpen,
+      mode: taskModalMode,
       formValues,
       fieldErrors,
       formError,
       isSubmitting,
-      close: closeCreateTaskModal,
+      close: closeTaskModal,
       onFieldChange: onTaskFieldChange,
-      onSubmit: onCreateTaskSubmit,
+      onSubmit: onTaskSubmit,
     },
   };
 }

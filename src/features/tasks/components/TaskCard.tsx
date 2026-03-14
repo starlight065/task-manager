@@ -23,9 +23,10 @@ interface TaskCardProps {
   task: TaskDto;
   isUpdating: boolean;
   onCompletionChange: (taskId: number, completed: boolean) => void;
+  onEditClick: (task: TaskDto) => void;
 }
 
-function TaskCard({ task, isUpdating, onCompletionChange }: TaskCardProps) {
+function TaskCard({ task, isUpdating, onCompletionChange, onEditClick }: TaskCardProps) {
   return (
     <div
       className={classNames("task-card", {
@@ -53,10 +54,21 @@ function TaskCard({ task, isUpdating, onCompletionChange }: TaskCardProps) {
         <div className="task-card__description">{task.description}</div>
       </div>
       <div className="task-card__actions">
-        <button className="task-card__action" aria-label="Edit task" disabled={isUpdating}>
+        <button
+          type="button"
+          className="task-card__action"
+          aria-label="Edit task"
+          disabled={isUpdating}
+          onClick={() => onEditClick(task)}
+        >
           <img src={editIcon} alt="" width="16" height="16" />
         </button>
-        <button className="task-card__action" aria-label="Delete task" disabled={isUpdating}>
+        <button
+          type="button"
+          className="task-card__action"
+          aria-label="Delete task"
+          disabled={isUpdating}
+        >
           <img src={trashIcon} alt="" width="16" height="16" />
         </button>
       </div>

@@ -77,12 +77,14 @@ function TasksPage() {
         tasks={model.taskLists.activeTasks}
         pendingTaskIds={model.taskLists.pendingTaskIds}
         onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
+        onTaskEditClick={model.taskLists.openEditTaskModal}
       />
       <TaskListSection
         title="Completed"
         tasks={model.taskLists.completedTasks}
         pendingTaskIds={model.taskLists.pendingTaskIds}
         onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
+        onTaskEditClick={model.taskLists.openEditTaskModal}
       />
 
       {model.taskLists.visibleCount === 0 ? (
@@ -99,6 +101,7 @@ function TasksPage() {
 
       <CreateTaskModal
         isOpen={model.createTaskModal.isOpen}
+        mode={model.createTaskModal.mode}
         formValues={model.createTaskModal.formValues}
         fieldErrors={model.createTaskModal.fieldErrors}
         formError={model.createTaskModal.formError}

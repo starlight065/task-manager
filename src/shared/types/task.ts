@@ -19,6 +19,8 @@ export interface CreateTaskDto {
   tag: string;
 }
 
+export type UpdateTaskDto = CreateTaskDto;
+
 export interface UpdateTaskCompletionDto {
   completed: boolean;
 }

@@ -3,6 +3,7 @@ const {
   createTask,
   findTasksByUserId,
   findTaskByIdForUser,
+  updateTask,
   updateTaskCompletion,
 } = require("../../repositories/taskRepository");
 const { requireAuth } = require("../../middleware/requireAuth");
@@ -46,6 +47,32 @@ router.post("/tasks", async (req, res) => {
     });
 
     return res.status(201).json({ task: serializeTask(task) });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: AUTH_MESSAGES.serverError });
+  }
+});
+
+router.put("/tasks/:taskId", async (req, res) => {
+  try {
+    const taskId = Number.parseInt(req.params.taskId, 10);
+    if (!Number.isInteger(taskId) || taskId <= 0) {
+      return res.status(400).json({ error: "Task id must be a positive integer" });
+    }
+
+    const result = validateCreateTaskPayload(req.body);
+    if (result.error) {
+      return res.status(400).json({ error: result.error });
+    }
+
+    const task = await findTaskByIdForUser(taskId, req.user.id);
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    const updatedTask = await updateTask(task, result.value);
+
+    return res.json({ task: serializeTask(updatedTask) });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: AUTH_MESSAGES.serverError });

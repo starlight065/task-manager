@@ -2,6 +2,7 @@ import { apiRequest } from "../../../shared/api/apiClient";
 import type {
   CreateTaskDto,
   TaskDto,
+  UpdateTaskDto,
   UpdateTaskCompletionDto,
 } from "../../../shared/types";
 
@@ -26,6 +27,16 @@ export async function createTask(payload: CreateTaskDto): Promise<TaskDto> {
     method: "POST",
     body: payload,
     fallbackErrorMessage: "Failed to create task",
+  });
+
+  return data.task;
+}
+
+export async function updateTask(taskId: number, payload: UpdateTaskDto): Promise<TaskDto> {
+  const data = await apiRequest<TaskResponse>(`/api/tasks/${taskId}`, {
+    method: "PUT",
+    body: payload,
+    fallbackErrorMessage: "Failed to update task",
   });
 
   return data.task;
