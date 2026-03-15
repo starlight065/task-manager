@@ -1,5 +1,6 @@
 import "../styles/TasksPage.css";
 import CreateTaskModal from "../features/tasks/components/CreateTaskModal";
+import TaskDeleteModal from "../features/tasks/components/TaskDeleteModal";
 import TaskErrorModal from "../features/tasks/components/TaskErrorModal";
 import TaskListSection from "../features/tasks/components/TaskListSection";
 import TasksColumnHeaders from "../features/tasks/components/TasksColumnHeaders";
@@ -78,6 +79,7 @@ function TasksPage() {
         pendingTaskIds={model.taskLists.pendingTaskIds}
         onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
         onTaskEditClick={model.taskLists.openEditTaskModal}
+        onTaskDeleteClick={model.taskLists.openDeleteTaskModal}
       />
       <TaskListSection
         title="Completed"
@@ -85,6 +87,7 @@ function TasksPage() {
         pendingTaskIds={model.taskLists.pendingTaskIds}
         onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
         onTaskEditClick={model.taskLists.openEditTaskModal}
+        onTaskDeleteClick={model.taskLists.openDeleteTaskModal}
       />
 
       {model.taskLists.visibleCount === 0 ? (
@@ -115,6 +118,15 @@ function TasksPage() {
         open={model.completionError !== null}
         message={model.completionError ?? ""}
         onClose={model.dismissCompletionError}
+      />
+
+      <TaskDeleteModal
+        isOpen={model.deleteTaskModal.isOpen}
+        taskTitle={model.deleteTaskModal.taskTitle}
+        error={model.deleteTaskModal.error}
+        isDeleting={model.deleteTaskModal.isDeleting}
+        onClose={model.deleteTaskModal.close}
+        onConfirm={model.deleteTaskModal.confirm}
       />
     </div>
   );

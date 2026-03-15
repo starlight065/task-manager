@@ -1,6 +1,6 @@
 # Task Manager
 
-Task Manager is a full-stack task tracking application with a React frontend and an Express backend. It supports account registration, session-based authentication, and a personal task dashboard with creation, editing, filtering, sorting, and completion tracking.
+Task Manager is a full-stack task tracking application with a React frontend and an Express backend. It supports account registration, session-based authentication, and a personal task dashboard with creation, editing, deletion, filtering, sorting, and completion tracking.
 
 The repository is split into two runtime applications:
 
@@ -14,6 +14,7 @@ The repository is split into two runtime applications:
 - Restores the signed-in user on page refresh
 - Lets each user create private tasks with title, description, priority, due date, and tag
 - Lets users edit existing tasks from the task card action menu using the same form as task creation
+- Lets users delete tasks from the task card after confirming the action in a dialog
 - Separates active and completed tasks
 - Supports search, status filtering, priority filtering, and sorting
 - Tracks completion progress on the tasks page
@@ -60,7 +61,7 @@ The client is organized by feature rather than by component type alone.
 
 Authentication state is managed through `AuthProvider`, which restores the current session from `GET /api/me` and redirects on unauthorized responses.
 
-Task creation and task editing share the same modal component. The tasks page model switches that modal between `create` and `edit` modes, preloads form values for edits, and persists updates through the tasks API client.
+Task creation and task editing share the same modal component. The tasks page model switches that modal between `create` and `edit` modes, preloads form values for edits, and persists updates through the tasks API client. Task deletion uses a separate confirmation dialog before sending the delete request.
 
 ### Backend
 
@@ -84,7 +85,7 @@ The server:
 - stores Express sessions in the database
 - exposes all API routes under `/api`
 
-Task updates are handled by `PUT /api/tasks/:taskId`, which validates the full task payload, checks task ownership, and returns the serialized updated task.
+Task updates are handled by `PUT /api/tasks/:taskId`, which validates the full task payload, checks task ownership, and returns the serialized updated task. Task deletion is handled by `DELETE /api/tasks/:taskId`, which verifies ownership before removing the record.
 
 ## Project Structure
 
@@ -248,8 +249,12 @@ All backend endpoints are mounted under `/api`.
   - returns all tasks for the authenticated user
 - `POST /api/tasks`
   - creates a new task for the authenticated user
+- `PUT /api/tasks/:taskId`
+  - replaces the editable task fields for a task owned by the authenticated user
 - `PATCH /api/tasks/:taskId`
   - updates only the `completed` state for a task owned by the authenticated user
+- `DELETE /api/tasks/:taskId`
+  - deletes a task owned by the authenticated user
 
 ## Task Data Model
 

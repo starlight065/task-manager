@@ -47,8 +47,13 @@ async function updateTaskCompletion(task, completed) {
   return task;
 }
 
+async function deleteTask(task) {
+  await task.destroy();
+}
+
 module.exports = {
   createTask,
+  deleteTask,
   findTasksByUserId,
   findTaskByIdForUser,
   updateTask,

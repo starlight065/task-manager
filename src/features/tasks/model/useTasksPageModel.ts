@@ -1,6 +1,12 @@
 import { useEffect, useState, type SubmitEvent } from "react";
 import type { CreateTaskDto, TaskDto } from "../../../shared/types";
-import { createTask, getTasks, updateTask, updateTaskCompletion } from "../api/tasksApi";
+import {
+  createTask,
+  deleteTask,
+  getTasks,
+  updateTask,
+  updateTaskCompletion,
+} from "../api/tasksApi";
 import { getTaskSummary } from "../lib/getTaskSummary";
 import {
   EMPTY_TASK_FORM,
@@ -31,6 +37,8 @@ export function useTasksPageModel() {
   const [fieldErrors, setFieldErrors] = useState<TaskFormErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<TaskDto | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -101,6 +109,16 @@ export function useTasksPageModel() {
     setFormValues(EMPTY_TASK_FORM);
     setFieldErrors({});
     setFormError(null);
+  }
+
+  function openDeleteTaskModal(task: TaskDto) {
+    setTaskToDelete(task);
+    setDeleteError(null);
+  }
+
+  function closeDeleteTaskModal() {
+    setTaskToDelete(null);
+    setDeleteError(null);
   }
 
   function onTaskFieldChange(field: keyof CreateTaskDto, value: string) {
@@ -204,6 +222,34 @@ export function useTasksPageModel() {
     }
   }
 
+  async function confirmTaskDelete() {
+    if (!taskToDelete) {
+      return;
+    }
+
+    const { id: taskId } = taskToDelete;
+
+    setPendingTaskIds((currentTaskIds) =>
+      currentTaskIds.includes(taskId) ? currentTaskIds : [...currentTaskIds, taskId],
+    );
+    setDeleteError(null);
+
+    try {
+      await deleteTask(taskId);
+      setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
+      closeDeleteTaskModal();
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete task");
+    } finally {
+      setPendingTaskIds((currentTaskIds) =>
+        currentTaskIds.filter((currentTaskId) => currentTaskId !== taskId),
+      );
+    }
+  }
+
+  const isDeletingTask =
+    taskToDelete !== null && pendingTaskIds.includes(taskToDelete.id);
+
   return {
     isLoading,
     error,
@@ -228,6 +274,7 @@ export function useTasksPageModel() {
       pendingTaskIds,
       toggleTaskCompletion,
       openEditTaskModal,
+      openDeleteTaskModal,
     },
     createTaskModal: {
       isOpen: isTaskModalOpen,
@@ -239,6 +286,14 @@ export function useTasksPageModel() {
       close: closeTaskModal,
       onFieldChange: onTaskFieldChange,
       onSubmit: onTaskSubmit,
+    },
+    deleteTaskModal: {
+      isOpen: taskToDelete !== null,
+      taskTitle: taskToDelete?.title ?? "",
+      error: deleteError,
+      isDeleting: isDeletingTask,
+      close: closeDeleteTaskModal,
+      confirm: confirmTaskDelete,
     },
   };
 }

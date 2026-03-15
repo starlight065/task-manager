@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   createTask,
+  deleteTask,
   findTasksByUserId,
   findTaskByIdForUser,
   updateTask,
@@ -99,6 +100,27 @@ router.patch("/tasks/:taskId", async (req, res) => {
     const updatedTask = await updateTaskCompletion(task, result.value.completed);
 
     return res.json({ task: serializeTask(updatedTask) });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: AUTH_MESSAGES.serverError });
+  }
+});
+
+router.delete("/tasks/:taskId", async (req, res) => {
+  try {
+    const taskId = Number.parseInt(req.params.taskId, 10);
+    if (!Number.isInteger(taskId) || taskId <= 0) {
+      return res.status(400).json({ error: "Task id must be a positive integer" });
+    }
+
+    const task = await findTaskByIdForUser(taskId, req.user.id);
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    await deleteTask(task);
+
+    return res.status(204).send();
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: AUTH_MESSAGES.serverError });

@@ -54,3 +54,10 @@ export async function updateTaskCompletion(
 
   return data.task;
 }
+
+export async function deleteTask(taskId: number): Promise<void> {
+  await apiRequest<void>(`/api/tasks/${taskId}`, {
+    method: "DELETE",
+    fallbackErrorMessage: "Failed to delete task",
+  });
+}

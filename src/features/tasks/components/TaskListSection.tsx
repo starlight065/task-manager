@@ -7,6 +7,7 @@ interface TaskListSectionProps {
   pendingTaskIds: number[];
   onTaskCompletionChange: (taskId: number, completed: boolean) => void;
   onTaskEditClick: (task: TaskDto) => void;
+  onTaskDeleteClick: (task: TaskDto) => void;
 }
 
 function TaskListSection({
@@ -15,6 +16,7 @@ function TaskListSection({
   pendingTaskIds,
   onTaskCompletionChange,
   onTaskEditClick,
+  onTaskDeleteClick,
 }: TaskListSectionProps) {
   return (
     <>
@@ -28,6 +30,7 @@ function TaskListSection({
           isUpdating={pendingTaskIds.includes(task.id)}
           onCompletionChange={onTaskCompletionChange}
           onEditClick={onTaskEditClick}
+          onDeleteClick={onTaskDeleteClick}
         />
       ))}
     </>
