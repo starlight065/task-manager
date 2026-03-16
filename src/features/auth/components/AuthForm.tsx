@@ -1,14 +1,22 @@
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  InputAdornment,
+  Link,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useState, type SubmitEvent } from "react";
-import classNames from "classnames";
-import { createPortal } from "react-dom";
-import { Link } from "react-router-dom";
-import "../../../styles/AuthPages.css";
+import { Link as RouterLink } from "react-router-dom";
 import type { AuthCredentials } from "../../../shared/types";
-import alertCircleIcon from "../../../assets/auth-alert-circle.svg";
-import arrowLeftIcon from "../../../assets/auth-arrow-left.svg";
-import closeIcon from "../../../assets/auth-close.svg";
-import eyeIcon from "../../../assets/auth-eye.svg";
-import eyeOffIcon from "../../../assets/auth-eye-off.svg";
 import {
   AUTH_MESSAGES,
   PASSWORD_RULES,
@@ -89,131 +97,163 @@ function AuthForm({ mode, onSubmit }: AuthFormProps) {
     }
   }
 
+  const emailError = touched.email && !validation.isEmailValid;
+  const passwordError = touched.password && !validation.isPasswordValid;
+
   return (
-    <div className="auth">
-      <Link to="/" className="auth__home">
-        <img className="auth__icon auth__icon--sm" src={arrowLeftIcon} alt="" />
-        Home
-      </Link>
-      <form className="auth__form" onSubmit={handleSubmit}>
-        <h1 className="auth__title">{copy.title}</h1>
+    <>
+      <Box
+        sx={{
+          alignItems: "center",
+          background:
+            "radial-gradient(circle at top, rgba(0, 123, 255, 0.16), transparent 30%), #f8f9fa",
+          display: "flex",
+          justifyContent: "center",
+          minHeight: "100vh",
+          px: 2,
+          py: { sm: 4, xs: 10 },
+          position: "relative",
+        }}
+      >
+        <Button
+          component={RouterLink}
+          disabled={isLoading}
+          to="/"
+          variant="text"
+          sx={{
+            left: { sm: 24, xs: 16 },
+            position: "absolute",
+            top: { sm: 24, xs: 16 },
+          }}
+        >
+          Back to Home
+        </Button>
 
-        <div className="auth__field">
-          <label className="auth__label" htmlFor="email">
-            Email
-          </label>
-          <input
-            id="email"
-            className={classNames("auth__input", {
-              "auth__input--error": touched.email && !validation.isEmailValid,
-            })}
-            type="email"
-            placeholder="example@gmail.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            onBlur={() => setTouched((currentTouched) => ({ ...currentTouched, email: true }))}
-          />
-          {touched.email && !validation.isEmailValid ? (
-            <span className="auth__error">{AUTH_MESSAGES.emailInvalid}</span>
-          ) : null}
-        </div>
+        <Card
+          elevation={8}
+          sx={{
+            borderRadius: 4,
+            maxWidth: 440,
+            overflow: "visible",
+            width: "100%",
+          }}
+        >
+          <CardContent sx={{ p: { sm: 5, xs: 3 } }}>
+            <Box component="form" noValidate onSubmit={handleSubmit}>
+              <Stack spacing={3}>
+                <Stack spacing={1} textAlign="center">
+                  <Typography component="h1" variant="h4" fontWeight={700}>
+                    {copy.title}
+                  </Typography>
+                  <Typography color="text.secondary" variant="body2">
+                    Use your email and password to continue.
+                  </Typography>
+                </Stack>
 
-        <div className="auth__field">
-          <label className="auth__label" htmlFor="password">
-            Password
-          </label>
-          <div className="auth__input-wrapper">
-            <input
-              id="password"
-              className={classNames("auth__input", {
-                "auth__input--error": touched.password && !validation.isPasswordValid,
-              })}
-              type={showPassword ? "text" : "password"}
-              placeholder={copy.passwordPlaceholder}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              onBlur={() =>
-                setTouched((currentTouched) => ({ ...currentTouched, password: true }))
-              }
-            />
-            <button
-              type="button"
-              className="auth__eye"
-              onClick={() => setShowPassword((currentValue) => !currentValue)}
-            >
-              <img
-                className="auth__icon auth__icon--sm"
-                src={showPassword ? eyeOffIcon : eyeIcon}
-                alt=""
-              />
-            </button>
-          </div>
-          <div className="auth__rules">
-            <span
-              className={classNames("auth__rule", {
-                "auth__rule--valid": validation.hasMinLength,
-              })}
-            >
-              {PASSWORD_RULES.minLength}
-            </span>
-            <span
-              className={classNames("auth__rule", {
-                "auth__rule--valid": validation.hasSpecialCharacter,
-              })}
-            >
-              {PASSWORD_RULES.specialCharacter}
-            </span>
-          </div>
-        </div>
+                <TextField
+                  autoComplete="email"
+                  autoFocus
+                  disabled={isLoading}
+                  error={emailError}
+                  fullWidth
+                  helperText={emailError ? AUTH_MESSAGES.emailInvalid : " "}
+                  id="email"
+                  label="Email"
+                  placeholder="example@gmail.com"
+                  type="email"
+                  value={email}
+                  onBlur={() => setTouched((currentTouched) => ({ ...currentTouched, email: true }))}
+                  onChange={(event) => setEmail(event.target.value)}
+                />
 
-        <button type="submit" className="auth__submit" disabled={isLoading}>
-          {isLoading ? "Loading..." : copy.submitLabel}
-        </button>
-
-        <p className="auth__footer">
-          {copy.footerPrompt}{" "}
-          <Link to={copy.footerLinkTo} className="auth__link">
-            {copy.footerLinkLabel}
-          </Link>
-        </p>
-      </form>
-
-      {serverError
-        ? createPortal(
-            <div className="auth-modal__overlay" onClick={() => setServerError("")}>
-              <div className="auth-modal" onClick={(event) => event.stopPropagation()}>
-                <div className="auth-modal__icon">
-                  <img
-                    className="auth__icon auth__icon--lg"
-                    src={alertCircleIcon}
-                    alt=""
+                <Stack spacing={1.25}>
+                  <TextField
+                    autoComplete={mode === "login" ? "current-password" : "new-password"}
+                    disabled={isLoading}
+                    error={passwordError}
+                    fullWidth
+                    helperText={
+                      passwordError ? "Password must meet both requirements below." : " "
+                    }
+                    id="password"
+                    label="Password"
+                    placeholder={copy.passwordPlaceholder}
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onBlur={() =>
+                      setTouched((currentTouched) => ({ ...currentTouched, password: true }))
+                    }
+                    onChange={(event) => setPassword(event.target.value)}
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <Button
+                              disabled={isLoading}
+                              size="small"
+                              type="button"
+                              onClick={() => setShowPassword((currentValue) => !currentValue)}
+                            >
+                              {showPassword ? "Hide" : "Show"}
+                            </Button>
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
                   />
-                </div>
-                <h2 className="auth-modal__title">{copy.errorTitle}</h2>
-                <p className="auth-modal__message">{serverError}</p>
-                <button
-                  className="auth-modal__close-btn"
-                  onClick={() => setServerError("")}
-                >
-                  Try again
-                </button>
-                <button
-                  className="auth-modal__dismiss"
-                  onClick={() => setServerError("")}
-                  aria-label="Dismiss"
-                >
-                  <img
-                    className="auth__icon auth__icon--xs"
-                    src={closeIcon}
-                    alt=""
-                  />
-                </button>
-              </div>
-            </div>,
-            document.body,
-          )
-        : null}
-    </div>
+
+                  <Stack direction="row" flexWrap="wrap" gap={1}>
+                    <Chip
+                      color={validation.hasMinLength ? "success" : "default"}
+                      label={PASSWORD_RULES.minLength}
+                      size="small"
+                      variant={validation.hasMinLength ? "filled" : "outlined"}
+                    />
+                    <Chip
+                      color={validation.hasSpecialCharacter ? "success" : "default"}
+                      label={PASSWORD_RULES.specialCharacter}
+                      size="small"
+                      variant={validation.hasSpecialCharacter ? "filled" : "outlined"}
+                    />
+                  </Stack>
+                </Stack>
+
+                <Button disabled={isLoading} size="large" type="submit" variant="contained">
+                  {isLoading ? "Loading..." : copy.submitLabel}
+                </Button>
+
+                <Typography color="text.secondary" textAlign="center" variant="body2">
+                  {copy.footerPrompt}{" "}
+                  <Link component={RouterLink} to={copy.footerLinkTo} underline="hover">
+                    {copy.footerLinkLabel}
+                  </Link>
+                </Typography>
+              </Stack>
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
+
+      <Dialog
+        aria-labelledby="auth-error-title"
+        fullWidth
+        maxWidth="xs"
+        open={Boolean(serverError)}
+        onClose={() => setServerError("")}
+      >
+        <DialogTitle id="auth-error-title">{copy.errorTitle}</DialogTitle>
+        <DialogContent>
+          <Typography color="text.secondary" variant="body2">
+            {serverError}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 0 }}>
+          <Button type="button" variant="contained" onClick={() => setServerError("")}>
+            Try again
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
 
