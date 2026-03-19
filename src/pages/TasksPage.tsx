@@ -1,4 +1,5 @@
 import "../styles/TasksPage.css";
+import loadingSpinnerIcon from "../assets/tasks-loading-spinner.svg";
 import CreateTaskModal from "../features/tasks/components/CreateTaskModal";
 import TaskDeleteModal from "../features/tasks/components/TaskDeleteModal";
 import TaskErrorModal from "../features/tasks/components/TaskErrorModal";
@@ -18,31 +19,7 @@ function TasksPage() {
         <TasksHeader pending={0} done={0} total={0} />
         <hr className="tasks-page__header-divider" />
         <div className="tasks-page__loading-state" aria-label="Loading tasks" role="status">
-          <svg
-            className="loading-spinner"
-            width="40"
-            height="40"
-            viewBox="0 0 50 50"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <circle
-              cx="25"
-              cy="25"
-              r="20"
-              fill="none"
-              stroke="#e2e8f0"
-              strokeWidth="5"
-            />
-            <circle
-              className="spinner-path"
-              cx="25"
-              cy="25"
-              r="20"
-              fill="none"
-              strokeWidth="5"
-            />
-          </svg>
+          <img src={loadingSpinnerIcon} alt="" width="40" height="40" aria-hidden="true" />
         </div>
       </div>
     );
