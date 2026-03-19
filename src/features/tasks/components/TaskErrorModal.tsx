@@ -20,7 +20,7 @@ function TaskErrorModal({ open, message, onClose }: TaskErrorModalProps) {
       fullWidth
       maxWidth="xs"
       open={open}
-      onClose={(_, __) => onClose()}
+      onClose={() => onClose()}
     >
       <DialogTitle id="task-error-modal-title">Could not update task</DialogTitle>
       <DialogContent>
