@@ -57,12 +57,34 @@ function TaskCard({
         aria-label={`Mark ${task.title} as ${task.completed ? "incomplete" : "completed"}`}
       />
       <div className="task-card__content">
-        <div
-          className={classNames("task-card__title", {
-            "task-card__title--completed": task.completed,
-          })}
-        >
-          {task.title}
+        <div className="task-card__header">
+          <div
+            className={classNames("task-card__title", {
+              "task-card__title--completed": task.completed,
+            })}
+          >
+            {task.title}
+          </div>
+          <div className="task-card__actions">
+            <button
+              type="button"
+              className="task-card__action"
+              aria-label="Edit task"
+              disabled={isUpdating}
+              onClick={() => onEditClick(task)}
+            >
+              <img src={editIcon} alt="" width="16" height="16" />
+            </button>
+            <button
+              type="button"
+              className="task-card__action"
+              aria-label="Delete task"
+              disabled={isUpdating}
+              onClick={() => onDeleteClick(task)}
+            >
+              <img src={trashIcon} alt="" width="16" height="16" />
+            </button>
+          </div>
         </div>
         <div className="task-card__description">{task.description}</div>
 
@@ -104,26 +126,6 @@ function TaskCard({
             </ul>
           </div>
         )}
-      </div>
-      <div className="task-card__actions">
-        <button
-          type="button"
-          className="task-card__action"
-          aria-label="Edit task"
-          disabled={isUpdating}
-          onClick={() => onEditClick(task)}
-        >
-          <img src={editIcon} alt="" width="16" height="16" />
-        </button>
-        <button
-          type="button"
-          className="task-card__action"
-          aria-label="Delete task"
-          disabled={isUpdating}
-          onClick={() => onDeleteClick(task)}
-        >
-          <img src={trashIcon} alt="" width="16" height="16" />
-        </button>
       </div>
       <div className="task-card__meta">
         <span className={classNames("priority-badge", `priority-badge--${task.priority}`)}>

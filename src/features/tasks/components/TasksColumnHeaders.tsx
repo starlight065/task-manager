@@ -14,7 +14,6 @@ function TasksColumnHeaders() {
       <div className={classNames("tasks-page__col-header", "tasks-page__col-header--tag")}>
         Tag
       </div>
-      <div className="tasks-page__col-headers-actions" />
     </div>
   );
 }
