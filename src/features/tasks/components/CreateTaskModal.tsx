@@ -155,7 +155,7 @@ function CreateTaskModal({
               disabled={isSubmitting}
               error={Boolean(fieldErrors.description)}
               helperText={fieldErrors.description}
-              label="Description"
+              label="Description (optional)"
               minRows={4}
               multiline
               value={formValues.description}
@@ -198,7 +198,7 @@ function CreateTaskModal({
                 fullWidth
                 helperText={fieldErrors.dueDate}
                 id="create-task-due-date"
-                label="Due date"
+                label="Due date (optional)"
                 type="date"
                 value={formValues.dueDate}
                 onChange={handleChange("dueDate")}
@@ -214,7 +214,7 @@ function CreateTaskModal({
               disabled={isSubmitting}
               error={Boolean(fieldErrors.tag)}
               helperText={fieldErrors.tag}
-              label="Tag"
+              label="Tag (optional)"
               type="text"
               value={formValues.tag}
               onChange={handleChange("tag")}

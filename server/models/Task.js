@@ -20,7 +20,7 @@ const Task = sequelize.define(
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
     priority: {
       type: DataTypes.ENUM("high", "medium", "low"),
@@ -28,11 +28,11 @@ const Task = sequelize.define(
     },
     due_date: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
     },
     tag: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     completed: {
       type: DataTypes.BOOLEAN,

@@ -34,22 +34,12 @@ export function validateTaskForm(values: CreateTaskDto): TaskFormErrors {
     errors.title = "Title is required.";
   }
 
-  if (!values.description) {
-    errors.description = "Description is required.";
-  }
-
   if (!values.priority) {
     errors.priority = "Priority is required.";
   }
 
-  if (!values.dueDate) {
-    errors.dueDate = "Due date is required.";
-  } else if (values.dueDate < today) {
+  if (values.dueDate && values.dueDate < today) {
     errors.dueDate = "Due date cannot be in the past.";
-  }
-
-  if (!values.tag) {
-    errors.tag = "Tag is required.";
   }
 
   return errors;

@@ -1,0 +1,229 @@
+[
+  {
+    "id": 101,
+    "title": "Inbox zero cleanup",
+    "description": "Archive low-value threads, label anything blocking, and leave follow-ups for Monday.",
+    "priority": "high",
+    "dueDate": "2026-03-21",
+    "createdAt": "2026-03-19T08:30:00.000Z",
+    "tag": "Operations",
+    "completed": false,
+    "subtasks": [
+      {
+        "id": 1001,
+        "title": "Review unread messages",
+        "completed": true
+      },
+      {
+        "id": 1002,
+        "title": "Archive resolved conversations",
+        "completed": false
+      },
+      {
+        "id": 1003,
+        "title": "Flag items needing replies",
+        "completed": false
+      }
+    ]
+  },
+  {
+    "id": 102,
+    "title": "Finalize Q2 roadmap draft",
+    "description": "Combine product, design, and engineering notes into a single planning draft for review.",
+    "priority": "high",
+    "dueDate": "2026-03-24",
+    "createdAt": "2026-03-18T14:15:00.000Z",
+    "tag": "Planning",
+    "completed": false,
+    "subtasks": [
+      {
+        "id": 1004,
+        "title": "Collect team input",
+        "completed": true
+      },
+      {
+        "id": 1005,
+        "title": "Draft roadmap themes",
+        "completed": true
+      },
+      {
+        "id": 1006,
+        "title": "Estimate delivery windows",
+        "completed": false
+      },
+      {
+        "id": 1007,
+        "title": "Prepare stakeholder summary",
+        "completed": false
+      }
+    ]
+  },
+  {
+    "id": 103,
+    "title": "Update onboarding checklist",
+    "description": "",
+    "priority": "medium",
+    "dueDate": "2026-03-27",
+    "createdAt": "2026-03-17T10:00:00.000Z",
+    "tag": "People",
+    "completed": false,
+    "subtasks": []
+  },
+  {
+    "id": 104,
+    "title": "Ship March billing export",
+    "description": "Validate account totals, export the CSV, and send it to finance before close of business.",
+    "priority": "high",
+    "dueDate": "2026-03-20",
+    "createdAt": "2026-03-16T16:45:00.000Z",
+    "tag": "Finance",
+    "completed": false,
+    "subtasks": [
+      {
+        "id": 1008,
+        "title": "Validate subscription totals",
+        "completed": true
+      },
+      {
+        "id": 1009,
+        "title": "Generate CSV export",
+        "completed": false
+      },
+      {
+        "id": 1010,
+        "title": "Send export to finance",
+        "completed": false
+      }
+    ]
+  },
+  {
+    "id": 105,
+    "title": "Refresh help center screenshots",
+    "description": "Capture the latest screens for login, task creation, filtering, and task editing.",
+    "priority": "medium",
+    "dueDate": "2026-04-02",
+    "createdAt": "2026-03-15T09:20:00.000Z",
+    "tag": "Docs",
+    "completed": false,
+    "subtasks": [
+      {
+        "id": 1011,
+        "title": "Capture login flow",
+        "completed": true
+      },
+      {
+        "id": 1012,
+        "title": "Capture task creation modal",
+        "completed": true
+      },
+      {
+        "id": 1013,
+        "title": "Capture filtering states",
+        "completed": false
+      },
+      {
+        "id": 1014,
+        "title": "Capture edit and delete flows",
+        "completed": false
+      }
+    ]
+  },
+  {
+    "id": 106,
+    "title": "Prepare demo environment",
+    "description": "Reset sample users, confirm seeded data looks realistic, and get a clean account ready for stakeholder review.",
+    "priority": "medium",
+    "dueDate": "",
+    "createdAt": "2026-03-14T11:50:00.000Z",
+    "tag": "",
+    "completed": false,
+    "subtasks": [
+      {
+        "id": 1015,
+        "title": "Reset sample accounts",
+        "completed": false
+      },
+      {
+        "id": 1016,
+        "title": "Verify seeded tasks",
+        "completed": false
+      }
+    ]
+  },
+  {
+    "id": 107,
+    "title": "Refactor mobile nav spacing",
+    "description": "Tighten the header spacing on smaller screens and make sure the task controls still wrap cleanly.",
+    "priority": "low",
+    "dueDate": "2026-04-08",
+    "createdAt": "2026-03-13T07:40:00.000Z",
+    "tag": "Frontend",
+    "completed": false,
+    "subtasks": []
+  },
+  {
+    "id": 108,
+    "title": "Backfill regression test notes",
+    "description": "Document the manual scenarios covered during the last release so they are easier to replay next time.",
+    "priority": "low",
+    "dueDate": "2026-04-15",
+    "createdAt": "2026-03-12T13:05:00.000Z",
+    "tag": "QA",
+    "completed": true,
+    "subtasks": [
+      {
+        "id": 1017,
+        "title": "List critical flows",
+        "completed": true
+      },
+      {
+        "id": 1018,
+        "title": "Capture edge cases from last launch",
+        "completed": true
+      },
+      {
+        "id": 1019,
+        "title": "Share notes with the team",
+        "completed": true
+      }
+    ]
+  },
+  {
+    "id": 109,
+    "title": "Customer follow-up batch",
+    "description": "Reach out to trial users who asked for reminders after the new task management flow shipped.",
+    "priority": "medium",
+    "dueDate": "2026-03-22",
+    "createdAt": "2026-03-11T17:25:00.000Z",
+    "tag": "Support",
+    "completed": false,
+    "subtasks": [
+      {
+        "id": 1020,
+        "title": "Draft follow-up message",
+        "completed": true
+      },
+      {
+        "id": 1021,
+        "title": "Send to priority customers",
+        "completed": false
+      },
+      {
+        "id": 1022,
+        "title": "Log responses",
+        "completed": false
+      }
+    ]
+  },
+  {
+    "id": 110,
+    "title": "Close sprint retrospective actions",
+    "description": "Resolve the remaining retro action items so next sprint starts with a clean slate.",
+    "priority": "low",
+    "dueDate": "2026-03-29",
+    "createdAt": "2026-03-10T12:10:00.000Z",
+    "tag": "Team",
+    "completed": true,
+    "subtasks": []
+  }
+]

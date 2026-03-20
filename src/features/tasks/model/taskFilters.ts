@@ -11,8 +11,12 @@ const PRIORITY_ORDER: Record<Priority, number> = {
 };
 
 function getDateValue(value: string): number {
+  if (!value) {
+    return Number.POSITIVE_INFINITY;
+  }
+
   const parsed = Date.parse(value);
-  return Number.isNaN(parsed) ? 0 : parsed;
+  return Number.isNaN(parsed) ? Number.POSITIVE_INFINITY : parsed;
 }
 
 function matchesSearch(task: TaskDto, query: string): boolean {

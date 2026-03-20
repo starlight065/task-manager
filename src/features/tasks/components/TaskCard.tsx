@@ -4,9 +4,17 @@ import editIcon from "../../../assets/icon-edit.svg";
 import trashIcon from "../../../assets/icon-trash.svg";
 
 function dueDateClass(dateStr: string): string {
+  if (!dateStr) {
+    return "task-card__due-date--normal";
+  }
+
   const date = new Date(dateStr);
   const now = new Date();
   const diffDays = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+  if (Number.isNaN(diffDays)) {
+    return "task-card__due-date--normal";
+  }
 
   if (diffDays < 0) {
     return "task-card__due-date--overdue";
@@ -39,6 +47,9 @@ function TaskCard({
   const subtaskTotal = task.subtasks.length;
   const subtaskDone = task.subtasks.filter((s) => s.completed).length;
   const subtaskPct = subtaskTotal === 0 ? 0 : Math.round((subtaskDone / subtaskTotal) * 100);
+  const hasDescription = task.description.trim().length > 0;
+  const hasDueDate = task.dueDate.trim().length > 0;
+  const hasTag = task.tag.trim().length > 0;
 
   return (
     <div
@@ -86,7 +97,7 @@ function TaskCard({
             </button>
           </div>
         </div>
-        <div className="task-card__description">{task.description}</div>
+        {hasDescription ? <div className="task-card__description">{task.description}</div> : null}
 
         {subtaskTotal > 0 && (
           <div className="task-card__subtasks">
@@ -131,15 +142,17 @@ function TaskCard({
         <span className={classNames("priority-badge", `priority-badge--${task.priority}`)}>
           {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
         </span>
-        <span
-          className={classNames(
-            "task-card__due-date",
-            task.completed ? "task-card__due-date--completed" : dueDateClass(task.dueDate),
-          )}
-        >
-          {task.dueDate}
-        </span>
-        <span className="tag-badge">{task.tag}</span>
+        {hasDueDate ? (
+          <span
+            className={classNames(
+              "task-card__due-date",
+              task.completed ? "task-card__due-date--completed" : dueDateClass(task.dueDate),
+            )}
+          >
+            {task.dueDate}
+          </span>
+        ) : null}
+        {hasTag ? <span className="tag-badge">{task.tag}</span> : null}
       </div>
     </div>
   );
