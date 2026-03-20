@@ -1,6 +1,6 @@
 # Task Manager
 
-Task Manager is a full-stack task tracking application with a React frontend and an Express backend. It supports account registration, session-based authentication, and a personal task dashboard with creation, editing, deletion, filtering, sorting, and completion tracking.
+Task Manager is a full-stack task tracking application with a React frontend and an Express backend. It supports account registration, session-based authentication, and a personal task dashboard with creation, editing, deletion, subtasks, filtering, sorting, and completion tracking.
 
 The repository is split into two runtime applications:
 
@@ -12,12 +12,14 @@ The repository is split into two runtime applications:
 - Registers and logs users in with email/password credentials
 - Persists authentication with HTTP-only session cookies
 - Restores the signed-in user on page refresh
-- Lets each user create private tasks with title, description, priority, due date, and tag
+- Lets each user create private tasks with title, description, priority, due date, tag, and subtasks
 - Lets users edit existing tasks from the task card action menu using the same form as task creation
 - Lets users delete tasks from the task card after confirming the action in a dialog
+- Supports subtasks within each task, with individual completion toggles and a per-task progress bar
+- Auto-completes a task when all its subtasks are completed, and reverts it when a subtask is unchecked
 - Separates active and completed tasks
 - Supports search, status filtering, priority filtering, and sorting
-- Tracks completion progress on the tasks page
+- Tracks completion progress on the tasks page with a summary and progress bar
 
 ## Technology Stack
 
@@ -63,6 +65,8 @@ Authentication state is managed through `AuthProvider`, which restores the curre
 
 Task creation and task editing share the same modal component. The tasks page model switches that modal between `create` and `edit` modes, preloads form values for edits, and persists updates through the tasks API client. Task deletion uses a separate confirmation dialog before sending the delete request.
 
+Subtasks can be added and removed inline in the create/edit modal. Each task card renders its subtasks with individual checkboxes and a progress bar showing how many are completed. Completion toggles for both tasks and subtasks use optimistic updates with rollback on failure and display errors through a dedicated error modal.
+
 ### Backend
 
 The server is organized around modules plus shared infrastructure code.
@@ -85,57 +89,10 @@ The server:
 - stores Express sessions in the database
 - exposes all API routes under `/api`
 
-Task updates are handled by `PUT /api/tasks/:taskId`, which validates the full task payload, checks task ownership, and returns the serialized updated task. Task deletion is handled by `DELETE /api/tasks/:taskId`, which verifies ownership before removing the record.
+Task updates are handled by `PUT /api/tasks/:taskId`, which validates the task payload, checks task ownership, and returns the serialized updated task including its subtasks. Task deletion is handled by `DELETE /api/tasks/:taskId`, which verifies ownership before removing the record and its associated subtasks via cascade.
 
-## Project Structure
+Subtask completion is handled by `PATCH /api/tasks/:taskId/subtasks/:subtaskId`. When all subtasks for a task become completed, the server automatically marks the parent task as completed. When a subtask is unchecked and the parent was completed, the server reverts the parent to incomplete.
 
-```text
-task-manager/
-├── README.md
-├── package.json
-├── vite.config.ts
-├── shared/
-│   └── auth.json
-├── public/
-│   └── users.json
-├── src/
-│   ├── app/
-│   │   ├── providers/
-│   │   └── router/
-│   ├── assets/
-│   ├── features/
-│   │   ├── auth/
-│   │   │   ├── api/
-│   │   │   ├── components/
-│   │   │   ├── model/
-│   │   │   └── utils/
-│   │   └── tasks/
-│   │       ├── api/
-│   │       ├── components/
-│   │       ├── lib/
-│   │       └── model/
-│   ├── pages/
-│   ├── shared/
-│   │   ├── api/
-│   │   └── types/
-│   ├── styles/
-│   └── theme/
-└── server/
-    ├── app.js
-    ├── db.js
-    ├── index.js
-    ├── package.json
-    ├── config/
-    ├── middleware/
-    ├── models/
-    ├── modules/
-    │   ├── auth/
-    │   └── tasks/
-    ├── repositories/
-    ├── services/
-    ├── utils/
-    └── validators/
-```
 
 ## Shared Configuration
 
@@ -217,6 +174,7 @@ The Vite dev server starts on `http://localhost:5173` by default.
 - `npm run dev`: start the Vite frontend dev server
 - `npm run build`: type-check and build the frontend
 - `npm run lint`: run ESLint
+- `npm run lint:fix`: run ESLint with auto-fix
 - `npm run preview`: preview the production frontend build
 
 ### `server/`
@@ -246,30 +204,42 @@ All backend endpoints are mounted under `/api`.
 ### Tasks
 
 - `GET /api/tasks`
-  - returns all tasks for the authenticated user
+  - returns all tasks (with subtasks) for the authenticated user
 - `POST /api/tasks`
-  - creates a new task for the authenticated user
+  - creates a new task with optional subtasks for the authenticated user
 - `PUT /api/tasks/:taskId`
-  - replaces the editable task fields for a task owned by the authenticated user
+  - replaces the editable task fields and syncs subtasks for a task owned by the authenticated user
 - `PATCH /api/tasks/:taskId`
   - updates only the `completed` state for a task owned by the authenticated user
+- `PATCH /api/tasks/:taskId/subtasks/:subtaskId`
+  - toggles the `completed` state of a subtask
+  - auto-completes the parent task when all subtasks are done
+  - reverts the parent task to incomplete when a subtask is unchecked
 - `DELETE /api/tasks/:taskId`
-  - deletes a task owned by the authenticated user
+  - deletes a task and its subtasks (cascade) owned by the authenticated user
 
-## Task Data Model
+## Data Models
 
-Tasks currently include:
+### Task
 
 - `id`
 - `title`
-- `description`
+- `description` (nullable)
 - `priority`: `high | medium | low`
-- `dueDate`
+- `dueDate` (nullable)
 - `createdAt`
-- `tag`
+- `tag` (nullable)
 - `completed`
 
 On the database side, tasks belong to a user through `user_id`.
+
+### Subtask
+
+- `id`
+- `title`
+- `completed`
+
+On the database side, subtasks belong to a task through `task_id` and are cascade-deleted when the parent task is removed.
 
 ## Validation Rules
 
@@ -281,11 +251,13 @@ On the database side, tasks belong to a user through `user_id`.
 
 ### Tasks
 
-- all task fields are required when creating a task
+- `title` is required
 - `priority` must be `high`, `medium`, or `low`
-- `dueDate` must use `YYYY-MM-DD`
-- `dueDate` cannot be in the past
+- `description`, `dueDate`, and `tag` are optional
+- `dueDate`, when provided, must use `YYYY-MM-DD` and cannot be in the past
 - task completion updates must send a boolean `completed`
+- subtask completion updates must send a boolean `completed`
+- subtask titles are trimmed and empty entries are filtered out
 
 ## Routing
 
