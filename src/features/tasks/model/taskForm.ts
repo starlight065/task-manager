@@ -8,6 +8,7 @@ export const EMPTY_TASK_FORM: CreateTaskDto = {
   priority: "medium",
   dueDate: "",
   tag: "",
+  subtasks: [],
 };
 
 function todayAsDateInputValue(): string {
@@ -21,6 +22,7 @@ export function normalizeTaskFormValues(values: CreateTaskDto): CreateTaskDto {
     priority: values.priority,
     dueDate: values.dueDate,
     tag: values.tag.trim(),
+    subtasks: (values.subtasks ?? []).map((s) => s.trim()).filter(Boolean),
   };
 }
 

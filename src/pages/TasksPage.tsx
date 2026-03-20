@@ -55,6 +55,7 @@ function TasksPage() {
         tasks={model.taskLists.activeTasks}
         pendingTaskIds={model.taskLists.pendingTaskIds}
         onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
+        onSubtaskCompletionChange={model.taskLists.toggleSubtaskCompletion}
         onTaskEditClick={model.taskLists.openEditTaskModal}
         onTaskDeleteClick={model.taskLists.openDeleteTaskModal}
       />
@@ -63,6 +64,7 @@ function TasksPage() {
         tasks={model.taskLists.completedTasks}
         pendingTaskIds={model.taskLists.pendingTaskIds}
         onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
+        onSubtaskCompletionChange={model.taskLists.toggleSubtaskCompletion}
         onTaskEditClick={model.taskLists.openEditTaskModal}
         onTaskDeleteClick={model.taskLists.openDeleteTaskModal}
       />
@@ -88,6 +90,8 @@ function TasksPage() {
         isSubmitting={model.createTaskModal.isSubmitting}
         onClose={model.createTaskModal.close}
         onFieldChange={model.createTaskModal.onFieldChange}
+        onSubtaskAdd={model.createTaskModal.onSubtaskAdd}
+        onSubtaskRemove={model.createTaskModal.onSubtaskRemove}
         onSubmit={model.createTaskModal.onSubmit}
       />
 

@@ -4,6 +4,7 @@ import type {
   TaskDto,
   UpdateTaskDto,
   UpdateTaskCompletionDto,
+  UpdateSubtaskCompletionDto,
 } from "../../../shared/types";
 
 interface TasksResponse {
@@ -50,6 +51,20 @@ export async function updateTaskCompletion(
     method: "PATCH",
     body: payload,
     fallbackErrorMessage: "Failed to update task",
+  });
+
+  return data.task;
+}
+
+export async function toggleSubtaskCompletion(
+  taskId: number,
+  subtaskId: number,
+  payload: UpdateSubtaskCompletionDto,
+): Promise<TaskDto> {
+  const data = await apiRequest<TaskResponse>(`/api/tasks/${taskId}/subtasks/${subtaskId}`, {
+    method: "PATCH",
+    body: payload,
+    fallbackErrorMessage: "Failed to update subtask",
   });
 
   return data.task;

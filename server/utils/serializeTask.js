@@ -8,6 +8,11 @@ function serializeTask(task) {
     createdAt: task.created_at ?? task.createdAt,
     tag: task.tag,
     completed: task.completed,
+    subtasks: (task.subtasks ?? []).map((s) => ({
+      id: s.id,
+      title: s.title,
+      completed: s.completed,
+    })),
   };
 }
 

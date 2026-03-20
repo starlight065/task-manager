@@ -11,7 +11,7 @@ import {
   TextField,
 } from "@mui/material";
 import closeIcon from "../../../assets/icon-close.svg";
-import { type ChangeEvent, type SubmitEvent } from "react";
+import { type ChangeEvent, type KeyboardEvent, type SubmitEvent, useRef, useState } from "react";
 import type { CreateTaskDto } from "../../../shared/types";
 import type { TaskFormErrors } from "../model/taskForm";
 
@@ -30,6 +30,8 @@ interface CreateTaskModalProps {
   isSubmitting: boolean;
   onClose: () => void;
   onFieldChange: (field: keyof CreateTaskDto, value: string) => void;
+  onSubtaskAdd: (title: string) => void;
+  onSubtaskRemove: (index: number) => void;
   onSubmit: (event: SubmitEvent<HTMLFormElement>) => void;
 }
 
@@ -42,6 +44,8 @@ function CreateTaskModal({
   isSubmitting,
   onClose,
   onFieldChange,
+  onSubtaskAdd,
+  onSubtaskRemove,
   onSubmit,
 }: CreateTaskModalProps) {
   const titleId = mode === "create" ? "create-task-title" : "edit-task-title";
@@ -53,6 +57,11 @@ function CreateTaskModal({
     : mode === "create"
       ? "Save task"
       : "Update task";
+
+  const [subtaskInput, setSubtaskInput] = useState("");
+  const subtaskInputRef = useRef<HTMLInputElement>(null);
+
+  const subtasks = formValues.subtasks ?? [];
 
   function handleCloseRequest() {
     if (isSubmitting) {
@@ -78,6 +87,21 @@ function CreateTaskModal({
     return (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       onFieldChange(field, event.target.value);
     };
+  }
+
+  function handleAddSubtask() {
+    const trimmed = subtaskInput.trim();
+    if (!trimmed) return;
+    onSubtaskAdd(trimmed);
+    setSubtaskInput("");
+    subtaskInputRef.current?.focus();
+  }
+
+  function handleSubtaskInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleAddSubtask();
+    }
   }
 
   return (
@@ -195,6 +219,69 @@ function CreateTaskModal({
               value={formValues.tag}
               onChange={handleChange("tag")}
             />
+
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Box sx={{ fontSize: "0.875rem", fontWeight: 500, color: "text.secondary" }}>
+                Subtasks
+              </Box>
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <TextField
+                  inputRef={subtaskInputRef}
+                  disabled={isSubmitting}
+                  label="Add subtask"
+                  size="small"
+                  fullWidth
+                  value={subtaskInput}
+                  onChange={(e) => setSubtaskInput(e.target.value)}
+                  onKeyDown={handleSubtaskInputKeyDown}
+                  slotProps={{ htmlInput: { maxLength: 200 } }}
+                />
+                <Button
+                  type="button"
+                  variant="outlined"
+                  size="small"
+                  disabled={isSubmitting || !subtaskInput.trim()}
+                  onClick={handleAddSubtask}
+                  sx={{ whiteSpace: "nowrap", flexShrink: 0 }}
+                >
+                  Add
+                </Button>
+              </Box>
+
+              {subtasks.length > 0 && (
+                <Box
+                  component="ul"
+                  sx={{ listStyle: "none", p: 0, m: 0, display: "flex", flexDirection: "column", gap: 0.5 }}
+                >
+                  {subtasks.map((title, index) => (
+                    <Box
+                      component="li"
+                      key={index}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        px: 1.5,
+                        py: 0.75,
+                        borderRadius: 1,
+                        bgcolor: "action.hover",
+                      }}
+                    >
+                      <Box sx={{ flex: 1, fontSize: "0.875rem" }}>{title}</Box>
+                      <IconButton
+                        size="small"
+                        disabled={isSubmitting}
+                        onClick={() => onSubtaskRemove(index)}
+                        aria-label={`Remove subtask "${title}"`}
+                        sx={{ p: 0.25 }}
+                      >
+                        <img src={closeIcon} alt="" width="16" height="16" />
+                      </IconButton>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Box>
 
             {formError ? <Alert severity="error">{formError}</Alert> : null}
           </Box>

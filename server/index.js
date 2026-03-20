@@ -1,5 +1,6 @@
 const sequelize = require("./db");
 require("./models/Task");
+require("./models/Subtask");
 const { env } = require("./config/env");
 const { createSessionStore } = require("./config/session");
 const { createApp } = require("./app");

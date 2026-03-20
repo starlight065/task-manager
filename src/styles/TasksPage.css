@@ -354,6 +354,36 @@
   height: 100%;
   background: #333;
   border-radius: 3px;
+  transition: width 0.25s ease;
+}
+
+@media (max-width: 599px) {
+  .task-card__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.5rem;
+  }
+
+  .task-card__meta .priority-badge {
+    order: 1;
+  }
+
+  .task-card__meta .task-card__due-date {
+    order: 2;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.22rem 0.75rem;
+    border: 1.5px solid #d7d7d7;
+    border-radius: 20px;
+    background: #fafafa;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  .task-card__meta .tag-badge {
+    order: 3;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -483,4 +513,115 @@
     box-sizing: border-box;
     text-align: center;
   }
+}
+
+@media (min-width: 600px) and (max-width: 839px) {
+  .tasks-page__toolbar {
+    align-items: stretch;
+  }
+
+  .tasks-page__search-wrapper {
+    order: 1;
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .tasks-page__select-group {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-width: 0;
+  }
+
+  .tasks-page__select-group--sort {
+    order: 2;
+    flex-basis: calc(50% - 0.25rem);
+  }
+
+  .tasks-page__select-group--priority {
+    order: 3;
+    flex-basis: calc(50% - 0.25rem);
+  }
+
+  .tasks-page__select-group--status {
+    order: 4;
+    flex: 1 1 100%;
+  }
+
+  .tasks-page__new-task-btn {
+    order: 5;
+    flex-basis: auto;
+    margin-left: auto;
+  }
+}
+
+/* ── Subtasks ──────────────────────────────────────────────────── */
+
+.task-card__subtasks {
+  margin-top: 0.6rem;
+}
+
+.task-card__subtask-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.task-card__subtask-progress-bar-track {
+  flex: 1;
+  max-width: 120px;
+  height: 4px;
+  background: #ddd;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.task-card__subtask-progress-bar-fill {
+  height: 100%;
+  background: #333;
+  border-radius: 3px;
+  transition: width 0.25s ease;
+}
+
+.task-card__subtask-progress-label {
+  font-size: 0.72rem;
+  color: #888;
+  white-space: nowrap;
+}
+
+.task-card__subtask-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.task-card__subtask {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.task-card__subtask-checkbox {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: #555;
+}
+
+.task-card__subtask-checkbox:disabled {
+  cursor: not-allowed;
+}
+
+.task-card__subtask-title {
+  font-size: 0.82rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+.task-card__subtask-title--completed {
+  text-decoration: line-through;
+  color: #aaa;
 }

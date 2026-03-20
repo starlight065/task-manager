@@ -23,6 +23,7 @@ interface TaskCardProps {
   task: TaskDto;
   isUpdating: boolean;
   onCompletionChange: (taskId: number, completed: boolean) => void;
+  onSubtaskCompletionChange: (taskId: number, subtaskId: number, completed: boolean) => void;
   onEditClick: (task: TaskDto) => void;
   onDeleteClick: (task: TaskDto) => void;
 }
@@ -31,9 +32,14 @@ function TaskCard({
   task,
   isUpdating,
   onCompletionChange,
+  onSubtaskCompletionChange,
   onEditClick,
   onDeleteClick,
 }: TaskCardProps) {
+  const subtaskTotal = task.subtasks.length;
+  const subtaskDone = task.subtasks.filter((s) => s.completed).length;
+  const subtaskPct = subtaskTotal === 0 ? 0 : Math.round((subtaskDone / subtaskTotal) * 100);
+
   return (
     <div
       className={classNames("task-card", {
@@ -59,6 +65,45 @@ function TaskCard({
           {task.title}
         </div>
         <div className="task-card__description">{task.description}</div>
+
+        {subtaskTotal > 0 && (
+          <div className="task-card__subtasks">
+            <div className="task-card__subtask-progress">
+              <div className="task-card__subtask-progress-bar-track">
+                <div
+                  className="task-card__subtask-progress-bar-fill"
+                  style={{ width: `${subtaskPct}%` }}
+                />
+              </div>
+              <span className="task-card__subtask-progress-label">
+                {subtaskDone}/{subtaskTotal}
+              </span>
+            </div>
+            <ul className="task-card__subtask-list">
+              {task.subtasks.map((subtask) => (
+                <li key={subtask.id} className="task-card__subtask">
+                  <input
+                    type="checkbox"
+                    className="task-card__subtask-checkbox"
+                    checked={subtask.completed}
+                    disabled={isUpdating}
+                    onChange={(event) => {
+                      onSubtaskCompletionChange(task.id, subtask.id, event.target.checked);
+                    }}
+                    aria-label={`Mark subtask "${subtask.title}" as ${subtask.completed ? "incomplete" : "completed"}`}
+                  />
+                  <span
+                    className={classNames("task-card__subtask-title", {
+                      "task-card__subtask-title--completed": subtask.completed,
+                    })}
+                  >
+                    {subtask.title}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
       <div className="task-card__actions">
         <button

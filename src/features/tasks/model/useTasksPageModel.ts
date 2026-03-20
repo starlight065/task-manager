@@ -1,9 +1,10 @@
 import { useEffect, useState, type SubmitEvent } from "react";
-import type { CreateTaskDto, TaskDto } from "../../../shared/types";
+import type { CreateTaskDto, SubtaskDto, TaskDto } from "../../../shared/types";
 import {
   createTask,
   deleteTask,
   getTasks,
+  toggleSubtaskCompletion as apiToggleSubtaskCompletion,
   updateTask,
   updateTaskCompletion,
 } from "../api/tasksApi";
@@ -97,6 +98,7 @@ export function useTasksPageModel() {
       priority: task.priority,
       dueDate: task.dueDate,
       tag: task.tag,
+      subtasks: task.subtasks.map((s) => s.title),
     });
     setFieldErrors({});
     setFormError(null);
@@ -141,6 +143,20 @@ export function useTasksPageModel() {
     setFormError(null);
   }
 
+  function onSubtaskAdd(title: string) {
+    setFormValues((currentValues) => ({
+      ...currentValues,
+      subtasks: [...(currentValues.subtasks ?? []), title],
+    }));
+  }
+
+  function onSubtaskRemove(index: number) {
+    setFormValues((currentValues) => ({
+      ...currentValues,
+      subtasks: (currentValues.subtasks ?? []).filter((_, i) => i !== index),
+    }));
+  }
+
   async function onTaskSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -162,7 +178,23 @@ export function useTasksPageModel() {
 
         setTasks((currentTasks) => [...currentTasks, createdTask]);
       } else {
-        const updatedTask = await updateTask(editingTaskId, trimmedValues);
+        const existingTask = tasks.find((t) => t.id === editingTaskId);
+        const existingSubtasks: SubtaskDto[] = existingTask?.subtasks ?? [];
+        const formSubtaskTitles = trimmedValues.subtasks ?? [];
+
+        const updateSubtasks = formSubtaskTitles.map((title, index) => {
+          const existing = existingSubtasks[index];
+          return existing ? { id: existing.id, title } : { title };
+        });
+
+        const updatedTask = await updateTask(editingTaskId, {
+          title: trimmedValues.title,
+          description: trimmedValues.description,
+          priority: trimmedValues.priority,
+          dueDate: trimmedValues.dueDate,
+          tag: trimmedValues.tag,
+          subtasks: updateSubtasks,
+        });
 
         setTasks((currentTasks) =>
           currentTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)),
@@ -222,6 +254,47 @@ export function useTasksPageModel() {
     }
   }
 
+  async function toggleSubtaskCompletion(taskId: number, subtaskId: number, completed: boolean) {
+    const previousTask = tasks.find((task) => task.id === taskId);
+
+    if (!previousTask) {
+      return;
+    }
+
+    setTasks((currentTasks) =>
+      currentTasks.map((task) => {
+        if (task.id !== taskId) return task;
+        return {
+          ...task,
+          subtasks: task.subtasks.map((s) =>
+            s.id === subtaskId ? { ...s, completed } : s,
+          ),
+        };
+      }),
+    );
+    setPendingTaskIds((currentTaskIds) =>
+      currentTaskIds.includes(taskId) ? currentTaskIds : [...currentTaskIds, taskId],
+    );
+
+    try {
+      const updatedTask = await apiToggleSubtaskCompletion(taskId, subtaskId, { completed });
+
+      setTasks((currentTasks) =>
+        currentTasks.map((task) => (task.id !== updatedTask.id ? task : updatedTask)),
+      );
+      setCompletionError(null);
+    } catch (err) {
+      setTasks((currentTasks) =>
+        currentTasks.map((task) => (task.id !== previousTask.id ? task : previousTask)),
+      );
+      setCompletionError(err instanceof Error ? err.message : "Failed to update subtask");
+    } finally {
+      setPendingTaskIds((currentTaskIds) =>
+        currentTaskIds.filter((currentTaskId) => currentTaskId !== taskId),
+      );
+    }
+  }
+
   async function confirmTaskDelete() {
     if (!taskToDelete) {
       return;
@@ -273,6 +346,7 @@ export function useTasksPageModel() {
       visibleCount: filteredTasks.length,
       pendingTaskIds,
       toggleTaskCompletion,
+      toggleSubtaskCompletion,
       openEditTaskModal,
       openDeleteTaskModal,
     },
@@ -285,6 +359,8 @@ export function useTasksPageModel() {
       isSubmitting,
       close: closeTaskModal,
       onFieldChange: onTaskFieldChange,
+      onSubtaskAdd,
+      onSubtaskRemove,
       onSubmit: onTaskSubmit,
     },
     deleteTaskModal: {
