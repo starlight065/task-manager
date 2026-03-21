@@ -6,14 +6,7 @@ import type {
   UpdateTaskCompletionDto,
   UpdateSubtaskCompletionDto,
 } from "../../../shared/types";
-
-interface TasksResponse {
-  tasks: TaskDto[];
-}
-
-interface TaskResponse {
-  task: TaskDto;
-}
+import type { TaskResponse, TasksResponse } from "../types/api";
 
 export async function getTasks(): Promise<TaskDto[]> {
   const data = await apiRequest<TasksResponse>("/api/tasks", {

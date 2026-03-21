@@ -4,19 +4,8 @@ import type {
   PriorityFilter,
   SortOption,
   StatusFilter,
-} from "../model/taskFilters";
-
-interface TasksToolbarProps {
-  searchQuery: string;
-  sortBy: SortOption;
-  priorityFilter: PriorityFilter;
-  statusFilter: StatusFilter;
-  onCreateTaskClick: () => void;
-  onSearchQueryChange: (value: string) => void;
-  onSortByChange: (value: SortOption) => void;
-  onPriorityFilterChange: (value: PriorityFilter) => void;
-  onStatusFilterChange: (value: StatusFilter) => void;
-}
+} from "../types/model";
+import type { TasksToolbarProps } from "../types/components";
 
 const SORT_OPTIONS = [
   { value: "due-date", label: "Due date" },

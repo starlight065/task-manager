@@ -1,6 +1,5 @@
 import type { CreateTaskDto } from "../../../shared/types";
-
-export type TaskFormErrors = Partial<Record<keyof CreateTaskDto, string>>;
+import type { TaskFormErrors } from "../types/model";
 
 export const EMPTY_TASK_FORM: CreateTaskDto = {
   title: "",

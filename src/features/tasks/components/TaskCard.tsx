@@ -1,20 +1,25 @@
 import classNames from "classnames";
-import type { TaskDto } from "../../../shared/types";
 import editIcon from "../../../assets/icon-edit.svg";
 import trashIcon from "../../../assets/icon-trash.svg";
+import { getTodayParts, parseIsoDate } from "../lib/calendarDate";
+import type { TaskCardProps } from "../types/components";
 
 function dueDateClass(dateStr: string): string {
   if (!dateStr) {
     return "task-card__due-date--normal";
   }
 
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffDays = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  const dueDate = parseIsoDate(dateStr);
 
-  if (Number.isNaN(diffDays)) {
+  if (!dueDate) {
     return "task-card__due-date--normal";
   }
+
+  // Convert both dates to local midnight timestamps so we can compare whole calendar days.
+  const today = getTodayParts();
+  const dueDateValue = new Date(dueDate.year, dueDate.month - 1, dueDate.day).getTime();
+  const todayValue = new Date(today.year, today.month - 1, today.day).getTime();
+  const diffDays = Math.round((dueDateValue - todayValue) / (1000 * 60 * 60 * 24));
 
   if (diffDays < 0) {
     return "task-card__due-date--overdue";
@@ -25,15 +30,6 @@ function dueDateClass(dateStr: string): string {
   }
 
   return "task-card__due-date--normal";
-}
-
-interface TaskCardProps {
-  task: TaskDto;
-  isUpdating: boolean;
-  onCompletionChange: (taskId: number, completed: boolean) => void;
-  onSubtaskCompletionChange: (taskId: number, subtaskId: number, completed: boolean) => void;
-  onEditClick: (task: TaskDto) => void;
-  onDeleteClick: (task: TaskDto) => void;
 }
 
 function TaskCard({

@@ -1,7 +1,6 @@
 import {
   useEffect,
   useState,
-  type ReactNode,
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { AuthCredentials, AuthUserDto } from "../../../shared/types";
@@ -12,11 +11,8 @@ import {
   logout as logoutRequest,
   register as registerRequest,
 } from "../api/authApi";
-import { AuthContext, type AuthStatus } from "./AuthContext";
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
+import type { AuthProviderProps, AuthStatus } from "../types";
+import { AuthContext } from "./AuthContext";
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const navigate = useNavigate();

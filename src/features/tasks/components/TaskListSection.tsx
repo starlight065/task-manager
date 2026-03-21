@@ -1,15 +1,5 @@
-import type { TaskDto } from "../../../shared/types";
+import type { TaskListSectionProps } from "../types/components";
 import TaskCard from "./TaskCard";
-
-interface TaskListSectionProps {
-  title: string;
-  tasks: TaskDto[];
-  pendingTaskIds: number[];
-  onTaskCompletionChange: (taskId: number, completed: boolean) => void;
-  onSubtaskCompletionChange: (taskId: number, subtaskId: number, completed: boolean) => void;
-  onTaskEditClick: (task: TaskDto) => void;
-  onTaskDeleteClick: (task: TaskDto) => void;
-}
 
 function TaskListSection({
   title,

@@ -1,10 +1,7 @@
 import { apiRequest, apiRequestOrNull } from "../../../shared/api/apiClient";
 import type { AuthCredentials, AuthUserDto } from "../../../shared/types";
+import type { AuthResponse } from "../types";
 import { AUTH_MESSAGES } from "../utils/authValidation";
-
-interface AuthResponse {
-  user: AuthUserDto;
-}
 
 export async function login(credentials: AuthCredentials): Promise<AuthUserDto> {
   const data = await apiRequest<AuthResponse>("/api/login", {

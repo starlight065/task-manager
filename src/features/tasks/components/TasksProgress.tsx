@@ -1,8 +1,4 @@
-interface TasksProgressProps {
-  done: number;
-  total: number;
-  progressPct: number;
-}
+import type { TasksProgressProps } from "../types/components";
 
 function TasksProgress({ done, total, progressPct }: TasksProgressProps) {
   return (

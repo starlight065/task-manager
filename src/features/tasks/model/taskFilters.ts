@@ -1,8 +1,5 @@
 import type { Priority, TaskDto } from "../../../shared/types";
-
-export type SortOption = "due-date" | "priority" | "created";
-export type StatusFilter = "all" | "active" | "completed";
-export type PriorityFilter = "all" | Priority;
+import type { PriorityFilter, SortOption, StatusFilter } from "../types/model";
 
 const PRIORITY_ORDER: Record<Priority, number> = {
   high: 0,

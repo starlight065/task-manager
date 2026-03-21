@@ -6,12 +6,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-
-interface TaskErrorModalProps {
-  open: boolean;
-  message: string;
-  onClose: () => void;
-}
+import type { TaskErrorModalProps } from "../types/components";
 
 function TaskErrorModal({ open, message, onClose }: TaskErrorModalProps) {
   return (

@@ -1,21 +1,17 @@
 import classNames from "classnames";
+import type { TasksHeaderProps } from "../types/components";
 
-interface TasksHeaderProps {
-  pending: number;
-  done: number;
-  total: number;
-}
-
-function TasksHeader({ pending, done, total }: TasksHeaderProps) {
+function TasksHeader({ pending, done, total, subtitle }: TasksHeaderProps) {
   const currentMonth = new Intl.DateTimeFormat("en-US", {
     month: "long",
     year: "numeric",
   }).format(new Date());
+  const resolvedSubtitle = subtitle ?? currentMonth;
 
   return (
     <div className="tasks-page__header">
       <h1 className="tasks-page__title">
-        Task manager <span>• {currentMonth}</span>
+        Task manager {resolvedSubtitle ? <span>• {resolvedSubtitle}</span> : null}
       </h1>
       <div className="tasks-page__stats">
         <div className="tasks-page__stat">

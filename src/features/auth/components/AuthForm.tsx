@@ -16,19 +16,12 @@ import {
 } from "@mui/material";
 import { useState, type SubmitEvent } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import type { AuthCredentials } from "../../../shared/types";
+import type { AuthFormMode, AuthFormProps } from "../types";
 import {
   AUTH_MESSAGES,
   PASSWORD_RULES,
   validateAuthCredentials,
 } from "../utils/authValidation";
-
-type AuthFormMode = "login" | "signup";
-
-interface AuthFormProps {
-  mode: AuthFormMode;
-  onSubmit: (credentials: AuthCredentials) => Promise<void>;
-}
 
 const FORM_COPY: Record<
   AuthFormMode,

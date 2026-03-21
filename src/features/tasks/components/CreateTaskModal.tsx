@@ -11,29 +11,15 @@ import {
   TextField,
 } from "@mui/material";
 import closeIcon from "../../../assets/icon-close.svg";
-import { type ChangeEvent, type KeyboardEvent, type SubmitEvent, useRef, useState } from "react";
+import { type ChangeEvent, type KeyboardEvent, useRef, useState } from "react";
 import type { CreateTaskDto } from "../../../shared/types";
-import type { TaskFormErrors } from "../model/taskForm";
+import type { CreateTaskModalProps } from "../types/components";
 
 const PRIORITY_OPTIONS = [
   { value: "high", label: "High" },
   { value: "medium", label: "Medium" },
   { value: "low", label: "Low" },
 ] satisfies ReadonlyArray<{ label: string; value: CreateTaskDto["priority"] }>;
-
-interface CreateTaskModalProps {
-  isOpen: boolean;
-  mode: "create" | "edit";
-  formValues: CreateTaskDto;
-  fieldErrors: TaskFormErrors;
-  formError: string | null;
-  isSubmitting: boolean;
-  onClose: () => void;
-  onFieldChange: (field: keyof CreateTaskDto, value: string) => void;
-  onSubtaskAdd: (title: string) => void;
-  onSubtaskRemove: (index: number) => void;
-  onSubmit: (event: SubmitEvent<HTMLFormElement>) => void;
-}
 
 function CreateTaskModal({
   isOpen,

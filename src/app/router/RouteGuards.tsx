@@ -1,10 +1,6 @@
-import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
+import type { RouteGuardProps } from "../types";
 import { useAuth } from "../../features/auth/model/useAuth";
-
-interface RouteGuardProps {
-  children: ReactNode;
-}
 
 export function ProtectedRoute({ children }: RouteGuardProps) {
   const { status } = useAuth();

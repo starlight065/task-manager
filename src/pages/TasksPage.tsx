@@ -1,23 +1,26 @@
 import "../styles/TasksPage.css";
+import { Outlet, useLocation } from "react-router-dom";
 import loadingSpinnerIcon from "../assets/tasks-loading-spinner.svg";
 import CreateTaskModal from "../features/tasks/components/CreateTaskModal";
 import TaskDeleteModal from "../features/tasks/components/TaskDeleteModal";
 import TaskErrorModal from "../features/tasks/components/TaskErrorModal";
-import TaskListSection from "../features/tasks/components/TaskListSection";
-import TasksColumnHeaders from "../features/tasks/components/TasksColumnHeaders";
 import TasksHeader from "../features/tasks/components/TasksHeader";
-import TasksProgress from "../features/tasks/components/TasksProgress";
-import TasksToolbar from "../features/tasks/components/TasksToolbar";
+import TasksViewTabs from "../features/tasks/components/TasksViewTabs";
 import { useTasksPageModel } from "../features/tasks/model/useTasksPageModel";
 
 function TasksPage() {
   const model = useTasksPageModel();
+  const location = useLocation();
+  const headerSubtitle = location.pathname.startsWith("/tasks/calendar")
+    ? "Deadline calendar"
+    : undefined;
 
   if (model.isLoading) {
     return (
       <div className="tasks-page">
-        <TasksHeader pending={0} done={0} total={0} />
+        <TasksHeader pending={0} done={0} total={0} subtitle={headerSubtitle} />
         <hr className="tasks-page__header-divider" />
+        <TasksViewTabs />
         <div className="tasks-page__loading-state" aria-label="Loading tasks" role="status">
           <img src={loadingSpinnerIcon} alt="" width="40" height="40" aria-hidden="true" />
         </div>
@@ -31,55 +34,13 @@ function TasksPage() {
         pending={model.summary.pending}
         done={model.summary.done}
         total={model.summary.total}
+        subtitle={headerSubtitle}
       />
       <hr className="tasks-page__header-divider" />
+      <TasksViewTabs />
 
       {model.error ? <div className="tasks-page__section-heading">{model.error}</div> : null}
-
-      <TasksToolbar
-        searchQuery={model.toolbar.searchQuery}
-        sortBy={model.toolbar.sortBy}
-        priorityFilter={model.toolbar.priorityFilter}
-        statusFilter={model.toolbar.statusFilter}
-        onCreateTaskClick={model.toolbar.openCreateTaskModal}
-        onSearchQueryChange={model.toolbar.setSearchQuery}
-        onSortByChange={model.toolbar.setSortBy}
-        onPriorityFilterChange={model.toolbar.setPriorityFilter}
-        onStatusFilterChange={model.toolbar.setStatusFilter}
-      />
-
-      <TasksColumnHeaders />
-
-      <TaskListSection
-        title="Active"
-        tasks={model.taskLists.activeTasks}
-        pendingTaskIds={model.taskLists.pendingTaskIds}
-        onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
-        onSubtaskCompletionChange={model.taskLists.toggleSubtaskCompletion}
-        onTaskEditClick={model.taskLists.openEditTaskModal}
-        onTaskDeleteClick={model.taskLists.openDeleteTaskModal}
-      />
-      <TaskListSection
-        title="Completed"
-        tasks={model.taskLists.completedTasks}
-        pendingTaskIds={model.taskLists.pendingTaskIds}
-        onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
-        onSubtaskCompletionChange={model.taskLists.toggleSubtaskCompletion}
-        onTaskEditClick={model.taskLists.openEditTaskModal}
-        onTaskDeleteClick={model.taskLists.openDeleteTaskModal}
-      />
-
-      {model.taskLists.visibleCount === 0 ? (
-        <div className="tasks-page__empty-state">
-          No tasks match your current search and filters.
-        </div>
-      ) : null}
-
-      <TasksProgress
-        done={model.summary.done}
-        total={model.summary.total}
-        progressPct={model.summary.progressPct}
-      />
+      {model.error ? null : <Outlet context={model} />}
 
       <CreateTaskModal
         isOpen={model.createTaskModal.isOpen}

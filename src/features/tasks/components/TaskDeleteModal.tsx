@@ -1,13 +1,5 @@
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
-
-interface TaskDeleteModalProps {
-  isOpen: boolean;
-  taskTitle: string;
-  error: string | null;
-  isDeleting: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-}
+import type { TaskDeleteModalProps } from "../types/components";
 
 function TaskDeleteModal({
   isOpen,

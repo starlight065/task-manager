@@ -17,10 +17,8 @@ import {
 } from "./taskForm";
 import {
   getFilteredTasks,
-  type PriorityFilter,
-  type SortOption,
-  type StatusFilter,
 } from "./taskFilters";
+import type { PriorityFilter, SortOption, StatusFilter } from "../types/model";
 
 export function useTasksPageModel() {
   const [tasks, setTasks] = useState<TaskDto[]>([]);
@@ -326,7 +324,9 @@ export function useTasksPageModel() {
   return {
     isLoading,
     error,
+    tasks,
     completionError,
+    openCreateTaskModal,
     dismissCompletionError: () => setCompletionError(null),
     summary: getTaskSummary(tasks),
     toolbar: {

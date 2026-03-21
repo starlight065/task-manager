@@ -1,13 +1,5 @@
 import authConfig from "../../../shared/auth.json";
-
-interface ApiRequestOptions {
-  method?: string;
-  body?: unknown;
-  headers?: HeadersInit;
-  fallbackErrorMessage?: string;
-  unauthorizedMessage?: string;
-  handleUnauthorized?: boolean;
-}
+import type { ApiRequestOptions } from "../types/api";
 
 let unauthorizedHandler: (() => void) | null = null;
 
