@@ -31,7 +31,7 @@ The repository is split into two runtime applications:
 - React Router 7
 - Material UI 7
 - Emotion
-- Plain CSS files for global, page, and feature styling
+- SCSS (Sass) for global, page, and component styling
 - `classnames` for conditional styling
 
 ### Backend
@@ -59,7 +59,7 @@ The client is organized by feature rather than by component type alone.
 - `src/shared/api`: shared fetch wrapper with cookie credentials and centralized error handling
 - `src/shared/types`: DTOs shared across the client
 - `src/theme`: Material UI theme setup
-- `src/styles`: global and page-specific styles
+- `src/styles`: SCSS entrypoint and partials for shared styling foundations, components, and pages
 
 Authentication state is managed through `AuthProvider`, which restores the current session from `GET /api/me` and redirects on unauthorized responses.
 

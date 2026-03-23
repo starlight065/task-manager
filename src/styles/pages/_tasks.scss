@@ -560,7 +560,13 @@
   }
 
   &__due-date {
+    @include pill(0.22rem, 0.75rem);
+    display: inline-flex;
+    align-items: center;
+    border: 1.5px solid #d7d7d7;
+    background: palette(surface-muted);
     font-size: 0.78rem;
+    font-weight: 600;
     white-space: nowrap;
 
     @each $state, $tone in $due-date-colors {
@@ -842,13 +848,8 @@
     }
 
     &__meta .task-card__due-date {
-      @include pill(0.22rem, 0.75rem);
       order: 2;
-      align-items: center;
-      border: 1.5px solid #d7d7d7;
-      background: palette(surface-muted);
       font-size: 0.72rem;
-      font-weight: 600;
     }
 
     &__meta .tag-badge {
