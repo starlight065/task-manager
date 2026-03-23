@@ -473,15 +473,53 @@
   border: 1.5px solid palette(border);
   border-radius: radius(card);
   background: palette(surface);
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(31, 78, 135, 0.04);
   transition:
     background-color timing(base),
     border-color timing(base),
-    opacity timing(base);
+    box-shadow timing(base),
+    opacity timing(base),
+    transform timing(base);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      115deg,
+      transparent 0%,
+      rgba(58, 142, 246, 0.06) 42%,
+      rgba(255, 255, 255, 0.85) 50%,
+      rgba(58, 142, 246, 0.08) 58%,
+      transparent 100%
+    );
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-130%);
+  }
+
+  &:hover {
+    border-color: #bfd4f6;
+    background: linear-gradient(180deg, #ffffff 0%, #f6faff 100%);
+    box-shadow: 0 14px 28px rgba(58, 142, 246, 0.16);
+    transform: translateY(-3px);
+
+    &::after {
+      opacity: 1;
+      animation: task-card-hover-sheen 0.8s ease forwards;
+    }
+  }
 
   &--updating {
     border-color: #d5d5d5;
     background: #f0f0f0;
+    box-shadow: none;
     opacity: 0.85;
+
+    &::after {
+      display: none;
+    }
   }
 
   &__checkbox {
@@ -664,6 +702,16 @@
       color: palette(subtask-text-muted);
       text-decoration: line-through;
     }
+  }
+}
+
+@keyframes task-card-hover-sheen {
+  from {
+    transform: translateX(-130%);
+  }
+
+  to {
+    transform: translateX(130%);
   }
 }
 
@@ -1037,5 +1085,13 @@
   .task-card,
   .task-card__action img {
     transition: none;
+  }
+
+  .task-card::after {
+    animation: none;
+  }
+
+  .task-card:hover {
+    transform: none;
   }
 }
