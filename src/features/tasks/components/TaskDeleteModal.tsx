@@ -27,17 +27,20 @@ function TaskDeleteModal({
       fullWidth
       maxWidth="xs"
       open={isOpen}
+      slotProps={{ paper: { className: "app-dialog task-modal" } }}
       onClose={handleClose}
     >
-      <DialogTitle id="delete-task-title">Delete task?</DialogTitle>
-      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <p>
+      <DialogTitle className="app-dialog__title" id="delete-task-title">
+        Delete task?
+      </DialogTitle>
+      <DialogContent className="app-dialog__content">
+        <p className="app-dialog__copy task-modal__delete-copy">
           Are you sure you want to delete <strong>{taskTitle}</strong>? This action cannot be
           undone.
         </p>
         {error ? <Alert severity="error">{error}</Alert> : null}
       </DialogContent>
-      <DialogActions sx={{ p: 3, pt: 0 }}>
+      <DialogActions className="app-dialog__actions">
         <Button onClick={onClose} disabled={isDeleting}>
           Cancel
         </Button>

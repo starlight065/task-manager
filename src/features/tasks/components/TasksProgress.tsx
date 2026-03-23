@@ -6,9 +6,7 @@ function TasksProgress({ done, total, progressPct }: TasksProgressProps) {
       <span className="tasks-page__progress-label">
         {done} / {total} completed
       </span>
-      <div className="tasks-page__progress-bar-track">
-        <div className="tasks-page__progress-bar-fill" style={{ width: `${progressPct}%` }} />
-      </div>
+      <progress className="tasks-page__progress-bar" max={100} value={progressPct} />
     </div>
   );
 }

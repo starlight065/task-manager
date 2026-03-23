@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Card,
   CardContent,
@@ -10,9 +9,7 @@ import {
   DialogTitle,
   InputAdornment,
   Link,
-  Stack,
   TextField,
-  Typography,
 } from "@mui/material";
 import { useState, type SubmitEvent } from "react";
 import { Link as RouterLink } from "react-router-dom";
@@ -95,152 +92,126 @@ function AuthForm({ mode, onSubmit }: AuthFormProps) {
 
   return (
     <>
-      <Box
-        sx={{
-          alignItems: "center",
-          background:
-            "radial-gradient(circle at top, rgba(0, 123, 255, 0.16), transparent 30%), #f8f9fa",
-          display: "flex",
-          justifyContent: "center",
-          minHeight: "100vh",
-          px: 2,
-          py: { sm: 4, xs: 10 },
-          position: "relative",
-        }}
-      >
+      <div className="auth-page">
         <Button
+          className="auth-page__back-link"
           component={RouterLink}
           disabled={isLoading}
           to="/"
           variant="text"
-          sx={{
-            left: { sm: 24, xs: 16 },
-            position: "absolute",
-            top: { sm: 24, xs: 16 },
-          }}
         >
           Back to Home
         </Button>
 
-        <Card
-          elevation={8}
-          sx={{
-            borderRadius: 4,
-            maxWidth: 440,
-            overflow: "visible",
-            width: "100%",
-          }}
-        >
-          <CardContent sx={{ p: { sm: 5, xs: 3 } }}>
-            <Box component="form" noValidate onSubmit={handleSubmit}>
-              <Stack spacing={3}>
-                <Stack spacing={1} textAlign="center">
-                  <Typography component="h1" variant="h4" fontWeight={700}>
-                    {copy.title}
-                  </Typography>
-                  <Typography color="text.secondary" variant="body2">
-                    Use your email and password to continue.
-                  </Typography>
-                </Stack>
+        <Card className="auth-page__card" elevation={8}>
+          <CardContent className="auth-page__card-content">
+            <form className="auth-page__form" noValidate onSubmit={handleSubmit}>
+              <div className="auth-page__intro">
+                <h1 className="auth-page__title">{copy.title}</h1>
+                <p className="auth-page__subtitle">Use your email and password to continue.</p>
+              </div>
 
+              <TextField
+                autoComplete="email"
+                autoFocus
+                disabled={isLoading}
+                error={emailError}
+                fullWidth
+                helperText={emailError ? AUTH_MESSAGES.emailInvalid : " "}
+                id="email"
+                label="Email"
+                placeholder="example@gmail.com"
+                type="email"
+                value={email}
+                onBlur={() => setTouched((currentTouched) => ({ ...currentTouched, email: true }))}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+
+              <div className="auth-page__password-group">
                 <TextField
-                  autoComplete="email"
-                  autoFocus
+                  autoComplete={mode === "login" ? "current-password" : "new-password"}
                   disabled={isLoading}
-                  error={emailError}
+                  error={passwordError}
                   fullWidth
-                  helperText={emailError ? AUTH_MESSAGES.emailInvalid : " "}
-                  id="email"
-                  label="Email"
-                  placeholder="example@gmail.com"
-                  type="email"
-                  value={email}
-                  onBlur={() => setTouched((currentTouched) => ({ ...currentTouched, email: true }))}
-                  onChange={(event) => setEmail(event.target.value)}
+                  helperText={passwordError ? "Password must meet both requirements below." : " "}
+                  id="password"
+                  label="Password"
+                  placeholder={copy.passwordPlaceholder}
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onBlur={() =>
+                    setTouched((currentTouched) => ({ ...currentTouched, password: true }))
+                  }
+                  onChange={(event) => setPassword(event.target.value)}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <Button
+                            disabled={isLoading}
+                            size="small"
+                            type="button"
+                            onClick={() => setShowPassword((currentValue) => !currentValue)}
+                          >
+                            {showPassword ? "Hide" : "Show"}
+                          </Button>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
                 />
 
-                <Stack spacing={1.25}>
-                  <TextField
-                    autoComplete={mode === "login" ? "current-password" : "new-password"}
-                    disabled={isLoading}
-                    error={passwordError}
-                    fullWidth
-                    helperText={
-                      passwordError ? "Password must meet both requirements below." : " "
-                    }
-                    id="password"
-                    label="Password"
-                    placeholder={copy.passwordPlaceholder}
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onBlur={() =>
-                      setTouched((currentTouched) => ({ ...currentTouched, password: true }))
-                    }
-                    onChange={(event) => setPassword(event.target.value)}
-                    slotProps={{
-                      input: {
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <Button
-                              disabled={isLoading}
-                              size="small"
-                              type="button"
-                              onClick={() => setShowPassword((currentValue) => !currentValue)}
-                            >
-                              {showPassword ? "Hide" : "Show"}
-                            </Button>
-                          </InputAdornment>
-                        ),
-                      },
-                    }}
+                <div className="auth-page__password-rules">
+                  <Chip
+                    color={validation.hasMinLength ? "success" : "default"}
+                    label={PASSWORD_RULES.minLength}
+                    size="small"
+                    variant={validation.hasMinLength ? "filled" : "outlined"}
                   />
+                  <Chip
+                    color={validation.hasSpecialCharacter ? "success" : "default"}
+                    label={PASSWORD_RULES.specialCharacter}
+                    size="small"
+                    variant={validation.hasSpecialCharacter ? "filled" : "outlined"}
+                  />
+                </div>
+              </div>
 
-                  <Stack direction="row" flexWrap="wrap" gap={1}>
-                    <Chip
-                      color={validation.hasMinLength ? "success" : "default"}
-                      label={PASSWORD_RULES.minLength}
-                      size="small"
-                      variant={validation.hasMinLength ? "filled" : "outlined"}
-                    />
-                    <Chip
-                      color={validation.hasSpecialCharacter ? "success" : "default"}
-                      label={PASSWORD_RULES.specialCharacter}
-                      size="small"
-                      variant={validation.hasSpecialCharacter ? "filled" : "outlined"}
-                    />
-                  </Stack>
-                </Stack>
+              <Button disabled={isLoading} size="large" type="submit" variant="contained">
+                {isLoading ? "Loading..." : copy.submitLabel}
+              </Button>
 
-                <Button disabled={isLoading} size="large" type="submit" variant="contained">
-                  {isLoading ? "Loading..." : copy.submitLabel}
-                </Button>
-
-                <Typography color="text.secondary" textAlign="center" variant="body2">
-                  {copy.footerPrompt}{" "}
-                  <Link component={RouterLink} to={copy.footerLinkTo} underline="hover">
-                    {copy.footerLinkLabel}
-                  </Link>
-                </Typography>
-              </Stack>
-            </Box>
+              <p className="auth-page__footer">
+                {copy.footerPrompt}{" "}
+                <Link
+                  className="auth-page__footer-link"
+                  component={RouterLink}
+                  to={copy.footerLinkTo}
+                  underline="hover"
+                >
+                  {copy.footerLinkLabel}
+                </Link>
+              </p>
+            </form>
           </CardContent>
         </Card>
-      </Box>
+      </div>
 
       <Dialog
         aria-labelledby="auth-error-title"
         fullWidth
         maxWidth="xs"
         open={Boolean(serverError)}
+        slotProps={{ paper: { className: "app-dialog" } }}
         onClose={() => setServerError("")}
       >
-        <DialogTitle id="auth-error-title">{copy.errorTitle}</DialogTitle>
-        <DialogContent>
-          <Typography color="text.secondary" variant="body2">
-            {serverError}
-          </Typography>
+        <DialogTitle className="app-dialog__title" id="auth-error-title">
+          {copy.errorTitle}
+        </DialogTitle>
+        <DialogContent className="app-dialog__content">
+          <p className="app-dialog__subdued-text">{serverError}</p>
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 0 }}>
+        <DialogActions className="app-dialog__actions">
           <Button type="button" variant="contained" onClick={() => setServerError("")}>
             Try again
           </Button>

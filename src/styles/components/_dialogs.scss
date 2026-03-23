@@ -1,0 +1,62 @@
+@use "../abstracts" as *;
+
+.MuiPaper-root.app-dialog {
+  border-radius: radius(xl);
+  background: linear-gradient(180deg, palette(surface) 0%, palette(surface-soft) 100%);
+  box-shadow: shadow(panel);
+}
+
+.MuiDialogTitle-root.app-dialog__title {
+  padding: 1.5rem 1.5rem 0.75rem;
+  color: palette(text);
+  font-size: 1.125rem;
+  font-weight: 700;
+
+  &.app-dialog__title--split {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: space(sm);
+  }
+}
+
+.MuiDialogContent-root.app-dialog__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0 1.5rem 1.25rem;
+
+  &.app-dialog__content--form {
+    padding-top: 0.25rem;
+  }
+}
+
+.MuiDialogActions-root.app-dialog__actions {
+  gap: 0.75rem;
+  padding: 0 1.5rem 1.5rem;
+}
+
+.app-dialog__copy,
+.app-dialog__subdued-text {
+  margin: 0;
+  color: palette(text-muted);
+  font-size: 0.95rem;
+}
+
+.app-dialog__close-button {
+  flex-shrink: 0;
+}
+
+@include respond-max(phone) {
+  .MuiDialogTitle-root.app-dialog__title {
+    padding: 1.25rem 1.25rem 0.75rem;
+  }
+
+  .MuiDialogContent-root.app-dialog__content {
+    padding: 0 1.25rem 1rem;
+  }
+
+  .MuiDialogActions-root.app-dialog__actions {
+    padding: 0 1.25rem 1.25rem;
+  }
+}

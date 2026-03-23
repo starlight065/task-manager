@@ -1,6 +1,5 @@
 import {
   Alert,
-  Box,
   Button,
   Dialog,
   DialogActions,
@@ -96,37 +95,27 @@ function CreateTaskModal({
       fullWidth
       maxWidth="sm"
       open={isOpen}
+      slotProps={{ paper: { className: "app-dialog task-modal" } }}
       onClose={handleDialogClose}
     >
-      <Box component="form" onSubmit={onSubmit}>
+      <form className="task-modal__form" onSubmit={onSubmit}>
         <DialogTitle
+          className="app-dialog__title app-dialog__title--split"
           id={titleId}
-          sx={{
-            alignItems: "center",
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 1,
-          }}
         >
           <span>{modalTitle}</span>
           <IconButton
-            onClick={handleCloseRequest}
-            disabled={isSubmitting}
             aria-label={closeLabel}
+            className="app-dialog__close-button"
+            disabled={isSubmitting}
+            onClick={handleCloseRequest}
           >
             <img src={closeIcon} alt="" width="24" height="24" />
           </IconButton>
         </DialogTitle>
 
-        <DialogContent>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              pt: 1,
-            }}
-          >
+        <DialogContent className="app-dialog__content app-dialog__content--form">
+          <div className="task-modal__fields">
             <TextField
               autoFocus
               disabled={isSubmitting}
@@ -148,16 +137,7 @@ function CreateTaskModal({
               onChange={handleChange("description")}
             />
 
-            <Box
-              sx={{
-                display: "grid",
-                gap: 2,
-                gridTemplateColumns: {
-                  sm: "repeat(2, minmax(0, 1fr))",
-                  xs: "1fr",
-                },
-              }}
-            >
+            <div className="task-modal__split-fields">
               <TextField
                 disabled={isSubmitting}
                 error={Boolean(fieldErrors.priority)}
@@ -194,7 +174,7 @@ function CreateTaskModal({
                   },
                 }}
               />
-            </Box>
+            </div>
 
             <TextField
               disabled={isSubmitting}
@@ -206,11 +186,9 @@ function CreateTaskModal({
               onChange={handleChange("tag")}
             />
 
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Box sx={{ fontSize: "0.875rem", fontWeight: 500, color: "text.secondary" }}>
-                Subtasks
-              </Box>
-              <Box sx={{ display: "flex", gap: 1 }}>
+            <div className="task-modal__subtasks">
+              <div className="task-modal__subtasks-label">Subtasks</div>
+              <div className="task-modal__subtasks-input">
                 <TextField
                   inputRef={subtaskInputRef}
                   disabled={isSubmitting}
@@ -226,65 +204,47 @@ function CreateTaskModal({
                   type="button"
                   variant="outlined"
                   size="small"
+                  className="task-modal__subtask-add"
                   disabled={isSubmitting || !subtaskInput.trim()}
                   onClick={handleAddSubtask}
-                  sx={{ whiteSpace: "nowrap", flexShrink: 0 }}
                 >
                   Add
                 </Button>
-              </Box>
+              </div>
 
               {subtasks.length > 0 && (
-                <Box
-                  component="ul"
-                  sx={{ listStyle: "none", p: 0, m: 0, display: "flex", flexDirection: "column", gap: 0.5 }}
-                >
+                <ul className="task-modal__subtask-list">
                   {subtasks.map((title, index) => (
-                    <Box
-                      component="li"
-                      key={index}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                        px: 1.5,
-                        py: 0.75,
-                        borderRadius: 1,
-                        bgcolor: "action.hover",
-                      }}
-                    >
-                      <Box sx={{ flex: 1, fontSize: "0.875rem" }}>{title}</Box>
+                    <li className="task-modal__subtask-item" key={index}>
+                      <span className="task-modal__subtask-title">{title}</span>
                       <IconButton
+                        className="task-modal__subtask-remove"
                         size="small"
                         disabled={isSubmitting}
                         onClick={() => onSubtaskRemove(index)}
                         aria-label={`Remove subtask "${title}"`}
-                        sx={{ p: 0.25 }}
                       >
                         <img src={closeIcon} alt="" width="16" height="16" />
                       </IconButton>
-                    </Box>
+                    </li>
                   ))}
-                </Box>
+                </ul>
               )}
-            </Box>
+            </div>
 
             {formError ? <Alert severity="error">{formError}</Alert> : null}
-          </Box>
+          </div>
         </DialogContent>
 
-        <DialogActions sx={{ p: 3, pt: 0 }}>
-          <Button
-            onClick={handleCloseRequest}
-            disabled={isSubmitting}
-          >
+        <DialogActions className="app-dialog__actions">
+          <Button disabled={isSubmitting} onClick={handleCloseRequest}>
             Cancel
           </Button>
           <Button type="submit" variant="contained" disabled={isSubmitting}>
             {submitLabel}
           </Button>
         </DialogActions>
-      </Box>
+      </form>
     </Dialog>
   );
 }

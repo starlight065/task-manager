@@ -1,0 +1,133 @@
+@use "sass:map";
+
+$font-family-base: "Exo 2", sans-serif;
+
+$colors: (
+  primary: #007bff,
+  primary-hover: #0069d9,
+  secondary: #28a745,
+  secondary-hover: #218838,
+  focus: #3a8ef6,
+  focus-strong: #216de0,
+  success: #28a745,
+  warning: #ff0000,
+  warning-soft: #e07b00,
+  danger: #e05c00,
+  info: #1a6fcf,
+  page-bg: #f8f9fa,
+  surface: #ffffff,
+  surface-soft: #fbfcfe,
+  surface-muted: #fafafa,
+  surface-quiet: #f7f9fc,
+  text: #333333,
+  text-muted: #666666,
+  text-soft: #5e6b7a,
+  text-subtle: #7a8ba1,
+  text-strong: #23415f,
+  text-deep: #294d73,
+  border: #dddddd,
+  border-soft: #eeeeee,
+  border-muted: #dde5ef,
+  border-panel: #dfe6ef,
+  border-light: #d9e3f1,
+  border-card: #e2e7ef,
+  border-action: #ebe6df,
+  calendar-empty-border: #d6e0ee,
+  calendar-empty-text: #66778c,
+  calendar-more: #6c7c90,
+  day-muted: #8b96a5,
+  title-accent: #1f4e87,
+  pill-bg: #edf4ff,
+  pill-text: #21466e,
+  pill-count-text: #2b5f9e,
+  completed-pill-bg: #f0f2f5,
+  completed-pill-text: #8a94a2,
+  action-hover: #f4f1eb,
+  tag-border: #bbbbbb,
+  tag-text: #555555,
+  text-disabled: #999999,
+  subtask-text: #888888,
+  subtask-text-muted: #aaaaaa,
+  progress-track: #dddddd,
+  progress-fill: #333333
+);
+
+$spaces: (
+  xxs: 0.25rem,
+  xs: 0.35rem,
+  sm: 0.5rem,
+  md: 0.75rem,
+  lg: 1rem,
+  xl: 1.25rem,
+  "2xl": 1.5rem,
+  "3xl": 2rem,
+  "4xl": 3rem
+);
+
+$radii: (
+  sm: 5px,
+  md: 8px,
+  card: 10px,
+  lg: 14px,
+  xl: 18px,
+  pill: 999px
+);
+
+$shadows: (
+  sm: 0 4px 12px rgba(0, 0, 0, 0.1),
+  md: 0 8px 20px rgba(0, 0, 0, 0.12),
+  floating: 0 10px 20px rgba(58, 142, 246, 0.22),
+  panel: 0 16px 32px rgba(18, 37, 63, 0.06),
+  panel-hover: 0 14px 26px rgba(58, 142, 246, 0.18)
+);
+
+$timings: (
+  fast: 0.15s ease,
+  base: 0.18s ease,
+  slow: 0.3s
+);
+
+$breakpoints: (
+  phone: 480px,
+  task: 600px,
+  tablet: 768px,
+  task-wide: 840px,
+  desktop: 960px
+);
+
+$priority-themes: (
+  high: (
+    soft-bg: #ffeaea,
+    soft-text: #e53935,
+    soft-border: #e53935,
+    solid-bg: #f45c5c,
+    solid-text: #ffffff
+  ),
+  medium: (
+    soft-bg: #fff8e1,
+    soft-text: #ff9800,
+    soft-border: #ff9800,
+    solid-bg: #f5a623,
+    solid-text: #ffffff
+  ),
+  low: (
+    soft-bg: #e8f5e9,
+    soft-text: #43a047,
+    soft-border: #43a047,
+    solid-bg: #5cb85c,
+    solid-text: #ffffff
+  )
+);
+
+$task-stat-colors: (
+  pending: map.get($colors, warning-soft),
+  done: map.get($colors, success),
+  total: map.get($colors, info)
+);
+
+$due-date-colors: (
+  overdue: map.get($colors, danger),
+  soon: map.get($colors, warning),
+  normal: map.get($colors, text),
+  completed: map.get($colors, text-disabled)
+);

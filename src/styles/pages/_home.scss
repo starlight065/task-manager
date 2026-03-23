@@ -1,0 +1,179 @@
+@use "sass:map";
+@use "../abstracts" as *;
+
+.header {
+  padding: 3rem 1rem;
+  border-bottom: 1px solid palette(border);
+  background: palette(surface);
+  box-shadow: shadow(sm);
+  text-align: center;
+
+  &__container {
+    width: min(90%, 1200px);
+    margin: 0 auto;
+  }
+
+  &__logo {
+    margin: 0;
+    color: palette(text);
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
+  &__tagline {
+    margin: 0.5rem 0 1.5rem;
+    color: palette(text-muted);
+    font-size: 1.2rem;
+  }
+}
+
+.main {
+  width: min(90%, 1200px);
+  margin: 0 auto;
+  padding: 1rem 0;
+}
+
+.section {
+  padding: 3rem 1rem;
+  border-bottom: 1px solid palette(border-soft);
+  text-align: center;
+
+  &--last {
+    border-bottom: 0;
+  }
+
+  &__title {
+    margin: 0 0 1rem;
+    color: palette(text);
+    font-size: 2rem;
+  }
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+  text-align: left;
+
+  &__item {
+    padding: 2rem;
+    border-radius: radius(md);
+    background: palette(surface);
+    box-shadow: shadow(sm);
+    @include interactive-lift(-5px, md);
+  }
+
+  &__title {
+    margin-top: 0;
+    color: palette(primary);
+    font-size: 1.3rem;
+  }
+
+  &__icon {
+    width: 120px;
+    height: 120px;
+    margin: 2rem auto 0;
+  }
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.button {
+  @include button-reset;
+  padding: 14px 28px;
+  border-radius: radius(sm);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  @include interactive-lift(-2px, md);
+
+  &--primary {
+    background: palette(primary);
+    color: palette(surface);
+
+    &:hover {
+      background: palette(primary-hover);
+    }
+  }
+
+  &--secondary {
+    background: palette(secondary);
+    color: palette(surface);
+
+    &:hover {
+      background: palette(secondary-hover);
+    }
+  }
+}
+
+.footer {
+  margin-top: 2rem;
+  padding: 2rem 1rem;
+  background: palette(text);
+  color: palette(surface);
+  text-align: center;
+}
+
+.priority {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+
+  &__item {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  @each $level, $theme in $priority-themes {
+    &__item--#{$level} {
+      background: map.get($theme, soft-bg);
+      border-color: map.get($theme, soft-border);
+      color: map.get($theme, soft-text);
+    }
+  }
+}
+
+@include respond-max(tablet) {
+  .header__logo {
+    font-size: 2rem;
+  }
+
+  .section__title {
+    font-size: 1.8rem;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include respond-max(phone) {
+  .button-group {
+    flex-direction: column;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
+
+@include reduced-motion {
+  .button,
+  .features__item {
+    transition: none;
+  }
+}

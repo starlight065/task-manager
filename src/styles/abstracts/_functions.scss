@@ -1,0 +1,44 @@
+@use "sass:color";
+@use "sass:map";
+@use "./tokens";
+
+@function resolve-token($collection, $key, $label) {
+  @if not map.has-key($collection, $key) {
+    @error "Unknown #{$label}: #{$key}";
+  }
+
+  @return map.get($collection, $key);
+}
+
+@function palette($name) {
+  @return resolve-token(tokens.$colors, $name, "color token");
+}
+
+@function alpha($name, $alpha) {
+  @return color.change(palette($name), $alpha: $alpha);
+}
+
+@function space($name) {
+  @return resolve-token(tokens.$spaces, $name, "space token");
+}
+
+@function radius($name) {
+  @return resolve-token(tokens.$radii, $name, "radius token");
+}
+
+@function shadow($name) {
+  @return resolve-token(tokens.$shadows, $name, "shadow token");
+}
+
+@function timing($name) {
+  @return resolve-token(tokens.$timings, $name, "timing token");
+}
+
+@function breakpoint($name) {
+  @return resolve-token(tokens.$breakpoints, $name, "breakpoint token");
+}
+
+@function priority($level, $tone) {
+  $theme: resolve-token(tokens.$priority-themes, $level, "priority theme");
+  @return resolve-token($theme, $tone, "priority tone");
+}

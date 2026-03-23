@@ -98,12 +98,12 @@ function TaskCard({
         {subtaskTotal > 0 && (
           <div className="task-card__subtasks">
             <div className="task-card__subtask-progress">
-              <div className="task-card__subtask-progress-bar-track">
-                <div
-                  className="task-card__subtask-progress-bar-fill"
-                  style={{ width: `${subtaskPct}%` }}
-                />
-              </div>
+              <progress
+                aria-label="Subtask completion"
+                className="task-card__subtask-progress-bar"
+                max={100}
+                value={subtaskPct}
+              />
               <span className="task-card__subtask-progress-label">
                 {subtaskDone}/{subtaskTotal}
               </span>

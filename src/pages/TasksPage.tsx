@@ -1,4 +1,3 @@
-import "../styles/TasksPage.css";
 import { Outlet, useLocation } from "react-router-dom";
 import loadingSpinnerIcon from "../assets/tasks-loading-spinner.svg";
 import CreateTaskModal from "../features/tasks/components/CreateTaskModal";

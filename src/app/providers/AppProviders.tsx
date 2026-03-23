@@ -1,18 +1,17 @@
-import { ThemeProvider } from "@mui/material/styles";
+import { StyledEngineProvider } from "@mui/material/styles";
 import { StrictMode } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "../../features/auth/model/AuthProvider";
-import muiTheme from "../../theme/muiTheme";
 import type { AppProvidersProps } from "../types";
 
 function AppProviders({ children }: AppProvidersProps) {
   return (
     <StrictMode>
-      <ThemeProvider theme={muiTheme}>
+      <StyledEngineProvider injectFirst>
         <BrowserRouter>
           <AuthProvider>{children}</AuthProvider>
         </BrowserRouter>
-      </ThemeProvider>
+      </StyledEngineProvider>
     </StrictMode>
   );
 }

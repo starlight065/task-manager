@@ -1,0 +1,110 @@
+@use "./functions" as fn;
+
+@mixin emit-vars($prefix, $map) {
+  @each $name, $value in $map {
+    --#{$prefix}-#{$name}: #{$value};
+  }
+}
+
+@mixin respond-min($name) {
+  @media (min-width: fn.breakpoint($name)) {
+    @content;
+  }
+}
+
+@mixin respond-max($name) {
+  @media (max-width: calc(#{fn.breakpoint($name)} - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin respond-between($min, $max) {
+  @media (min-width: fn.breakpoint($min)) and (max-width: calc(#{fn.breakpoint($max)} - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+@mixin focus-ring($tone: focus) {
+  outline: 2px solid fn.palette($tone);
+  outline-offset: 2px;
+}
+
+@mixin button-reset {
+  appearance: none;
+  border: 0;
+  background: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+}
+
+@mixin pill($block-padding, $inline-padding) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $block-padding $inline-padding;
+  border-radius: fn.radius(pill);
+  white-space: nowrap;
+}
+
+@mixin panel-surface($shadow-name: panel) {
+  border: 1px solid fn.palette(border-panel);
+  border-radius: fn.radius(xl);
+  background: linear-gradient(180deg, fn.palette(surface) 0%, fn.palette(surface-soft) 100%);
+  box-shadow: fn.shadow($shadow-name);
+}
+
+@mixin interactive-lift($translate: -1px, $shadow-name: floating) {
+  transition:
+    background-color fn.timing(base),
+    border-color fn.timing(base),
+    box-shadow fn.timing(base),
+    color fn.timing(base),
+    opacity fn.timing(base),
+    transform fn.timing(base);
+
+  &:hover {
+    transform: translateY($translate);
+    box-shadow: fn.shadow($shadow-name);
+  }
+}
+
+@mixin progress($height, $track-color, $fill-color, $width: 100%) {
+  appearance: none;
+  display: block;
+  width: $width;
+  height: $height;
+  border: 0;
+  border-radius: fn.radius(pill);
+  overflow: hidden;
+  background: none;
+
+  &::-webkit-progress-bar {
+    background: $track-color;
+    border-radius: inherit;
+  }
+
+  &::-webkit-progress-value {
+    background: $fill-color;
+    border-radius: inherit;
+    transition: width fn.timing(base);
+  }
+
+  &::-moz-progress-bar {
+    background: $fill-color;
+    border-radius: inherit;
+    transition: width fn.timing(base);
+  }
+}
+
+@mixin list-reset {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

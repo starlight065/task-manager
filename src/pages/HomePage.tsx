@@ -1,7 +1,6 @@
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
 import calendarIcon from "../assets/calendar.svg";
-import "../styles/App.css";
 
 function HomePage() {
   const navigate = useNavigate();

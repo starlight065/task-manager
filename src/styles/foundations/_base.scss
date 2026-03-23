@@ -1,0 +1,62 @@
+@use "../abstracts" as *;
+
+:root {
+  @include emit-vars("color", $colors);
+  @include emit-vars("radius", $radii);
+  @include emit-vars("shadow", $shadows);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  background: palette(page-bg);
+}
+
+body {
+  margin: 0;
+  background: palette(page-bg);
+  color: palette(text);
+  font-family: $font-family-base;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+.MuiButtonBase-root,
+.MuiChip-root,
+.MuiDialogActions-root,
+.MuiDialogContent-root,
+.MuiDialogContentText-root,
+.MuiDialogTitle-root,
+.MuiFormLabel-root,
+.MuiInputBase-root,
+.MuiMenuItem-root,
+.MuiTypography-root {
+  font-family: inherit;
+}
