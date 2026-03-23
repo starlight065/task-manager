@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useState } from "react";
+import { useRef, useState, type TouchEvent } from "react";
 import type { TaskDto } from "../../../shared/types";
 import TaskCard from "./TaskCard";
 import {
@@ -23,6 +23,29 @@ const PRIORITY_ORDER: Record<TaskDto["priority"], number> = {
   medium: 1,
   low: 2,
 };
+
+const SWIPE_THRESHOLD = 56;
+const SWIPE_VERTICAL_TOLERANCE = 80;
+
+function CalendarArrowIcon({ direction }: { direction: "previous" | "next" }) {
+  const path =
+    direction === "previous"
+      ? "M14.75 5.75L8.5 12l6.25 6.25"
+      : "M9.25 5.75L15.5 12l-6.25 6.25";
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d={path}
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+}
 
 function sortTasksForCalendar(tasks: TaskDto[]): TaskDto[] {
   return [...tasks].sort((left, right) => {
@@ -61,6 +84,7 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
   const todayMonth = getCalendarMonth(todayParts);
   const tasksByDate = getTasksByDate(model.tasks);
   const dueDates = [...tasksByDate.keys()];
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const [visibleMonth, setVisibleMonth] = useState<CalendarMonth>(todayMonth);
   const [selectedDate, setSelectedDate] = useState(() => todayIsoDate);
 
@@ -115,11 +139,81 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
     }
   }
 
+  function showPreviousMonth() {
+    selectMonth(addMonths(visibleMonth, -1));
+  }
+
+  function showNextMonth() {
+    selectMonth(addMonths(visibleMonth, 1));
+  }
+
+  function handleCalendarTouchStart(event: TouchEvent<HTMLDivElement>) {
+    const touch = event.changedTouches[0];
+
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+    };
+  }
+
+  function handleCalendarTouchEnd(event: TouchEvent<HTMLDivElement>) {
+    const touchStart = touchStartRef.current;
+
+    touchStartRef.current = null;
+
+    if (!touchStart) {
+      return;
+    }
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStart.x;
+    const deltaY = touch.clientY - touchStart.y;
+
+    if (
+      Math.abs(deltaX) < SWIPE_THRESHOLD ||
+      Math.abs(deltaY) > SWIPE_VERTICAL_TOLERANCE ||
+      Math.abs(deltaY) > Math.abs(deltaX)
+    ) {
+      return;
+    }
+
+    if (deltaX < 0) {
+      showNextMonth();
+      return;
+    }
+
+    showPreviousMonth();
+  }
+
   return (
     <section className="tasks-page__calendar">
       <div className="tasks-page__calendar-controls">
-        <div>
-          <h2 className="tasks-page__calendar-title">{getMonthLabel(visibleMonth)}</h2>
+        <div className="tasks-page__calendar-heading">
+          <div className="tasks-page__calendar-title-row">
+            <h2 className="tasks-page__calendar-title">{getMonthLabel(visibleMonth)}</h2>
+            <div
+              className="tasks-page__calendar-month-nav"
+              role="group"
+              aria-label="Change month"
+            >
+              <button
+                type="button"
+                className="tasks-page__calendar-nav-icon"
+                onClick={showPreviousMonth}
+                aria-label="Show previous month"
+              >
+                <CalendarArrowIcon direction="previous" />
+              </button>
+              <button
+                type="button"
+                className="tasks-page__calendar-nav-icon"
+                onClick={showNextMonth}
+                aria-label="Show next month"
+              >
+                <CalendarArrowIcon direction="next" />
+              </button>
+            </div>
+          </div>
           <p className="tasks-page__calendar-subtitle">
             Click a day to review the tasks due then.
           </p>
@@ -128,26 +222,10 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
         <div className="tasks-page__calendar-actions">
           <button
             type="button"
-            className="tasks-page__calendar-nav-button"
-            onClick={() => selectMonth(addMonths(visibleMonth, -1))}
-            aria-label="Show previous month"
-          >
-            Prev
-          </button>
-          <button
-            type="button"
-            className="tasks-page__calendar-nav-button"
+            className="tasks-page__calendar-secondary-button"
             onClick={() => selectMonth(todayMonth)}
           >
             Today
-          </button>
-          <button
-            type="button"
-            className="tasks-page__calendar-nav-button"
-            onClick={() => selectMonth(addMonths(visibleMonth, 1))}
-            aria-label="Show next month"
-          >
-            Next
           </button>
           <button
             type="button"
@@ -161,55 +239,64 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
 
       <div className="tasks-page__calendar-layout">
         <div className="tasks-page__calendar-board">
-          <div className="tasks-page__calendar-weekdays" aria-hidden="true">
-            {WEEKDAY_LABELS.map((label) => (
-              <span key={label} className="tasks-page__calendar-weekday">
-                {label}
-              </span>
-            ))}
-          </div>
+          <div
+            className="tasks-page__calendar-swipe-surface"
+            onTouchStart={handleCalendarTouchStart}
+            onTouchEnd={handleCalendarTouchEnd}
+            onTouchCancel={() => {
+              touchStartRef.current = null;
+            }}
+          >
+            <div className="tasks-page__calendar-weekdays" aria-hidden="true">
+              {WEEKDAY_LABELS.map((label) => (
+                <span key={label} className="tasks-page__calendar-weekday">
+                  {label}
+                </span>
+              ))}
+            </div>
 
-          <div className="tasks-page__calendar-grid">
-            {calendarDays.map((day) => (
-              <button
-                key={day.isoDate}
-                type="button"
-                className={classNames("tasks-page__calendar-day", {
-                  "tasks-page__calendar-day--outside": !day.inCurrentMonth,
-                  "tasks-page__calendar-day--today": day.isToday,
-                  "tasks-page__calendar-day--selected": day.isSelected,
-                  "tasks-page__calendar-day--has-tasks": day.tasks.length > 0,
-                })}
-                onClick={() => handleDaySelect(day.isoDate, day.year, day.month)}
-                aria-pressed={day.isSelected}
-              >
-                <span className="tasks-page__calendar-day-number">{day.dayNumber}</span>
-                <span className="tasks-page__calendar-day-content">
-                  <span className="tasks-page__calendar-task-preview">
-                    {day.tasks.slice(0, 2).map((task) => (
-                      <span
-                        key={task.id}
-                        className={classNames("tasks-page__calendar-task-pill", {
-                          "tasks-page__calendar-task-pill--completed": task.completed,
-                        })}
-                      >
-                        {task.title}
-                      </span>
-                    ))}
-                    {day.tasks.length > 2 ? (
-                      <span className="tasks-page__calendar-task-more">
-                        +{day.tasks.length - 2} more
+            <div className="tasks-page__calendar-grid">
+              {calendarDays.map((day) => (
+                <button
+                  key={day.isoDate}
+                  type="button"
+                  className={classNames("tasks-page__calendar-day", {
+                    "tasks-page__calendar-day--outside": !day.inCurrentMonth,
+                    "tasks-page__calendar-day--today": day.isToday,
+                    "tasks-page__calendar-day--selected": day.isSelected,
+                    "tasks-page__calendar-day--has-tasks": day.tasks.length > 0,
+                  })}
+                  onClick={() => handleDaySelect(day.isoDate, day.year, day.month)}
+                  aria-pressed={day.isSelected}
+                >
+                  <span className="tasks-page__calendar-day-number">{day.dayNumber}</span>
+                  <span className="tasks-page__calendar-day-content">
+                    <span className="tasks-page__calendar-task-preview">
+                      {day.tasks.slice(0, 2).map((task) => (
+                        <span
+                          key={task.id}
+                          className={classNames("tasks-page__calendar-task-pill", {
+                            "tasks-page__calendar-task-pill--completed": task.completed,
+                          })}
+                        >
+                          {task.title}
+                        </span>
+                      ))}
+                      {day.tasks.length > 2 ? (
+                        <span className="tasks-page__calendar-task-more">
+                          +{day.tasks.length - 2} more
+                        </span>
+                      ) : null}
+                    </span>
+                    {day.tasks.length > 0 ? (
+                      <span className="tasks-page__calendar-task-count">
+                        {day.tasks.length} due
                       </span>
                     ) : null}
                   </span>
-                  {day.tasks.length > 0 ? (
-                    <span className="tasks-page__calendar-task-count">
-                      {day.tasks.length} due
-                    </span>
-                  ) : null}
-                </span>
-              </button>
-            ))}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
