@@ -76,8 +76,30 @@ function findTaskByIdForUser(taskId, userId) {
   });
 }
 
+function findTaskByShareToken(shareToken) {
+  return Task.findOne({
+    where: { share_token: shareToken },
+    include: [{ model: Subtask, as: "subtasks" }],
+  });
+}
+
+function findTaskByShareTokenForOtherTask(shareToken, taskId) {
+  return Task.findOne({
+    where: {
+      share_token: shareToken,
+      id: { [require("sequelize").Op.ne]: taskId },
+    },
+  });
+}
+
 async function updateTaskCompletion(task, completed) {
   task.completed = completed;
+  await task.save();
+  return findTaskByIdForUser(task.id, task.user_id);
+}
+
+async function setTaskShareToken(task, shareToken) {
+  task.share_token = shareToken;
   await task.save();
   return findTaskByIdForUser(task.id, task.user_id);
 }
@@ -89,8 +111,11 @@ async function deleteTask(task) {
 module.exports = {
   createTask,
   deleteTask,
-  findTasksByUserId,
   findTaskByIdForUser,
+  findTaskByShareToken,
+  findTaskByShareTokenForOtherTask,
+  findTasksByUserId,
+  setTaskShareToken,
   updateTask,
   updateTaskCompletion,
 };

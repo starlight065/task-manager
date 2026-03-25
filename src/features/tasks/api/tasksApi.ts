@@ -16,11 +16,38 @@ export async function getTasks(): Promise<TaskDto[]> {
   return data.tasks;
 }
 
+export async function getPublicTask(shareToken: string): Promise<TaskDto> {
+  const data = await apiRequest<TaskResponse>(`/api/public/tasks/${shareToken}`, {
+    fallbackErrorMessage: "Failed to load shared task",
+    handleUnauthorized: false,
+  });
+
+  return data.task;
+}
+
 export async function createTask(payload: CreateTaskDto): Promise<TaskDto> {
   const data = await apiRequest<TaskResponse>("/api/tasks", {
     method: "POST",
     body: payload,
     fallbackErrorMessage: "Failed to create task",
+  });
+
+  return data.task;
+}
+
+export async function createShareLink(taskId: number): Promise<TaskDto> {
+  const data = await apiRequest<TaskResponse>(`/api/tasks/${taskId}/share`, {
+    method: "POST",
+    fallbackErrorMessage: "Failed to create share link",
+  });
+
+  return data.task;
+}
+
+export async function revokeShareLink(taskId: number): Promise<TaskDto> {
+  const data = await apiRequest<TaskResponse>(`/api/tasks/${taskId}/share`, {
+    method: "DELETE",
+    fallbackErrorMessage: "Failed to revoke share link",
   });
 
   return data.task;

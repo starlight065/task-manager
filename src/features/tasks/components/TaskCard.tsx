@@ -39,6 +39,8 @@ function TaskCard({
   onSubtaskCompletionChange,
   onEditClick,
   onDeleteClick,
+  onShareClick,
+  onShareRevokeClick,
 }: TaskCardProps) {
   const subtaskTotal = task.subtasks.length;
   const subtaskDone = task.subtasks.filter((s) => s.completed).length;
@@ -46,6 +48,7 @@ function TaskCard({
   const hasDescription = task.description.trim().length > 0;
   const hasDueDate = task.dueDate.trim().length > 0;
   const hasTag = task.tag.trim().length > 0;
+  const isShared = task.shareToken !== null;
 
   return (
     <div
@@ -73,6 +76,26 @@ function TaskCard({
             {task.title}
           </div>
           <div className="task-card__actions">
+            <button
+              type="button"
+              className="task-card__action task-card__action--share"
+              aria-label={isShared ? "Copy shared task link" : "Create shared task link"}
+              disabled={isUpdating}
+              onClick={() => onShareClick(task)}
+            >
+              Share
+            </button>
+            {isShared ? (
+              <button
+                type="button"
+                className="task-card__action task-card__action--revoke"
+                aria-label="Revoke shared task link"
+                disabled={isUpdating}
+                onClick={() => onShareRevokeClick(task)}
+              >
+                Revoke
+              </button>
+            ) : null}
             <button
               type="button"
               className="task-card__action"
@@ -138,6 +161,7 @@ function TaskCard({
         <span className={classNames("priority-badge", `priority-badge--${task.priority}`)}>
           {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
         </span>
+        {isShared ? <span className="task-card__share-badge">Public link enabled</span> : null}
         {hasDueDate ? (
           <span
             className={classNames(

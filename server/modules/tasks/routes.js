@@ -1,9 +1,13 @@
+const crypto = require("crypto");
 const express = require("express");
 const {
   createTask,
   deleteTask,
-  findTasksByUserId,
   findTaskByIdForUser,
+  findTaskByShareToken,
+  findTaskByShareTokenForOtherTask,
+  findTasksByUserId,
+  setTaskShareToken,
   updateTask,
   updateTaskCompletion,
 } = require("../../repositories/taskRepository");
@@ -17,6 +21,39 @@ const {
 } = require("../../validators/taskValidator");
 
 const router = express.Router();
+
+async function generateUniqueShareToken(taskId) {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const token = crypto.randomBytes(24).toString("hex");
+    const existingTask = await findTaskByShareTokenForOtherTask(token, taskId);
+
+    if (!existingTask) {
+      return token;
+    }
+  }
+
+  throw new Error("Failed to generate a unique share token");
+}
+
+router.get("/public/tasks/:shareToken", async (req, res) => {
+  try {
+    const shareToken = typeof req.params.shareToken === "string" ? req.params.shareToken.trim() : "";
+
+    if (!/^[a-f0-9]{48}$/i.test(shareToken)) {
+      return res.status(404).json({ error: "Shared task not found" });
+    }
+
+    const task = await findTaskByShareToken(shareToken);
+    if (!task) {
+      return res.status(404).json({ error: "Shared task not found" });
+    }
+
+    return res.json({ task: serializeTask(task) });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: AUTH_MESSAGES.serverError });
+  }
+});
 
 router.use(requireAuth);
 
@@ -54,6 +91,49 @@ router.post("/tasks", async (req, res) => {
     });
 
     return res.status(201).json({ task: serializeTask(task) });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: AUTH_MESSAGES.serverError });
+  }
+});
+
+router.post("/tasks/:taskId/share", async (req, res) => {
+  try {
+    const taskId = Number.parseInt(req.params.taskId, 10);
+    if (!Number.isInteger(taskId) || taskId <= 0) {
+      return res.status(400).json({ error: "Task id must be a positive integer" });
+    }
+
+    const task = await findTaskByIdForUser(taskId, req.user.id);
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    const shareToken = await generateUniqueShareToken(task.id);
+    const updatedTask = await setTaskShareToken(task, shareToken);
+
+    return res.json({ task: serializeTask(updatedTask) });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: AUTH_MESSAGES.serverError });
+  }
+});
+
+router.delete("/tasks/:taskId/share", async (req, res) => {
+  try {
+    const taskId = Number.parseInt(req.params.taskId, 10);
+    if (!Number.isInteger(taskId) || taskId <= 0) {
+      return res.status(400).json({ error: "Task id must be a positive integer" });
+    }
+
+    const task = await findTaskByIdForUser(taskId, req.user.id);
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    const updatedTask = await setTaskShareToken(task, null);
+
+    return res.json({ task: serializeTask(updatedTask) });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: AUTH_MESSAGES.serverError });

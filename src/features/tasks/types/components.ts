@@ -29,7 +29,10 @@ export interface TaskCardProps {
   onSubtaskCompletionChange: (taskId: number, subtaskId: number, completed: boolean) => void;
   onEditClick: (task: TaskDto) => void;
   onDeleteClick: (task: TaskDto) => void;
+  onShareClick: (task: TaskDto) => void;
+  onShareRevokeClick: (task: TaskDto) => void;
 }
+
 
 export interface TaskDeleteModalProps {
   isOpen: boolean;
@@ -54,7 +57,10 @@ export interface TaskListSectionProps {
   onSubtaskCompletionChange: (taskId: number, subtaskId: number, completed: boolean) => void;
   onTaskEditClick: (task: TaskDto) => void;
   onTaskDeleteClick: (task: TaskDto) => void;
+  onTaskShareClick: (task: TaskDto) => void;
+  onTaskShareRevokeClick: (task: TaskDto) => void;
 }
+
 
 export interface TasksCalendarViewProps {
   model: TasksPageModel;

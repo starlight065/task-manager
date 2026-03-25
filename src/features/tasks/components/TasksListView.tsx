@@ -29,6 +29,8 @@ function TasksListView({ model }: TasksListViewProps) {
         onSubtaskCompletionChange={model.taskLists.toggleSubtaskCompletion}
         onTaskEditClick={model.taskLists.openEditTaskModal}
         onTaskDeleteClick={model.taskLists.openDeleteTaskModal}
+        onTaskShareClick={model.taskLists.shareTask}
+        onTaskShareRevokeClick={model.taskLists.revokeTaskShare}
       />
       <TaskListSection
         title="Completed"
@@ -38,6 +40,8 @@ function TasksListView({ model }: TasksListViewProps) {
         onSubtaskCompletionChange={model.taskLists.toggleSubtaskCompletion}
         onTaskEditClick={model.taskLists.openEditTaskModal}
         onTaskDeleteClick={model.taskLists.openDeleteTaskModal}
+        onTaskShareClick={model.taskLists.shareTask}
+        onTaskShareRevokeClick={model.taskLists.revokeTaskShare}
       />
 
       {model.taskLists.visibleCount === 0 ? (

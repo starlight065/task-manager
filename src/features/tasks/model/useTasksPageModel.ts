@@ -1,9 +1,11 @@
 import { useEffect, useState, type SubmitEvent } from "react";
 import type { CreateTaskDto, SubtaskDto, TaskDto } from "../../../shared/types";
 import {
+  createShareLink,
   createTask,
   deleteTask,
   getTasks,
+  revokeShareLink,
   toggleSubtaskCompletion as apiToggleSubtaskCompletion,
   updateTask,
   updateTaskCompletion,
@@ -25,6 +27,7 @@ export function useTasksPageModel() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [completionError, setCompletionError] = useState<string | null>(null);
+  const [shareFeedbackMessage, setShareFeedbackMessage] = useState<string | null>(null);
   const [pendingTaskIds, setPendingTaskIds] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("due-date");
@@ -293,6 +296,71 @@ export function useTasksPageModel() {
     }
   }
 
+
+
+  async function copyShareLink(shareToken: string) {
+    const shareUrl = `${window.location.origin}/shared/${shareToken}`;
+
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(shareUrl);
+      return;
+    }
+
+    throw new Error("Clipboard copy is not supported in this browser");
+  }
+
+  async function shareTask(task: TaskDto) {
+    setPendingTaskIds((currentTaskIds) =>
+      currentTaskIds.includes(task.id) ? currentTaskIds : [...currentTaskIds, task.id],
+    );
+
+    try {
+      const nextTask = task.shareToken ? task : await createShareLink(task.id);
+
+      setTasks((currentTasks) =>
+        currentTasks.map((currentTask) => (currentTask.id === nextTask.id ? nextTask : currentTask)),
+      );
+
+      if (!nextTask.shareToken) {
+        throw new Error("Failed to generate share link");
+      }
+
+      await copyShareLink(nextTask.shareToken);
+      setShareFeedbackMessage("Link copied");
+      setCompletionError(null);
+    } catch (err) {
+      setShareFeedbackMessage(null);
+      setCompletionError(err instanceof Error ? err.message : "Failed to copy share link");
+    } finally {
+      setPendingTaskIds((currentTaskIds) =>
+        currentTaskIds.filter((currentTaskId) => currentTaskId !== task.id),
+      );
+    }
+  }
+
+  async function revokeTaskShare(task: TaskDto) {
+    if (!task.shareToken) {
+      return;
+    }
+
+    setPendingTaskIds((currentTaskIds) =>
+      currentTaskIds.includes(task.id) ? currentTaskIds : [...currentTaskIds, task.id],
+    );
+
+    try {
+      const nextTask = await revokeShareLink(task.id);
+      setTasks((currentTasks) =>
+        currentTasks.map((currentTask) => (currentTask.id === nextTask.id ? nextTask : currentTask)),
+      );
+      setCompletionError(null);
+    } catch (err) {
+      setCompletionError(err instanceof Error ? err.message : "Failed to revoke share link");
+    } finally {
+      setPendingTaskIds((currentTaskIds) =>
+        currentTaskIds.filter((currentTaskId) => currentTaskId !== task.id),
+      );
+    }
+  }
   async function confirmTaskDelete() {
     if (!taskToDelete) {
       return;
@@ -326,8 +394,10 @@ export function useTasksPageModel() {
     error,
     tasks,
     completionError,
+    shareFeedbackMessage,
     openCreateTaskModal,
     dismissCompletionError: () => setCompletionError(null),
+    dismissShareFeedback: () => setShareFeedbackMessage(null),
     summary: getTaskSummary(tasks),
     toolbar: {
       searchQuery,
@@ -349,6 +419,8 @@ export function useTasksPageModel() {
       toggleSubtaskCompletion,
       openEditTaskModal,
       openDeleteTaskModal,
+      shareTask,
+      revokeTaskShare,
     },
     createTaskModal: {
       isOpen: isTaskModalOpen,
