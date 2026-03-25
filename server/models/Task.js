@@ -39,6 +39,11 @@ const Task = sequelize.define(
       allowNull: false,
       defaultValue: false,
     },
+    share_token: {
+      type: DataTypes.STRING(64),
+      allowNull: true,
+      unique: true,
+    },
   },
   {
     tableName: "tasks",

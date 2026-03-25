@@ -5,6 +5,7 @@ import SignupPage from "../../pages/SignupPage";
 import TasksCalendarPage from "../../pages/TasksCalendarPage";
 import TasksListPage from "../../pages/TasksListPage";
 import TasksPage from "../../pages/TasksPage";
+import PublicTaskPage from "../../pages/PublicTaskPage";
 import { ProtectedRoute, PublicRoute } from "./RouteGuards";
 
 function AppRouter() {
@@ -27,6 +28,7 @@ function AppRouter() {
           </PublicRoute>
         }
       />
+      <Route path="/shared/:shareToken" element={<PublicTaskPage />} />
       <Route
         path="/tasks"
         element={

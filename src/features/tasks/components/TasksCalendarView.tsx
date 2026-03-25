@@ -320,6 +320,8 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
                   onSubtaskCompletionChange={model.taskLists.toggleSubtaskCompletion}
                   onEditClick={model.taskLists.openEditTaskModal}
                   onDeleteClick={model.taskLists.openDeleteTaskModal}
+                  onShareClick={model.taskLists.shareTask}
+                  onShareRevokeClick={model.taskLists.revokeTaskShare}
                 />
               ))}
             </div>

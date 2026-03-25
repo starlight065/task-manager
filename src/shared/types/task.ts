@@ -15,6 +15,7 @@ export interface TaskDto {
   createdAt: string;
   tag: string;
   completed: boolean;
+  shareToken: string | null;
   subtasks: SubtaskDto[];
 }
 
