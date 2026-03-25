@@ -1,25 +1,31 @@
 # Task Manager
 
-Task Manager is a full-stack task tracking application with a React frontend and an Express backend. It supports account registration, session-based authentication, and a personal task dashboard with creation, editing, deletion, subtasks, filtering, sorting, and completion tracking.
+Task Manager is a full-stack task tracking application with a Vite + React + TypeScript frontend and an Express + Sequelize + MySQL backend. It supports account registration, session-based authentication, private task management, a deadline calendar, and public task sharing.
 
-The repository is split into two runtime applications:
+The repository is split into three main parts:
 
 - `./`: Vite + React + TypeScript frontend
 - `./server`: Express + Sequelize + MySQL backend
+- `./shared`: configuration shared between client and server
 
-## What The App Does
+## What the App Does
 
+- Serves a landing page at `/` plus dedicated `/login` and `/signup` screens
 - Registers and logs users in with email/password credentials
-- Persists authentication with HTTP-only session cookies
-- Restores the signed-in user on page refresh
+- Persists authentication with HTTP-only session cookies stored in MySQL
+- Restores the signed-in user from `GET /api/me` on page refresh
 - Lets each user create private tasks with title, description, priority, due date, tag, and subtasks
-- Lets users edit existing tasks from the task card action menu using the same form as task creation
-- Lets users delete tasks from the task card after confirming the action in a dialog
-- Supports subtasks within each task, with individual completion toggles and a per-task progress bar
-- Auto-completes a task when all its subtasks are completed, and reverts it when a subtask is unchecked
-- Separates active and completed tasks
-- Supports search, status filtering, priority filtering, and sorting
-- Tracks completion progress on the tasks page with a summary and progress bar
+- Reuses the same modal for task creation and editing
+- Lets users delete tasks from a confirmation dialog
+- Supports per-subtask completion toggles and a per-task subtask progress bar
+- Auto-completes a task when all subtasks are completed, and reopens it when any subtask is unchecked
+- Separates active and completed tasks in the list view
+- Supports search, priority filtering, status filtering, and sorting by due date, priority, or creation date in the list view
+- Shows overall pending/done/total counts plus a progress bar on the tasks dashboard
+- Provides a calendar view at `/tasks/calendar` for browsing tasks by due date
+- Supports touch swipe month navigation in the calendar view
+- Lets users generate a public share link for a task, copy it to the clipboard, and revoke it later
+- Exposes a read-only public task page at `/shared/:shareToken`
 
 ## Technology Stack
 
@@ -31,8 +37,8 @@ The repository is split into two runtime applications:
 - React Router 7
 - Material UI 7
 - Emotion
-- SCSS (Sass) for global, page, and component styling
-- `classnames` for conditional styling
+- SCSS (Sass)
+- `classnames`
 
 ### Backend
 
@@ -50,22 +56,28 @@ The repository is split into two runtime applications:
 
 ### Frontend
 
-The client is organized by feature rather than by component type alone.
+The client is organized by app shell, route pages, and feature folders.
 
-- `src/app`: application shell, providers, and router
+- `src/app`: application shell, providers, router, and route guards
 - `src/pages`: route-level pages
 - `src/features/auth`: auth UI, auth state, client validation, and auth API calls
-- `src/features/tasks`: task UI, API calls, filtering/sorting logic, and page model
+- `src/features/tasks`: task API calls, page model, list/calendar UI, filtering, and form helpers
 - `src/shared/api`: shared fetch wrapper with cookie credentials and centralized error handling
-- `src/shared/types`: DTOs shared across the client
-- `src/theme`: Material UI theme setup
-- `src/styles`: SCSS entrypoint and partials for shared styling foundations, components, and pages
+- `src/shared/types`: client-side DTOs and request option types
+- `src/styles`: SCSS entrypoint plus foundations, component partials, and page styles
 
-Authentication state is managed through `AuthProvider`, which restores the current session from `GET /api/me` and redirects on unauthorized responses.
+`AuthProvider` restores the current session from `GET /api/me`, exposes `login`, `register`, and `logout` actions, and installs a centralized unauthorized handler that redirects users back to `/login`.
 
-Task creation and task editing share the same modal component. The tasks page model switches that modal between `create` and `edit` modes, preloads form values for edits, and persists updates through the tasks API client. Task deletion uses a separate confirmation dialog before sending the delete request.
+`useTasksPageModel` is the main tasks state layer. It:
 
-Subtasks can be added and removed inline in the create/edit modal. Each task card renders its subtasks with individual checkboxes and a progress bar showing how many are completed. Completion toggles for both tasks and subtasks use optimistic updates with rollback on failure and display errors through a dedicated error modal.
+- fetches tasks from the backend
+- manages search/filter/sort state for the list view
+- owns create/edit/delete modal state
+- performs optimistic task and subtask completion updates
+- creates and revokes share links
+- exposes shared state to both the list view and calendar view
+
+The list view renders the toolbar, active/completed sections, and overall progress. The calendar view renders a month grid, highlights days with due tasks, and shows the selected day's tasks in a side panel.
 
 ### Backend
 
@@ -73,34 +85,32 @@ The server is organized around modules plus shared infrastructure code.
 
 - `server/config`: environment parsing and session configuration
 - `server/modules/auth`: auth routes
-- `server/modules/tasks`: task routes
+- `server/modules/tasks`: task and public-share routes
 - `server/repositories`: database access helpers
 - `server/models`: Sequelize models and associations
 - `server/middleware`: shared Express middleware
-- `server/services`: session-related helpers
+- `server/services`: session helpers
 - `server/validators`: request validation
 - `server/utils`: response serialization helpers
 
-The server:
+On startup, the backend:
 
-- reads environment variables from the root `.env`
-- connects to MySQL through Sequelize
-- syncs database tables on startup with `sequelize.sync({ alter: true })`
-- stores Express sessions in the database
-- exposes all API routes under `/api`
+- loads environment variables from the root `.env`
+- authenticates against MySQL through Sequelize
+- syncs application tables with `sequelize.sync({ alter: true })`
+- syncs the session store table with `alter: true`
+- configures CORS for `CLIENT_ORIGIN`
+- mounts auth and task routes under `/api`
 
-Task updates are handled by `PUT /api/tasks/:taskId`, which validates the task payload, checks task ownership, and returns the serialized updated task including its subtasks. Task deletion is handled by `DELETE /api/tasks/:taskId`, which verifies ownership before removing the record and its associated subtasks via cascade.
-
-Subtask completion is handled by `PATCH /api/tasks/:taskId/subtasks/:subtaskId`. When all subtasks for a task become completed, the server automatically marks the parent task as completed. When a subtask is unchecked and the parent was completed, the server reverts the parent to incomplete.
-
+Public shared-task access is exposed before auth middleware at `GET /api/public/tasks/:shareToken`. All private task routes under `/api/tasks` require an authenticated session.
 
 ## Shared Configuration
 
-`shared/auth.json` is a single source of truth for authentication rules and auth-related messages used on both sides of the application.
+`shared/auth.json` is the single source of truth for auth-related validation rules and messages used on both the frontend and backend.
 
 Current shared auth rules:
 
-- email must match the configured email regex
+- email must match the configured regex pattern
 - password minimum length is `14`
 - password must include at least `1` special character
 
@@ -110,26 +120,27 @@ Current shared auth rules:
 
 - Node.js
 - npm
-- MySQL database
+- MySQL
 
-### 1. Install Dependencies
+### 1. Install Frontend Dependencies
 
-Install frontend dependencies from the repository root:
+From the repository root:
 
 ```bash
 npm install
 ```
 
-Install backend dependencies inside `server/`:
+### 2. Install Backend Dependencies
+
+From `server/`:
 
 ```bash
-cd server
 npm install
 ```
 
-### 2. Create `.env`
+### 3. Create the Root `.env`
 
-Create a root `.env` file in the repository root.
+Create a `.env` file in the repository root.
 
 Example:
 
@@ -145,7 +156,13 @@ CLIENT_ORIGIN=http://localhost:5173
 NODE_ENV=development
 ```
 
-### 3. Start The Backend
+Notes:
+
+- the backend reads this root `.env` file, not `server/.env`
+- `CLIENT_ORIGIN` should match the frontend URL that will send cookies
+- `NODE_ENV=production` enables `secure` session cookies
+
+### 4. Start the Backend
 
 From `server/`:
 
@@ -155,7 +172,7 @@ npm run dev
 
 The API starts on `http://localhost:3001` by default.
 
-### 4. Start The Frontend
+### 5. Start the Frontend
 
 From the repository root:
 
@@ -165,7 +182,7 @@ npm run dev
 
 The Vite dev server starts on `http://localhost:5173` by default.
 
-`vite.config.ts` proxies `/api` requests to `http://localhost:3001`, so the frontend can call the backend without changing API URLs during local development.
+`vite.config.ts` proxies `/api` requests to `http://localhost:3001`, so local frontend code can call the backend without changing request URLs.
 
 ## Available Scripts
 
@@ -181,6 +198,23 @@ The Vite dev server starts on `http://localhost:5173` by default.
 
 - `npm run dev`: start the backend with Node watch mode
 - `npm start`: start the backend normally
+
+## Routing
+
+The frontend currently exposes these routes:
+
+- `/`: landing page
+- `/login`: login form
+- `/signup`: registration form
+- `/tasks`: authenticated list dashboard
+- `/tasks/calendar`: authenticated calendar dashboard
+- `/shared/:shareToken`: public read-only shared task page
+
+Route guards redirect:
+
+- authenticated users away from `/login` and `/signup`
+- unauthenticated users away from `/tasks` and `/tasks/calendar`
+- shared task pages remain public
 
 ## API Overview
 
@@ -199,39 +233,60 @@ All backend endpoints are mounted under `/api`.
   - returns the current signed-in user
   - requires authentication
 - `POST /api/logout`
-  - destroys the session and clears the session cookie
+  - destroys the session
+  - clears the session cookie
+
+### Public Tasks
+
+- `GET /api/public/tasks/:shareToken`
+  - returns a read-only serialized task for a valid share token
+  - does not require authentication
 
 ### Tasks
 
 - `GET /api/tasks`
-  - returns all tasks (with subtasks) for the authenticated user
+  - returns all tasks with subtasks for the authenticated user
 - `POST /api/tasks`
-  - creates a new task with optional subtasks for the authenticated user
+  - creates a task with optional subtasks for the authenticated user
+- `POST /api/tasks/:taskId/share`
+  - generates a unique public share token for the authenticated user's task
+- `DELETE /api/tasks/:taskId/share`
+  - revokes the current public share token for the authenticated user's task
 - `PUT /api/tasks/:taskId`
-  - replaces the editable task fields and syncs subtasks for a task owned by the authenticated user
+  - replaces editable task fields and syncs subtasks for a task owned by the authenticated user
 - `PATCH /api/tasks/:taskId`
   - updates only the `completed` state for a task owned by the authenticated user
 - `PATCH /api/tasks/:taskId/subtasks/:subtaskId`
   - toggles the `completed` state of a subtask
   - auto-completes the parent task when all subtasks are done
-  - reverts the parent task to incomplete when a subtask is unchecked
+  - reopens the parent task when any subtask becomes incomplete
 - `DELETE /api/tasks/:taskId`
-  - deletes a task and its subtasks (cascade) owned by the authenticated user
+  - deletes a task and its subtasks owned by the authenticated user
 
 ## Data Models
+
+### User
+
+- `id`
+- `email`
+- `createdAt`
+
+The password hash is stored server-side as `password_hash` and is never returned to the client.
 
 ### Task
 
 - `id`
 - `title`
-- `description` (nullable)
+- `description` (empty string on the client when absent)
 - `priority`: `high | medium | low`
-- `dueDate` (nullable)
+- `dueDate` (empty string on the client when absent)
 - `createdAt`
-- `tag` (nullable)
+- `tag` (empty string on the client when absent)
 - `completed`
+- `shareToken` (`string | null`)
+- `subtasks`
 
-On the database side, tasks belong to a user through `user_id`.
+On the database side, tasks belong to a user through `user_id` and store the public share token in `share_token`.
 
 ### Subtask
 
@@ -247,7 +302,7 @@ On the database side, subtasks belong to a task through `task_id` and are cascad
 
 - email and password are required
 - email must match the shared regex pattern
-- password must satisfy the shared minimum length and special-character rule
+- password must satisfy the shared minimum-length and special-character rules
 
 ### Tasks
 
@@ -255,27 +310,16 @@ On the database side, subtasks belong to a task through `task_id` and are cascad
 - `priority` must be `high`, `medium`, or `low`
 - `description`, `dueDate`, and `tag` are optional
 - `dueDate`, when provided, must use `YYYY-MM-DD` and cannot be in the past
+- `POST /api/tasks` accepts `subtasks` as a string array; blank items are trimmed out
+- `PUT /api/tasks/:taskId` accepts `subtasks` as `{ id?: number; title: string }[]`
+- subtasks omitted from a task update are removed during sync
 - task completion updates must send a boolean `completed`
 - subtask completion updates must send a boolean `completed`
-- subtask titles are trimmed and empty entries are filtered out
-
-## Routing
-
-The frontend currently exposes these routes:
-
-- `/`: marketing/landing page
-- `/login`: login form
-- `/signup`: registration form
-- `/tasks`: authenticated task dashboard
-
-Route guards redirect:
-
-- authenticated users away from `/login` and `/signup`
-- unauthenticated users away from `/tasks`
+- public share links must use a valid 48-character hex token
 
 ## Notes
 
-- The backend loads environment variables from the root `.env`, not from `server/.env`.
+- Session cookies are `httpOnly`, `sameSite: "lax"`, have a 30-day max age, and become `secure` in production.
 - Sessions are stored in MySQL through `connect-session-sequelize`.
-- Session cookies are `httpOnly`, `sameSite: "lax"`, and become `secure` in production.
 - The backend currently syncs database schema automatically on startup with `alter: true`, which is convenient for development but should be reviewed before production deployment.
+- The list dashboard includes search/filter/sort controls, while the calendar dashboard is focused on due-date navigation and day-level task review.
