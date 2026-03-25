@@ -1,3 +1,4 @@
+import { Alert, Snackbar } from "@mui/material";
 import { Outlet, useLocation } from "react-router-dom";
 import loadingSpinnerIcon from "../assets/tasks-loading-spinner.svg";
 import CreateTaskModal from "../features/tasks/components/CreateTaskModal";
@@ -60,6 +61,17 @@ function TasksPage() {
         message={model.completionError ?? ""}
         onClose={model.dismissCompletionError}
       />
+
+      <Snackbar
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={model.shareFeedbackMessage !== null}
+        onClose={model.dismissShareFeedback}
+      >
+        <Alert severity="success" variant="filled" onClose={model.dismissShareFeedback}>
+          {model.shareFeedbackMessage ?? ""}
+        </Alert>
+      </Snackbar>
 
       <TaskDeleteModal
         isOpen={model.deleteTaskModal.isOpen}

@@ -27,6 +27,7 @@ export function useTasksPageModel() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [completionError, setCompletionError] = useState<string | null>(null);
+  const [shareFeedbackMessage, setShareFeedbackMessage] = useState<string | null>(null);
   const [pendingTaskIds, setPendingTaskIds] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("due-date");
@@ -325,8 +326,10 @@ export function useTasksPageModel() {
       }
 
       await copyShareLink(nextTask.shareToken);
+      setShareFeedbackMessage("Link copied");
       setCompletionError(null);
     } catch (err) {
+      setShareFeedbackMessage(null);
       setCompletionError(err instanceof Error ? err.message : "Failed to copy share link");
     } finally {
       setPendingTaskIds((currentTaskIds) =>
@@ -391,8 +394,10 @@ export function useTasksPageModel() {
     error,
     tasks,
     completionError,
+    shareFeedbackMessage,
     openCreateTaskModal,
     dismissCompletionError: () => setCompletionError(null),
+    dismissShareFeedback: () => setShareFeedbackMessage(null),
     summary: getTaskSummary(tasks),
     toolbar: {
       searchQuery,
