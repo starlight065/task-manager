@@ -7,71 +7,67 @@
   background: palette(surface);
 
   &__content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.9rem;
+    display: grid;
+    justify-items: end;
+    gap: 0.45rem;
     width: min(100%, 1200px);
     margin: 0 auto;
-    flex-wrap: wrap;
   }
 
   &__label {
     color: palette(text-muted);
     font-size: 0.92rem;
     font-weight: 600;
+    text-align: right;
   }
 
   &__switcher {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: inline-block;
   }
 
-  &__button {
-    @include button-reset;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.55rem 0.85rem;
-    border: 1px solid palette(border);
-    border-radius: radius(pill);
-    background: palette(surface-muted);
-    color: palette(text);
-    cursor: pointer;
-    font-size: 0.92rem;
-    font-weight: 600;
-    @include interactive-lift(-1px, floating);
+  &__field {
+    min-width: 10rem;
 
-    &:focus-visible {
-      @include focus-ring;
+    .MuiOutlinedInput-root {
+      background: palette(surface-muted);
+      color: palette(text);
+      font-weight: 600;
+      border-radius: radius(md);
     }
 
-    &--active {
+    .MuiSelect-select {
+      padding: 0.45rem 2rem 0.45rem 0.75rem;
+      font-size: 0.9rem;
+      line-height: 1.2;
+    }
+
+    .MuiOutlinedInput-notchedOutline {
+      border-color: palette(border);
+    }
+
+    .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+      border-color: palette(text-muted);
+    }
+
+    .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+      border-width: 2px;
       border-color: palette(focus);
-      background: alpha(focus, 0.1);
-      color: palette(text-strong);
     }
   }
 }
 
 @include respond-max(phone) {
   .language-footer {
-    &__content {
-      flex-direction: column;
-    }
+    padding: 1.25rem 0.75rem;
 
-    &__button {
+    &__content {
       width: 100%;
-      justify-content: center;
     }
   }
 }
 
 @include reduced-motion {
-  .language-footer__button {
+  .language-footer__field .MuiOutlinedInput-root {
     transition: none;
   }
 }
