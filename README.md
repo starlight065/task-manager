@@ -47,19 +47,7 @@ npm install
 
 ### 2. Create a `.env` file
 
-Add a `.env` file in the project root with values like these:
-
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=task_manager
-DB_USER=root
-DB_PASSWORD=your_password
-SESSION_SECRET=replace_this_in_real_environments
-SERVER_PORT=3001
-CLIENT_ORIGIN=http://localhost:5173
-NODE_ENV=development
-```
+Copy `.env.example` in the project root to `.env` and adjust values for your environment.
 
 ### 3. Start the backend
 
