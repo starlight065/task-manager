@@ -1,4 +1,5 @@
 import { apiRequest } from "../../../shared/api/apiClient";
+import { t } from "../../../shared/i18n";
 import type {
   CreateTaskDto,
   TaskDto,
@@ -10,7 +11,7 @@ import type { TaskResponse, TasksResponse } from "../types/api";
 
 export async function getTasks(): Promise<TaskDto[]> {
   const data = await apiRequest<TasksResponse>("/api/tasks", {
-    fallbackErrorMessage: "Failed to load tasks",
+    fallbackErrorMessage: t("tasks.errors.loadTasks"),
   });
 
   return data.tasks;
@@ -18,7 +19,7 @@ export async function getTasks(): Promise<TaskDto[]> {
 
 export async function getPublicTask(shareToken: string): Promise<TaskDto> {
   const data = await apiRequest<TaskResponse>(`/api/public/tasks/${shareToken}`, {
-    fallbackErrorMessage: "Failed to load shared task",
+    fallbackErrorMessage: t("tasks.errors.loadSharedTask"),
     handleUnauthorized: false,
   });
 
@@ -29,7 +30,7 @@ export async function createTask(payload: CreateTaskDto): Promise<TaskDto> {
   const data = await apiRequest<TaskResponse>("/api/tasks", {
     method: "POST",
     body: payload,
-    fallbackErrorMessage: "Failed to create task",
+    fallbackErrorMessage: t("tasks.errors.createTask"),
   });
 
   return data.task;
@@ -38,7 +39,7 @@ export async function createTask(payload: CreateTaskDto): Promise<TaskDto> {
 export async function createShareLink(taskId: number): Promise<TaskDto> {
   const data = await apiRequest<TaskResponse>(`/api/tasks/${taskId}/share`, {
     method: "POST",
-    fallbackErrorMessage: "Failed to create share link",
+    fallbackErrorMessage: t("tasks.errors.createShareLink"),
   });
 
   return data.task;
@@ -47,7 +48,7 @@ export async function createShareLink(taskId: number): Promise<TaskDto> {
 export async function revokeShareLink(taskId: number): Promise<TaskDto> {
   const data = await apiRequest<TaskResponse>(`/api/tasks/${taskId}/share`, {
     method: "DELETE",
-    fallbackErrorMessage: "Failed to revoke share link",
+    fallbackErrorMessage: t("tasks.errors.revokeShareLink"),
   });
 
   return data.task;
@@ -57,7 +58,7 @@ export async function updateTask(taskId: number, payload: UpdateTaskDto): Promis
   const data = await apiRequest<TaskResponse>(`/api/tasks/${taskId}`, {
     method: "PUT",
     body: payload,
-    fallbackErrorMessage: "Failed to update task",
+    fallbackErrorMessage: t("tasks.errors.updateTask"),
   });
 
   return data.task;
@@ -70,7 +71,7 @@ export async function updateTaskCompletion(
   const data = await apiRequest<TaskResponse>(`/api/tasks/${taskId}`, {
     method: "PATCH",
     body: payload,
-    fallbackErrorMessage: "Failed to update task",
+    fallbackErrorMessage: t("tasks.errors.updateTask"),
   });
 
   return data.task;
@@ -84,7 +85,7 @@ export async function toggleSubtaskCompletion(
   const data = await apiRequest<TaskResponse>(`/api/tasks/${taskId}/subtasks/${subtaskId}`, {
     method: "PATCH",
     body: payload,
-    fallbackErrorMessage: "Failed to update subtask",
+    fallbackErrorMessage: t("tasks.errors.updateSubtask"),
   });
 
   return data.task;
@@ -93,6 +94,6 @@ export async function toggleSubtaskCompletion(
 export async function deleteTask(taskId: number): Promise<void> {
   await apiRequest<void>(`/api/tasks/${taskId}`, {
     method: "DELETE",
-    fallbackErrorMessage: "Failed to delete task",
+    fallbackErrorMessage: t("tasks.errors.deleteTask"),
   });
 }

@@ -1,0 +1,77 @@
+@use "../abstracts" as *;
+
+.language-footer {
+  margin-top: 2rem;
+  padding: 1.5rem 1rem;
+  border-top: 1px solid palette(border);
+  background: palette(surface);
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    width: min(100%, 1200px);
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+
+  &__label {
+    color: palette(text-muted);
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  &__switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  &__button {
+    @include button-reset;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 0.85rem;
+    border: 1px solid palette(border);
+    border-radius: radius(pill);
+    background: palette(surface-muted);
+    color: palette(text);
+    cursor: pointer;
+    font-size: 0.92rem;
+    font-weight: 600;
+    @include interactive-lift(-1px, floating);
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+
+    &--active {
+      border-color: palette(focus);
+      background: alpha(focus, 0.1);
+      color: palette(text-strong);
+    }
+  }
+}
+
+@include respond-max(phone) {
+  .language-footer {
+    &__content {
+      flex-direction: column;
+    }
+
+    &__button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+@include reduced-motion {
+  .language-footer__button {
+    transition: none;
+  }
+}

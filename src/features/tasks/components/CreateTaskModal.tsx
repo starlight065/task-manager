@@ -11,14 +11,9 @@ import {
 } from "@mui/material";
 import closeIcon from "../../../assets/icon-close.svg";
 import { type ChangeEvent, type KeyboardEvent, useRef, useState } from "react";
+import { useI18n } from "../../../shared/i18n/useI18n";
 import type { CreateTaskDto } from "../../../shared/types";
 import type { CreateTaskModalProps } from "../types/components";
-
-const PRIORITY_OPTIONS = [
-  { value: "high", label: "High" },
-  { value: "medium", label: "Medium" },
-  { value: "low", label: "Low" },
-] satisfies ReadonlyArray<{ label: string; value: CreateTaskDto["priority"] }>;
 
 function CreateTaskModal({
   isOpen,
@@ -33,15 +28,20 @@ function CreateTaskModal({
   onSubtaskRemove,
   onSubmit,
 }: CreateTaskModalProps) {
+  const { t } = useI18n();
   const titleId = mode === "create" ? "create-task-title" : "edit-task-title";
-  const modalTitle = mode === "create" ? "New task" : "Edit task";
-  const closeLabel =
-    mode === "create" ? "Close new task modal" : "Close edit task modal";
+  const priorityOptions = [
+    { value: "high", label: t("common.priorityLevels.high") },
+    { value: "medium", label: t("common.priorityLevels.medium") },
+    { value: "low", label: t("common.priorityLevels.low") },
+  ] satisfies ReadonlyArray<{ label: string; value: CreateTaskDto["priority"] }>;
+  const modalTitle = mode === "create" ? t("tasks.modal.newTitle") : t("tasks.modal.editTitle");
+  const closeLabel = mode === "create" ? t("tasks.modal.closeNew") : t("tasks.modal.closeEdit");
   const submitLabel = isSubmitting
-    ? "Saving..."
+    ? t("tasks.modal.saving")
     : mode === "create"
-      ? "Save task"
-      : "Update task";
+      ? t("tasks.modal.saveTask")
+      : t("tasks.modal.updateTask");
 
   const [subtaskInput, setSubtaskInput] = useState("");
   const subtaskInputRef = useRef<HTMLInputElement>(null);
@@ -121,7 +121,7 @@ function CreateTaskModal({
               disabled={isSubmitting}
               error={Boolean(fieldErrors.title)}
               helperText={fieldErrors.title}
-              label="Title"
+              label={t("common.title")}
               type="text"
               value={formValues.title}
               onChange={handleChange("title")}
@@ -130,7 +130,7 @@ function CreateTaskModal({
               disabled={isSubmitting}
               error={Boolean(fieldErrors.description)}
               helperText={fieldErrors.description}
-              label="Description (optional)"
+              label={t("common.descriptionOptional")}
               minRows={4}
               multiline
               value={formValues.description}
@@ -144,14 +144,14 @@ function CreateTaskModal({
                 fullWidth
                 helperText={fieldErrors.priority}
                 id="create-task-priority"
-                label="Priority"
+                label={t("common.priority")}
                 select
                 value={formValues.priority}
                 onChange={(event) =>
                   onFieldChange("priority", event.target.value as CreateTaskDto["priority"])
                 }
               >
-                {PRIORITY_OPTIONS.map((option) => (
+                {priorityOptions.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>
@@ -164,7 +164,7 @@ function CreateTaskModal({
                 fullWidth
                 helperText={fieldErrors.dueDate}
                 id="create-task-due-date"
-                label="Due date (optional)"
+                label={t("common.dueDateOptional")}
                 type="date"
                 value={formValues.dueDate}
                 onChange={handleChange("dueDate")}
@@ -180,19 +180,19 @@ function CreateTaskModal({
               disabled={isSubmitting}
               error={Boolean(fieldErrors.tag)}
               helperText={fieldErrors.tag}
-              label="Tag (optional)"
+              label={t("common.tagOptional")}
               type="text"
               value={formValues.tag}
               onChange={handleChange("tag")}
             />
 
             <div className="task-modal__subtasks">
-              <div className="task-modal__subtasks-label">Subtasks</div>
+              <div className="task-modal__subtasks-label">{t("tasks.modal.subtasks")}</div>
               <div className="task-modal__subtasks-input">
                 <TextField
                   inputRef={subtaskInputRef}
                   disabled={isSubmitting}
-                  label="Add subtask"
+                  label={t("tasks.modal.addSubtask")}
                   size="small"
                   fullWidth
                   value={subtaskInput}
@@ -208,7 +208,7 @@ function CreateTaskModal({
                   disabled={isSubmitting || !subtaskInput.trim()}
                   onClick={handleAddSubtask}
                 >
-                  Add
+                  {t("common.add")}
                 </Button>
               </div>
 
@@ -222,7 +222,7 @@ function CreateTaskModal({
                         size="small"
                         disabled={isSubmitting}
                         onClick={() => onSubtaskRemove(index)}
-                        aria-label={`Remove subtask "${title}"`}
+                        aria-label={t("tasks.modal.removeSubtask", { title })}
                       >
                         <img src={closeIcon} alt="" width="16" height="16" />
                       </IconButton>
@@ -238,7 +238,7 @@ function CreateTaskModal({
 
         <DialogActions className="app-dialog__actions">
           <Button disabled={isSubmitting} onClick={handleCloseRequest}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button type="submit" variant="contained" disabled={isSubmitting}>
             {submitLabel}

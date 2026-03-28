@@ -1,4 +1,5 @@
 import type { TaskListSectionProps } from "../types/components";
+import { useI18n } from "../../../shared/i18n/useI18n";
 import TaskCard from "./TaskCard";
 
 function TaskListSection({
@@ -12,10 +13,12 @@ function TaskListSection({
   onTaskShareClick,
   onTaskShareRevokeClick,
 }: TaskListSectionProps) {
+  const { t } = useI18n();
+
   return (
     <>
       <div className="tasks-page__section-heading">
-        {title}: {tasks.length} tasks
+        {t("tasks.list.sectionHeading", { title, count: tasks.length })}
       </div>
       {tasks.map((task) => (
         <TaskCard

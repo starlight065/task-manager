@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import { useRef, useState, type TouchEvent } from "react";
+import { useI18n } from "../../../shared/i18n/useI18n";
 import type { TaskDto } from "../../../shared/types";
 import TaskCard from "./TaskCard";
 import {
@@ -11,9 +12,9 @@ import {
   getMonthLabel,
   getTodayIsoDate,
   getTodayParts,
+  getWeekdayLabels,
   isSameCalendarMonth,
   toIsoDate,
-  WEEKDAY_LABELS,
 } from "../lib/calendarDate";
 import type { TasksCalendarViewProps } from "../types/components";
 import type { CalendarMonth } from "../types/calendar";
@@ -79,6 +80,7 @@ function getTasksByDate(tasks: TaskDto[]): Map<string, TaskDto[]> {
 }
 
 function TasksCalendarView({ model }: TasksCalendarViewProps) {
+  const { locale, t } = useI18n();
   const todayParts = getTodayParts();
   const todayIsoDate = getTodayIsoDate();
   const todayMonth = getCalendarMonth(todayParts);
@@ -87,6 +89,7 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const [visibleMonth, setVisibleMonth] = useState<CalendarMonth>(todayMonth);
   const [selectedDate, setSelectedDate] = useState(() => todayIsoDate);
+  const weekdayLabels = getWeekdayLabels(locale);
 
   const calendarDays = getMonthGrid(visibleMonth).map((parts) => {
     const isoDate = toIsoDate(parts);
@@ -111,6 +114,7 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
       day: "numeric",
       year: "numeric",
     },
+    locale,
   );
   const selectedDateShortLabel = formatIsoDate(
     selectedDate,
@@ -118,6 +122,7 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
       month: "long",
       day: "numeric",
     },
+    locale,
   );
 
   function selectMonth(nextMonth: CalendarMonth) {
@@ -190,17 +195,17 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
       <div className="tasks-page__calendar-controls">
         <div className="tasks-page__calendar-heading">
           <div className="tasks-page__calendar-title-row">
-            <h2 className="tasks-page__calendar-title">{getMonthLabel(visibleMonth)}</h2>
+            <h2 className="tasks-page__calendar-title">{getMonthLabel(visibleMonth, locale)}</h2>
             <div
               className="tasks-page__calendar-month-nav"
               role="group"
-              aria-label="Change month"
+              aria-label={t("tasks.calendar.changeMonth")}
             >
               <button
                 type="button"
                 className="tasks-page__calendar-nav-icon"
                 onClick={showPreviousMonth}
-                aria-label="Show previous month"
+                aria-label={t("tasks.calendar.showPreviousMonth")}
               >
                 <CalendarArrowIcon direction="previous" />
               </button>
@@ -208,14 +213,14 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
                 type="button"
                 className="tasks-page__calendar-nav-icon"
                 onClick={showNextMonth}
-                aria-label="Show next month"
+                aria-label={t("tasks.calendar.showNextMonth")}
               >
                 <CalendarArrowIcon direction="next" />
               </button>
             </div>
           </div>
           <p className="tasks-page__calendar-subtitle">
-            Click a day to review the tasks due then.
+            {t("tasks.calendar.subtitle")}
           </p>
         </div>
 
@@ -225,14 +230,14 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
             className="tasks-page__calendar-secondary-button"
             onClick={() => selectMonth(todayMonth)}
           >
-            Today
+            {t("common.today")}
           </button>
           <button
             type="button"
             className="tasks-page__new-task-btn tasks-page__new-task-btn--calendar"
             onClick={model.openCreateTaskModal}
           >
-            New task
+            {t("tasks.toolbar.newTask")}
           </button>
         </div>
       </div>
@@ -248,7 +253,7 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
             }}
           >
             <div className="tasks-page__calendar-weekdays" aria-hidden="true">
-              {WEEKDAY_LABELS.map((label) => (
+              {weekdayLabels.map((label) => (
                 <span key={label} className="tasks-page__calendar-weekday">
                   {label}
                 </span>
@@ -284,13 +289,13 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
                       ))}
                       {day.tasks.length > 2 ? (
                         <span className="tasks-page__calendar-task-more">
-                          +{day.tasks.length - 2} more
+                          {t("tasks.card.moreCount", { count: day.tasks.length - 2 })}
                         </span>
                       ) : null}
                     </span>
                     {day.tasks.length > 0 ? (
                       <span className="tasks-page__calendar-task-count">
-                        {day.tasks.length} due
+                        {t("tasks.calendar.dayTaskCount", { count: day.tasks.length })}
                       </span>
                     ) : null}
                   </span>
@@ -302,10 +307,10 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
 
         <aside className="tasks-page__calendar-panel" aria-live="polite">
           <div className="tasks-page__calendar-panel-header">
-            <p className="tasks-page__calendar-panel-label">Selected day</p>
+            <p className="tasks-page__calendar-panel-label">{t("tasks.calendar.selectedDay")}</p>
             <h3 className="tasks-page__calendar-panel-title">{selectedDateLabel}</h3>
             <p className="tasks-page__calendar-panel-count">
-              {selectedTasks.length} task{selectedTasks.length === 1 ? "" : "s"} due
+              {t("tasks.calendar.panelCount", { count: selectedTasks.length })}
             </p>
           </div>
 
@@ -327,7 +332,7 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
             </div>
           ) : (
             <div className="tasks-page__calendar-empty-state">
-              No tasks due on {selectedDateShortLabel}.
+              {t("tasks.calendar.empty", { date: selectedDateShortLabel })}
             </div>
           )}
         </aside>

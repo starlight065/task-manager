@@ -1,28 +1,30 @@
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
 import calendarIcon from "../assets/calendar.svg";
+import { useI18n } from "../shared/i18n/useI18n";
 
 function HomePage() {
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   return (
     <>
       <header className="header">
         <div className="header__container">
-          <h1 className="header__logo">Task Manager</h1>
-          <p className="header__tagline">Your Personal Productivity Partner</p>
+          <h1 className="header__logo">{t("common.appName")}</h1>
+          <p className="header__tagline">{t("home.tagline")}</p>
           <div className="button-group">
             <button
               className={classNames("button", "button--primary")}
               onClick={() => navigate("/login")}
             >
-              Login
+              {t("home.login")}
             </button>
             <button
               className={classNames("button", "button--secondary")}
               onClick={() => navigate("/signup")}
             >
-              Sign Up
+              {t("home.signUp")}
             </button>
           </div>
         </div>
@@ -30,81 +32,58 @@ function HomePage() {
 
       <main className="main">
         <section className="section">
-          <h2 className="section__title">About This Project</h2>
-          <p>
-            This Task Manager is a powerful tool designed to help you organize
-            your life, track your responsibilities, and boost your productivity.
-            Whether you&apos;re managing personal errands, academic deadlines,
-            or professional projects, our application provides the features you
-            need to stay on top of everything.
-          </p>
-          <p>
-            Our goal is to offer a clean, intuitive, and efficient user
-            experience, allowing you to focus on what truly matters: getting
-            things done.
-          </p>
+          <h2 className="section__title">{t("home.aboutTitle")}</h2>
+          <p>{t("home.aboutParagraphOne")}</p>
+          <p>{t("home.aboutParagraphTwo")}</p>
         </section>
 
         <section className="section">
-          <h2 className="section__title">Key Features</h2>
+          <h2 className="section__title">{t("home.featuresTitle")}</h2>
           <div className="features">
             <div className="features__item">
-              <h3 className="features__title">Task Creation</h3>
-              <p>
-                Easily create tasks with titles, detailed descriptions, and due
-                dates.
-              </p>
-              <img src={calendarIcon} alt="Calendar" className="features__icon" />
+              <h3 className="features__title">{t("home.taskCreationTitle")}</h3>
+              <p>{t("home.taskCreationDescription")}</p>
+              <img src={calendarIcon} alt={t("home.calendarAlt")} className="features__icon" />
             </div>
             <div className="features__item">
-              <h3 className="features__title">Priority Levels</h3>
-              <p>
-                Assign priorities to focus on what&apos;s most important:
-              </p>
+              <h3 className="features__title">{t("home.priorityLevelsTitle")}</h3>
+              <p>{t("home.priorityLevelsDescription")}</p>
               <div className="priority">
-                <span className={classNames("priority__item", "priority__item--high")}>High</span>
-                <span className={classNames("priority__item", "priority__item--medium")}>
-                  Medium
+                <span className={classNames("priority__item", "priority__item--high")}>
+                  {t("common.priorityLevels.high")}
                 </span>
-                <span className={classNames("priority__item", "priority__item--low")}>Low</span>
+                <span className={classNames("priority__item", "priority__item--medium")}>
+                  {t("common.priorityLevels.medium")}
+                </span>
+                <span className={classNames("priority__item", "priority__item--low")}>
+                  {t("common.priorityLevels.low")}
+                </span>
               </div>
             </div>
             <div className="features__item">
-              <h3 className="features__title">Progress Tracking</h3>
-              <p>
-                Stay on top of momentum with active and completed task sections
-                plus a clear progress summary.
-              </p>
+              <h3 className="features__title">{t("home.progressTrackingTitle")}</h3>
+              <p>{t("home.progressTrackingDescription")}</p>
             </div>
             <div className="features__item">
-              <h3 className="features__title">Secure Authentication</h3>
-              <p>
-                Your data is protected with a secure login and registration
-                system.
-              </p>
+              <h3 className="features__title">{t("home.secureAuthenticationTitle")}</h3>
+              <p>{t("home.secureAuthenticationDescription")}</p>
             </div>
             <div className="features__item">
-              <h3 className="features__title">Sorting and Filtering</h3>
-              <p>
-                Quickly find tasks by sorting them by due date, priority, or
-                creation date.
-              </p>
+              <h3 className="features__title">{t("home.sortingFilteringTitle")}</h3>
+              <p>{t("home.sortingFilteringDescription")}</p>
             </div>
           </div>
         </section>
 
         <section className={classNames("section", "section--last")}>
-          <h2 className="section__title">Ready to Get Started?</h2>
-          <p>
-            Sign up for a free account today and take the first step towards a
-            more organized life.
-          </p>
+          <h2 className="section__title">{t("home.readyTitle")}</h2>
+          <p>{t("home.readyDescription")}</p>
           <div className="button-group">
             <button
               className={classNames("button", "button--secondary")}
               onClick={() => navigate("/signup")}
             >
-              Sign Up Now
+              {t("home.signUpNow")}
             </button>
           </div>
         </section>

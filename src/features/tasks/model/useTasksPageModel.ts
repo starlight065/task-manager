@@ -1,5 +1,6 @@
 import { useEffect, useState, type SubmitEvent } from "react";
 import type { CreateTaskDto, SubtaskDto, TaskDto } from "../../../shared/types";
+import { t } from "../../../shared/i18n";
 import {
   createShareLink,
   createTask,
@@ -60,7 +61,7 @@ export function useTasksPageModel() {
           return;
         }
 
-        setError(err instanceof Error ? err.message : "Failed to load tasks");
+        setError(err instanceof Error ? err.message : t("tasks.errors.loadTasks"));
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -204,7 +205,7 @@ export function useTasksPageModel() {
 
       closeTaskModal();
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Failed to save task");
+      setFormError(err instanceof Error ? err.message : t("tasks.errors.saveTask"));
     } finally {
       setIsSubmitting(false);
     }
@@ -247,7 +248,7 @@ export function useTasksPageModel() {
           return previousTask;
         }),
       );
-      setCompletionError(err instanceof Error ? err.message : "Failed to update task");
+      setCompletionError(err instanceof Error ? err.message : t("tasks.errors.updateTask"));
     } finally {
       setPendingTaskIds((currentTaskIds) =>
         currentTaskIds.filter((currentTaskId) => currentTaskId !== taskId),
@@ -288,7 +289,7 @@ export function useTasksPageModel() {
       setTasks((currentTasks) =>
         currentTasks.map((task) => (task.id !== previousTask.id ? task : previousTask)),
       );
-      setCompletionError(err instanceof Error ? err.message : "Failed to update subtask");
+      setCompletionError(err instanceof Error ? err.message : t("tasks.errors.updateSubtask"));
     } finally {
       setPendingTaskIds((currentTaskIds) =>
         currentTaskIds.filter((currentTaskId) => currentTaskId !== taskId),
@@ -306,7 +307,7 @@ export function useTasksPageModel() {
       return;
     }
 
-    throw new Error("Clipboard copy is not supported in this browser");
+    throw new Error(t("tasks.share.clipboardUnsupported"));
   }
 
   async function shareTask(task: TaskDto) {
@@ -322,15 +323,15 @@ export function useTasksPageModel() {
       );
 
       if (!nextTask.shareToken) {
-        throw new Error("Failed to generate share link");
+        throw new Error(t("tasks.share.generateFailed"));
       }
 
       await copyShareLink(nextTask.shareToken);
-      setShareFeedbackMessage("Link copied");
+      setShareFeedbackMessage(t("tasks.share.linkCopied"));
       setCompletionError(null);
     } catch (err) {
       setShareFeedbackMessage(null);
-      setCompletionError(err instanceof Error ? err.message : "Failed to copy share link");
+      setCompletionError(err instanceof Error ? err.message : t("tasks.errors.copyShareLink"));
     } finally {
       setPendingTaskIds((currentTaskIds) =>
         currentTaskIds.filter((currentTaskId) => currentTaskId !== task.id),
@@ -354,7 +355,7 @@ export function useTasksPageModel() {
       );
       setCompletionError(null);
     } catch (err) {
-      setCompletionError(err instanceof Error ? err.message : "Failed to revoke share link");
+      setCompletionError(err instanceof Error ? err.message : t("tasks.errors.revokeShareLink"));
     } finally {
       setPendingTaskIds((currentTaskIds) =>
         currentTaskIds.filter((currentTaskId) => currentTaskId !== task.id),
@@ -378,7 +379,7 @@ export function useTasksPageModel() {
       setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
       closeDeleteTaskModal();
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : "Failed to delete task");
+      setDeleteError(err instanceof Error ? err.message : t("tasks.errors.deleteTask"));
     } finally {
       setPendingTaskIds((currentTaskIds) =>
         currentTaskIds.filter((currentTaskId) => currentTaskId !== taskId),

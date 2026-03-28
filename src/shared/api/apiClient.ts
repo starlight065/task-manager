@@ -1,4 +1,4 @@
-import authConfig from "../../../shared/auth.json";
+import { t } from "../i18n";
 import type { ApiRequestOptions } from "../types/api";
 
 let unauthorizedHandler: (() => void) | null = null;
@@ -37,8 +37,8 @@ export async function apiRequest<TResponse>(
     method = "GET",
     body,
     headers,
-    fallbackErrorMessage = "Request failed",
-    unauthorizedMessage = authConfig.messages.sessionExpired,
+    fallbackErrorMessage = t("common.requestFailed"),
+    unauthorizedMessage = t("auth.messages.sessionExpired"),
     handleUnauthorized = true,
   }: ApiRequestOptions = {},
 ): Promise<TResponse> {
@@ -96,7 +96,7 @@ export async function apiRequestOrNull<TResponse>(
 
   if (!response.ok) {
     throw new Error(
-      getErrorMessage(data, options?.fallbackErrorMessage ?? "Request failed"),
+      getErrorMessage(data, options?.fallbackErrorMessage ?? t("common.requestFailed")),
     );
   }
 

@@ -13,50 +13,53 @@ import {
 } from "@mui/material";
 import { useState, type SubmitEvent } from "react";
 import { Link as RouterLink } from "react-router-dom";
+import { useI18n } from "../../../shared/i18n/useI18n";
 import type { AuthFormMode, AuthFormProps } from "../types";
 import {
-  AUTH_MESSAGES,
-  PASSWORD_RULES,
+  getAuthMessages,
+  getPasswordRules,
   validateAuthCredentials,
 } from "../utils/authValidation";
 
-const FORM_COPY: Record<
-  AuthFormMode,
-  {
-    title: string;
-    submitLabel: string;
-    passwordPlaceholder: string;
-    footerPrompt: string;
-    footerLinkLabel: string;
-    footerLinkTo: string;
-    errorTitle: string;
-    networkErrorMessage: string;
-  }
-> = {
-  login: {
-    title: "Welcome back",
-    submitLabel: "Login",
-    passwordPlaceholder: "Enter your password",
-    footerPrompt: "Don't have an account yet?",
-    footerLinkLabel: "Signup",
-    footerLinkTo: "/signup",
-    errorTitle: "Login failed",
-    networkErrorMessage: AUTH_MESSAGES.loginNetworkError,
-  },
-  signup: {
-    title: "Create account",
-    submitLabel: "Sign Up",
-    passwordPlaceholder: "Create a password",
-    footerPrompt: "Already have an account?",
-    footerLinkLabel: "Login",
-    footerLinkTo: "/login",
-    errorTitle: "Signup failed",
-    networkErrorMessage: AUTH_MESSAGES.signupNetworkError,
-  },
-};
-
 function AuthForm({ mode, onSubmit }: AuthFormProps) {
-  const copy = FORM_COPY[mode];
+  const { t } = useI18n();
+  const authMessages = getAuthMessages();
+  const passwordRules = getPasswordRules();
+  const copyByMode: Record<
+    AuthFormMode,
+    {
+      errorTitle: string;
+      footerLinkLabel: string;
+      footerLinkTo: string;
+      footerPrompt: string;
+      networkErrorMessage: string;
+      passwordPlaceholder: string;
+      submitLabel: string;
+      title: string;
+    }
+  > = {
+    login: {
+      title: t("auth.loginTitle"),
+      submitLabel: t("auth.loginSubmit"),
+      passwordPlaceholder: t("auth.loginPasswordPlaceholder"),
+      footerPrompt: t("auth.loginFooterPrompt"),
+      footerLinkLabel: t("auth.loginFooterLink"),
+      footerLinkTo: "/signup",
+      errorTitle: t("auth.loginErrorTitle"),
+      networkErrorMessage: authMessages.loginNetworkError,
+    },
+    signup: {
+      title: t("auth.signupTitle"),
+      submitLabel: t("auth.signupSubmit"),
+      passwordPlaceholder: t("auth.signupPasswordPlaceholder"),
+      footerPrompt: t("auth.signupFooterPrompt"),
+      footerLinkLabel: t("auth.signupFooterLink"),
+      footerLinkTo: "/login",
+      errorTitle: t("auth.signupErrorTitle"),
+      networkErrorMessage: authMessages.signupNetworkError,
+    },
+  };
+  const copy = copyByMode[mode];
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -100,7 +103,7 @@ function AuthForm({ mode, onSubmit }: AuthFormProps) {
           to="/"
           variant="text"
         >
-          Back to Home
+          {t("auth.backToHome")}
         </Button>
 
         <Card className="auth-page__card" elevation={8}>
@@ -108,7 +111,7 @@ function AuthForm({ mode, onSubmit }: AuthFormProps) {
             <form className="auth-page__form" noValidate onSubmit={handleSubmit}>
               <div className="auth-page__intro">
                 <h1 className="auth-page__title">{copy.title}</h1>
-                <p className="auth-page__subtitle">Use your email and password to continue.</p>
+                <p className="auth-page__subtitle">{t("auth.subtitle")}</p>
               </div>
 
               <TextField
@@ -117,9 +120,9 @@ function AuthForm({ mode, onSubmit }: AuthFormProps) {
                 disabled={isLoading}
                 error={emailError}
                 fullWidth
-                helperText={emailError ? AUTH_MESSAGES.emailInvalid : " "}
+                helperText={emailError ? authMessages.emailInvalid : " "}
                 id="email"
-                label="Email"
+                label={t("common.email")}
                 placeholder="example@gmail.com"
                 type="email"
                 value={email}
@@ -133,9 +136,9 @@ function AuthForm({ mode, onSubmit }: AuthFormProps) {
                   disabled={isLoading}
                   error={passwordError}
                   fullWidth
-                  helperText={passwordError ? "Password must meet both requirements below." : " "}
+                  helperText={passwordError ? t("auth.passwordHelper") : " "}
                   id="password"
-                  label="Password"
+                  label={t("common.password")}
                   placeholder={copy.passwordPlaceholder}
                   type={showPassword ? "text" : "password"}
                   value={password}
@@ -153,7 +156,7 @@ function AuthForm({ mode, onSubmit }: AuthFormProps) {
                             type="button"
                             onClick={() => setShowPassword((currentValue) => !currentValue)}
                           >
-                            {showPassword ? "Hide" : "Show"}
+                            {showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
                           </Button>
                         </InputAdornment>
                       ),
@@ -164,13 +167,13 @@ function AuthForm({ mode, onSubmit }: AuthFormProps) {
                 <div className="auth-page__password-rules">
                   <Chip
                     color={validation.hasMinLength ? "success" : "default"}
-                    label={PASSWORD_RULES.minLength}
+                    label={passwordRules.minLength}
                     size="small"
                     variant={validation.hasMinLength ? "filled" : "outlined"}
                   />
                   <Chip
                     color={validation.hasSpecialCharacter ? "success" : "default"}
-                    label={PASSWORD_RULES.specialCharacter}
+                    label={passwordRules.specialCharacter}
                     size="small"
                     variant={validation.hasSpecialCharacter ? "filled" : "outlined"}
                   />
@@ -178,7 +181,7 @@ function AuthForm({ mode, onSubmit }: AuthFormProps) {
               </div>
 
               <Button disabled={isLoading} size="large" type="submit" variant="contained">
-                {isLoading ? "Loading..." : copy.submitLabel}
+                {isLoading ? t("common.loading") : copy.submitLabel}
               </Button>
 
               <p className="auth-page__footer">
@@ -213,7 +216,7 @@ function AuthForm({ mode, onSubmit }: AuthFormProps) {
         </DialogContent>
         <DialogActions className="app-dialog__actions">
           <Button type="button" variant="contained" onClick={() => setServerError("")}>
-            Try again
+            {t("auth.tryAgain")}
           </Button>
         </DialogActions>
       </Dialog>

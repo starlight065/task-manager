@@ -2,9 +2,12 @@ import TaskListSection from "./TaskListSection";
 import TasksColumnHeaders from "./TasksColumnHeaders";
 import TasksProgress from "./TasksProgress";
 import TasksToolbar from "./TasksToolbar";
+import { useI18n } from "../../../shared/i18n/useI18n";
 import type { TasksListViewProps } from "../types/components";
 
 function TasksListView({ model }: TasksListViewProps) {
+  const { t } = useI18n();
+
   return (
     <>
       <TasksToolbar
@@ -22,7 +25,7 @@ function TasksListView({ model }: TasksListViewProps) {
       <TasksColumnHeaders />
 
       <TaskListSection
-        title="Active"
+        title={t("common.active")}
         tasks={model.taskLists.activeTasks}
         pendingTaskIds={model.taskLists.pendingTaskIds}
         onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
@@ -33,7 +36,7 @@ function TasksListView({ model }: TasksListViewProps) {
         onTaskShareRevokeClick={model.taskLists.revokeTaskShare}
       />
       <TaskListSection
-        title="Completed"
+        title={t("common.completed")}
         tasks={model.taskLists.completedTasks}
         pendingTaskIds={model.taskLists.pendingTaskIds}
         onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
@@ -45,9 +48,7 @@ function TasksListView({ model }: TasksListViewProps) {
       />
 
       {model.taskLists.visibleCount === 0 ? (
-        <div className="tasks-page__empty-state">
-          No tasks match your current search and filters.
-        </div>
+        <div className="tasks-page__empty-state">{t("tasks.list.empty")}</div>
       ) : null}
 
       <TasksProgress

@@ -1,8 +1,10 @@
 import classNames from "classnames";
+import { useI18n } from "../../../shared/i18n/useI18n";
 import type { TasksHeaderProps } from "../types/components";
 
 function TasksHeader({ pending, done, total, subtitle }: TasksHeaderProps) {
-  const currentMonth = new Intl.DateTimeFormat("en-US", {
+  const { locale, t } = useI18n();
+  const currentMonth = new Intl.DateTimeFormat(locale, {
     month: "long",
     year: "numeric",
   }).format(new Date());
@@ -11,7 +13,7 @@ function TasksHeader({ pending, done, total, subtitle }: TasksHeaderProps) {
   return (
     <div className="tasks-page__header">
       <h1 className="tasks-page__title">
-        Task manager {resolvedSubtitle ? <span>• {resolvedSubtitle}</span> : null}
+        {t("tasks.pageTitle")} {resolvedSubtitle ? <span>• {resolvedSubtitle}</span> : null}
       </h1>
       <div className="tasks-page__stats">
         <div className="tasks-page__stat">
@@ -20,13 +22,13 @@ function TasksHeader({ pending, done, total, subtitle }: TasksHeaderProps) {
           >
             {pending}
           </span>
-          <span className="tasks-page__stat-label">pending</span>
+          <span className="tasks-page__stat-label">{t("tasks.stats.pending")}</span>
         </div>
         <div className="tasks-page__stat">
           <span className={classNames("tasks-page__stat-value", "tasks-page__stat-value--done")}>
             {done}
           </span>
-          <span className="tasks-page__stat-label">done</span>
+          <span className="tasks-page__stat-label">{t("tasks.stats.done")}</span>
         </div>
         <div className="tasks-page__stat">
           <span
@@ -34,7 +36,7 @@ function TasksHeader({ pending, done, total, subtitle }: TasksHeaderProps) {
           >
             {total}
           </span>
-          <span className="tasks-page__stat-label">total</span>
+          <span className="tasks-page__stat-label">{t("tasks.stats.total")}</span>
         </div>
       </div>
     </div>

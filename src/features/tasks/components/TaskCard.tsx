@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import editIcon from "../../../assets/icon-edit.svg";
 import trashIcon from "../../../assets/icon-trash.svg";
+import { useI18n } from "../../../shared/i18n/useI18n";
 import { getTodayParts, parseIsoDate } from "../lib/calendarDate";
 import type { TaskCardProps } from "../types/components";
 
@@ -49,6 +50,7 @@ function TaskCard({
   const hasDueDate = task.dueDate.trim().length > 0;
   const hasTag = task.tag.trim().length > 0;
   const isShared = task.shareToken !== null;
+  const { t } = useI18n();
 
   return (
     <div
@@ -64,7 +66,10 @@ function TaskCard({
         onChange={(event) => {
           onCompletionChange(task.id, event.target.checked);
         }}
-        aria-label={`Mark ${task.title} as ${task.completed ? "incomplete" : "completed"}`}
+        aria-label={t("tasks.card.markTaskAriaLabel", {
+          title: task.title,
+          completed: task.completed,
+        })}
       />
       <div className="task-card__content">
         <div className="task-card__header">
@@ -79,27 +84,29 @@ function TaskCard({
             <button
               type="button"
               className="task-card__action task-card__action--share"
-              aria-label={isShared ? "Copy shared task link" : "Create shared task link"}
+              aria-label={
+                isShared ? t("tasks.card.copyLinkAriaLabel") : t("tasks.card.createLinkAriaLabel")
+              }
               disabled={isUpdating}
               onClick={() => onShareClick(task)}
             >
-              Share
+              {t("tasks.card.share")}
             </button>
             {isShared ? (
               <button
                 type="button"
                 className="task-card__action task-card__action--revoke"
-                aria-label="Revoke shared task link"
+                aria-label={t("tasks.card.revokeLinkAriaLabel")}
                 disabled={isUpdating}
                 onClick={() => onShareRevokeClick(task)}
               >
-                Revoke
+                {t("tasks.card.revoke")}
               </button>
             ) : null}
             <button
               type="button"
               className="task-card__action"
-              aria-label="Edit task"
+              aria-label={t("tasks.card.editTaskAriaLabel")}
               disabled={isUpdating}
               onClick={() => onEditClick(task)}
             >
@@ -108,7 +115,7 @@ function TaskCard({
             <button
               type="button"
               className="task-card__action"
-              aria-label="Delete task"
+              aria-label={t("tasks.card.deleteTaskAriaLabel")}
               disabled={isUpdating}
               onClick={() => onDeleteClick(task)}
             >
@@ -122,7 +129,7 @@ function TaskCard({
           <div className="task-card__subtasks">
             <div className="task-card__subtask-progress">
               <progress
-                aria-label="Subtask completion"
+                aria-label={t("tasks.card.subtaskCompletion")}
                 className="task-card__subtask-progress-bar"
                 max={100}
                 value={subtaskPct}
@@ -142,7 +149,10 @@ function TaskCard({
                     onChange={(event) => {
                       onSubtaskCompletionChange(task.id, subtask.id, event.target.checked);
                     }}
-                    aria-label={`Mark subtask "${subtask.title}" as ${subtask.completed ? "incomplete" : "completed"}`}
+                    aria-label={t("tasks.card.markSubtaskAriaLabel", {
+                      title: subtask.title,
+                      completed: subtask.completed,
+                    })}
                   />
                   <span
                     className={classNames("task-card__subtask-title", {
@@ -159,9 +169,11 @@ function TaskCard({
       </div>
       <div className="task-card__meta">
         <span className={classNames("priority-badge", `priority-badge--${task.priority}`)}>
-          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+          {t(`common.priorityLevels.${task.priority}`)}
         </span>
-        {isShared ? <span className="task-card__share-badge">Public link enabled</span> : null}
+        {isShared ? (
+          <span className="task-card__share-badge">{t("tasks.card.publicLinkEnabled")}</span>
+        ) : null}
         {hasDueDate ? (
           <span
             className={classNames(

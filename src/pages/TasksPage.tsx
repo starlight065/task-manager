@@ -7,12 +7,14 @@ import TaskErrorModal from "../features/tasks/components/TaskErrorModal";
 import TasksHeader from "../features/tasks/components/TasksHeader";
 import TasksViewTabs from "../features/tasks/components/TasksViewTabs";
 import { useTasksPageModel } from "../features/tasks/model/useTasksPageModel";
+import { useI18n } from "../shared/i18n/useI18n";
 
 function TasksPage() {
   const model = useTasksPageModel();
   const location = useLocation();
+  const { t } = useI18n();
   const headerSubtitle = location.pathname.startsWith("/tasks/calendar")
-    ? "Deadline calendar"
+    ? t("tasks.deadlineCalendar")
     : undefined;
 
   if (model.isLoading) {
@@ -21,7 +23,7 @@ function TasksPage() {
         <TasksHeader pending={0} done={0} total={0} subtitle={headerSubtitle} />
         <hr className="tasks-page__header-divider" />
         <TasksViewTabs />
-        <div className="tasks-page__loading-state" aria-label="Loading tasks" role="status">
+        <div className="tasks-page__loading-state" aria-label={t("tasks.loadingTasks")} role="status">
           <img src={loadingSpinnerIcon} alt="" width="40" height="40" aria-hidden="true" />
         </div>
       </div>

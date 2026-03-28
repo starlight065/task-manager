@@ -1,30 +1,12 @@
 import { InputAdornment, MenuItem, TextField } from "@mui/material";
 import searchIcon from "../../../assets/icon-search.svg";
+import { useI18n } from "../../../shared/i18n/useI18n";
 import type {
   PriorityFilter,
   SortOption,
   StatusFilter,
 } from "../types/model";
 import type { TasksToolbarProps } from "../types/components";
-
-const SORT_OPTIONS = [
-  { value: "due-date", label: "Due date" },
-  { value: "priority", label: "Priority" },
-  { value: "created", label: "Created" },
-] satisfies ReadonlyArray<{ label: string; value: SortOption }>;
-
-const PRIORITY_FILTER_OPTIONS = [
-  { value: "all", label: "All" },
-  { value: "high", label: "High" },
-  { value: "medium", label: "Medium" },
-  { value: "low", label: "Low" },
-] satisfies ReadonlyArray<{ label: string; value: PriorityFilter }>;
-
-const STATUS_FILTER_OPTIONS = [
-  { value: "all", label: "All" },
-  { value: "active", label: "Active" },
-  { value: "completed", label: "Completed" },
-] satisfies ReadonlyArray<{ label: string; value: StatusFilter }>;
 
 function TasksToolbar({
   searchQuery,
@@ -37,13 +19,31 @@ function TasksToolbar({
   onPriorityFilterChange,
   onStatusFilterChange,
 }: TasksToolbarProps) {
+  const { t } = useI18n();
+  const sortOptions = [
+    { value: "due-date", label: t("tasks.toolbar.sortOptions.dueDate") },
+    { value: "priority", label: t("tasks.toolbar.sortOptions.priority") },
+    { value: "created", label: t("tasks.toolbar.sortOptions.created") },
+  ] satisfies ReadonlyArray<{ label: string; value: SortOption }>;
+  const priorityOptions = [
+    { value: "all", label: t("common.all") },
+    { value: "high", label: t("common.priorityLevels.high") },
+    { value: "medium", label: t("common.priorityLevels.medium") },
+    { value: "low", label: t("common.priorityLevels.low") },
+  ] satisfies ReadonlyArray<{ label: string; value: PriorityFilter }>;
+  const statusOptions = [
+    { value: "all", label: t("common.all") },
+    { value: "active", label: t("common.active") },
+    { value: "completed", label: t("common.completed") },
+  ] satisfies ReadonlyArray<{ label: string; value: StatusFilter }>;
+
   return (
     <div className="tasks-page__toolbar">
       <div className="tasks-page__search-wrapper">
         <TextField
           fullWidth
           id="tasks-search"
-          label="Search"
+          label={t("common.search")}
           size="small"
           value={searchQuery}
           onChange={(event) => onSearchQueryChange(event.target.value)}
@@ -64,13 +64,13 @@ function TasksToolbar({
           className="tasks-page__select-control"
           fullWidth
           id="tasks-sort-select"
-          label="Sort"
+          label={t("common.sort")}
           select
           size="small"
           value={sortBy}
           onChange={(event) => onSortByChange(event.target.value as SortOption)}
         >
-          {SORT_OPTIONS.map((option) => (
+          {sortOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
@@ -83,13 +83,13 @@ function TasksToolbar({
           className="tasks-page__select-control"
           fullWidth
           id="tasks-priority-select"
-          label="Priority"
+          label={t("common.priority")}
           select
           size="small"
           value={priorityFilter}
           onChange={(event) => onPriorityFilterChange(event.target.value as PriorityFilter)}
         >
-          {PRIORITY_FILTER_OPTIONS.map((option) => (
+          {priorityOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
@@ -102,13 +102,13 @@ function TasksToolbar({
           className="tasks-page__select-control"
           fullWidth
           id="tasks-status-select"
-          label="Status"
+          label={t("common.status")}
           select
           size="small"
           value={statusFilter}
           onChange={(event) => onStatusFilterChange(event.target.value as StatusFilter)}
         >
-          {STATUS_FILTER_OPTIONS.map((option) => (
+          {statusOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
@@ -117,7 +117,7 @@ function TasksToolbar({
       </div>
 
       <button type="button" className="tasks-page__new-task-btn" onClick={onCreateTaskClick}>
-        New task
+        {t("tasks.toolbar.newTask")}
       </button>
     </div>
   );

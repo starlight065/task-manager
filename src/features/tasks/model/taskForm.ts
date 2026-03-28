@@ -1,4 +1,5 @@
 import type { CreateTaskDto } from "../../../shared/types";
+import { t } from "../../../shared/i18n";
 import type { TaskFormErrors } from "../types/model";
 
 export const EMPTY_TASK_FORM: CreateTaskDto = {
@@ -30,15 +31,15 @@ export function validateTaskForm(values: CreateTaskDto): TaskFormErrors {
   const today = todayAsDateInputValue();
 
   if (!values.title) {
-    errors.title = "Title is required.";
+    errors.title = t("validation.titleRequired");
   }
 
   if (!values.priority) {
-    errors.priority = "Priority is required.";
+    errors.priority = t("validation.priorityRequired");
   }
 
   if (values.dueDate && values.dueDate < today) {
-    errors.dueDate = "Due date cannot be in the past.";
+    errors.dueDate = t("validation.dueDatePast");
   }
 
   return errors;

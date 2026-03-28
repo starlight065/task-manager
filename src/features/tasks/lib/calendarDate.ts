@@ -2,8 +2,6 @@ import type { CalendarMonth, DateParts } from "../types/calendar";
 
 const ISO_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 
-export const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
-
 export function parseIsoDate(value: string): DateParts | null {
   const match = ISO_DATE_PATTERN.exec(value);
 
@@ -90,6 +88,19 @@ export function formatIsoDate(
   return new Intl.DateTimeFormat(locale, options).format(
     new Date(parts.year, parts.month - 1, parts.day),
   );
+}
+
+export function getWeekdayLabels(locale = "en-US"): string[] {
+  const formatter = new Intl.DateTimeFormat(locale, { weekday: "short" });
+  const firstSunday = new Date(2023, 0, 1);
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(firstSunday);
+
+    date.setDate(firstSunday.getDate() + index);
+
+    return formatter.format(date);
+  });
 }
 
 export function getMonthGrid(month: CalendarMonth): DateParts[] {
