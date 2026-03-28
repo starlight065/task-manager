@@ -102,6 +102,9 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
       taskCreationTitle: "Task Creation",
       taskCreationDescription:
         "Easily create tasks with titles, detailed descriptions, and due dates.",
+      subtasksTitle: "Subtasks",
+      subtasksDescription:
+        "Break larger tasks into smaller checklist items so you can track each step to completion.",
       priorityLevelsTitle: "Priority Levels",
       priorityLevelsDescription: "Assign priorities to focus on what's most important:",
       progressTrackingTitle: "Progress Tracking",
@@ -118,6 +121,7 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
         "Sign up for a free account today and take the first step towards a more organized life.",
       signUpNow: "Sign Up Now",
       calendarAlt: "Calendar",
+      subtasksAlt: "Subtasks checklist",
     },
     auth: {
       backToHome: "Back to Home",
@@ -325,6 +329,9 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
       taskCreationTitle: "Створення завдань",
       taskCreationDescription:
         "Легко створюйте завдання з назвою, детальним описом і терміном виконання.",
+      subtasksTitle: "Підзавдання",
+      subtasksDescription:
+        "Розбивайте великі завдання на менші пункти чеклиста, щоб відстежувати виконання кожного кроку.",
       priorityLevelsTitle: "Рівні пріоритету",
       priorityLevelsDescription: "Призначайте пріоритети, щоб зосередитися на найважливішому:",
       progressTrackingTitle: "Відстеження прогресу",
@@ -341,6 +348,7 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
         "Створіть безкоштовний акаунт вже сьогодні та зробіть перший крок до більш організованого життя.",
       signUpNow: "Зареєструватися зараз",
       calendarAlt: "Календар",
+      subtasksAlt: "Чеклист підзавдань",
     },
     auth: {
       backToHome: "Назад на головну",

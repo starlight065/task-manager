@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
 import calendarIcon from "../assets/calendar.svg";
+import subtasksIcon from "../assets/subtasks.svg";
 import { useI18n } from "../shared/i18n/useI18n";
 
 function HomePage() {
@@ -44,6 +45,11 @@ function HomePage() {
               <h3 className="features__title">{t("home.taskCreationTitle")}</h3>
               <p>{t("home.taskCreationDescription")}</p>
               <img src={calendarIcon} alt={t("home.calendarAlt")} className="features__icon" />
+            </div>
+            <div className="features__item">
+              <h3 className="features__title">{t("home.subtasksTitle")}</h3>
+              <p>{t("home.subtasksDescription")}</p>
+              <img src={subtasksIcon} alt={t("home.subtasksAlt")} className="features__icon" />
             </div>
             <div className="features__item">
               <h3 className="features__title">{t("home.priorityLevelsTitle")}</h3>
