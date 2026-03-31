@@ -16,12 +16,14 @@ import {
   EMPTY_TASK_FORM,
   normalizeTaskFormValues,
   validateTaskForm,
-  type TaskFormErrors,
 } from "./taskForm";
-import {
-  getFilteredTasks,
-} from "./taskFilters";
-import type { PriorityFilter, SortOption, StatusFilter } from "../types/model";
+import { getFilteredTasks } from "./taskFilters";
+import type {
+  PriorityFilter,
+  SortOption,
+  StatusFilter,
+  TaskFormErrors,
+} from "../types/model";
 
 export function useTasksPageModel() {
   const [tasks, setTasks] = useState<TaskDto[]>([]);
