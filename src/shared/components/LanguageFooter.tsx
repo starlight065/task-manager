@@ -1,7 +1,6 @@
-import { MenuItem, TextField } from "@mui/material";
-import type { ChangeEvent } from "react";
+import { MenuItem, TextField, type TextFieldProps } from "@mui/material";
 import { useI18n } from "../i18n/useI18n";
-import type { SupportedLanguage } from "../i18n";
+import { isSupportedLanguage, type SupportedLanguage } from "../i18n";
 
 const LANGUAGE_OPTIONS: ReadonlyArray<{
   labelKey: string;
@@ -10,6 +9,10 @@ const LANGUAGE_OPTIONS: ReadonlyArray<{
   {
     value: "en",
     labelKey: "footer.english",
+  },
+  {
+    value: "ru",
+    labelKey: "footer.russian",
   },
   {
     value: "uk",
@@ -22,8 +25,12 @@ const LANGUAGE_SELECT_ID = "footer-language-select";
 function LanguageFooter() {
   const { language, setLanguage, t } = useI18n();
 
-  const handleLanguageChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(event.target.value as SupportedLanguage);
+  const handleLanguageChange: NonNullable<TextFieldProps["onChange"]> = (event) => {
+    const { value } = event.target;
+
+    if (isSupportedLanguage(value)) {
+      setLanguage(value);
+    }
   };
 
   return (
