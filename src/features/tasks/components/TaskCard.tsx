@@ -118,8 +118,8 @@ function TaskCard({
           >
             {task.title}
           </div>
-          <div className="task-card__actions">
-            <div className="task-card__action-group">
+          <div className="task-card__controls">
+            <div className="task-card__action-group task-card__action-group--share">
               <button
                 type="button"
                 className={classNames(
