@@ -1,5 +1,5 @@
 import type { SubmitEvent } from "react";
-import type { CreateTaskDto, TaskDto } from "../../../shared/types";
+import type { CreateTaskDto, Priority, TaskDto } from "../../../shared/types";
 import type {
   PriorityFilter,
   SortOption,
@@ -22,10 +22,15 @@ export interface CreateTaskModalProps {
   onSubmit: (event: SubmitEvent<HTMLFormElement>) => void;
 }
 
+export type TaskCardCheckboxMode = "complete" | "select";
+
 export interface TaskCardProps {
   task: TaskDto;
   isUpdating: boolean;
+  checkboxMode: TaskCardCheckboxMode;
+  isSelected?: boolean;
   onCompletionChange: (taskId: number, completed: boolean) => void;
+  onSelectionChange?: (taskId: number, selected: boolean) => void;
   onSubtaskCompletionChange: (taskId: number, subtaskId: number, completed: boolean) => void;
   onEditClick: (task: TaskDto) => void;
   onDeleteClick: (task: TaskDto) => void;
@@ -37,6 +42,7 @@ export interface TaskCardProps {
 export interface TaskDeleteModalProps {
   isOpen: boolean;
   taskTitle: string;
+  taskCount: number;
   error: string | null;
   isDeleting: boolean;
   onClose: () => void;
@@ -53,7 +59,9 @@ export interface TaskListSectionProps {
   title: string;
   tasks: TaskDto[];
   pendingTaskIds: number[];
+  selectedTaskIds: number[];
   onTaskCompletionChange: (taskId: number, completed: boolean) => void;
+  onTaskSelectionChange: (taskId: number, selected: boolean) => void;
   onSubtaskCompletionChange: (taskId: number, subtaskId: number, completed: boolean) => void;
   onTaskEditClick: (task: TaskDto) => void;
   onTaskDeleteClick: (task: TaskDto) => void;
@@ -75,6 +83,18 @@ export interface TasksHeaderProps {
 
 export interface TasksListViewProps {
   model: TasksPageModel;
+}
+
+export interface TasksBulkActionBarProps {
+  selectedCount: number;
+  selectedTasks: TaskDto[];
+  canUpdateCompletion: boolean;
+  isPending: boolean;
+  completionAction: "complete" | "activate";
+  onUpdateCompletion: () => Promise<boolean>;
+  onDelete: () => void;
+  onClearSelection: () => void;
+  onApplyPriority: (priority: Priority) => Promise<boolean>;
 }
 
 export interface TasksProgressProps {

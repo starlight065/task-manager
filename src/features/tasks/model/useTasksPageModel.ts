@@ -1,5 +1,5 @@
 import { useEffect, useState, type SubmitEvent } from "react";
-import type { CreateTaskDto, SubtaskDto, TaskDto } from "../../../shared/types";
+import type { CreateTaskDto, Priority, SubtaskDto, TaskDto } from "../../../shared/types";
 import { t } from "../../../shared/i18n";
 import {
   createShareLink,
@@ -12,11 +12,7 @@ import {
   updateTaskCompletion,
 } from "../api/tasksApi";
 import { getTaskSummary } from "../lib/getTaskSummary";
-import {
-  EMPTY_TASK_FORM,
-  normalizeTaskFormValues,
-  validateTaskForm,
-} from "./taskForm";
+import { EMPTY_TASK_FORM, normalizeTaskFormValues, validateTaskForm } from "./taskForm";
 import { getFilteredTasks } from "./taskFilters";
 import type {
   PriorityFilter,
@@ -25,6 +21,31 @@ import type {
   TaskFormErrors,
 } from "../types/model";
 
+type BulkAction = "complete" | "delete" | "priority" | null;
+
+type DeleteTarget =
+  | {
+      mode: "single";
+      task: TaskDto;
+    }
+  | {
+      mode: "bulk";
+      taskCount: number;
+      taskIds: number[];
+      taskTitle: string;
+    };
+
+function dedupeTaskIds(taskIds: number[]) {
+  return [...new Set(taskIds)];
+}
+
+function getRejectedResultsTaskIds(
+  taskIds: number[],
+  results: PromiseSettledResult<unknown>[],
+): number[] {
+  return taskIds.filter((_, index) => results[index]?.status === "rejected");
+}
+
 export function useTasksPageModel() {
   const [tasks, setTasks] = useState<TaskDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,6 +53,8 @@ export function useTasksPageModel() {
   const [completionError, setCompletionError] = useState<string | null>(null);
   const [shareFeedbackMessage, setShareFeedbackMessage] = useState<string | null>(null);
   const [pendingTaskIds, setPendingTaskIds] = useState<number[]>([]);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
+  const [bulkAction, setBulkAction] = useState<BulkAction>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("due-date");
   const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>("all");
@@ -42,7 +65,7 @@ export function useTasksPageModel() {
   const [fieldErrors, setFieldErrors] = useState<TaskFormErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [taskToDelete, setTaskToDelete] = useState<TaskDto | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -76,15 +99,78 @@ export function useTasksPageModel() {
     };
   }, []);
 
-  const filteredTasks = getFilteredTasks(
-    tasks,
-    searchQuery,
-    statusFilter,
-    priorityFilter,
-    sortBy,
+  useEffect(() => {
+    setSelectedTaskIds([]);
+  }, [priorityFilter, searchQuery, statusFilter]);
+
+  useEffect(() => {
+    const existingTaskIds = new Set(tasks.map((task) => task.id));
+
+    setSelectedTaskIds((currentTaskIds) => {
+      const nextTaskIds = currentTaskIds.filter((taskId) => existingTaskIds.has(taskId));
+
+      return nextTaskIds.length === currentTaskIds.length ? currentTaskIds : nextTaskIds;
+    });
+  }, [tasks]);
+
+  const filteredTasks = getFilteredTasks(tasks, searchQuery, statusFilter, priorityFilter, sortBy);
+  const selectedTasks = tasks.filter((task) => selectedTaskIds.includes(task.id));
+  const selectedCount = selectedTaskIds.length;
+  const areAllSelectedTasksCompleted =
+    selectedCount > 0 && selectedTasks.every((task) => task.completed);
+  const completionAction: "complete" | "activate" = areAllSelectedTasksCompleted
+    ? "activate"
+    : "complete";
+  const completionTarget = completionAction === "complete";
+  const canUpdateCompletion = selectedTasks.some(
+    (task) => task.completed !== completionTarget,
   );
-  const taskModalMode: "create" | "edit" =
-    editingTaskId === null ? "create" : "edit";
+  const taskModalMode: "create" | "edit" = editingTaskId === null ? "create" : "edit";
+
+  async function reloadTasks() {
+    const nextTasks = await getTasks();
+
+    setTasks(nextTasks);
+    setError(null);
+
+    return nextTasks;
+  }
+
+  function addPendingTaskIds(taskIds: number[]) {
+    const nextTaskIds = dedupeTaskIds(taskIds);
+
+    if (nextTaskIds.length === 0) {
+      return;
+    }
+
+    setPendingTaskIds((currentTaskIds) => dedupeTaskIds([...currentTaskIds, ...nextTaskIds]));
+  }
+
+  function removePendingTaskIds(taskIds: number[]) {
+    if (taskIds.length === 0) {
+      return;
+    }
+
+    const taskIdsToRemove = new Set(taskIds);
+
+    setPendingTaskIds((currentTaskIds) =>
+      currentTaskIds.filter((taskId) => !taskIdsToRemove.has(taskId)),
+    );
+  }
+
+  function clearTaskSelection() {
+    setSelectedTaskIds([]);
+  }
+
+  function onTaskSelectionChange(taskId: number, selected: boolean) {
+    setSelectedTaskIds((currentTaskIds) => {
+      if (selected) {
+        return currentTaskIds.includes(taskId) ? currentTaskIds : [...currentTaskIds, taskId];
+      }
+
+      return currentTaskIds.filter((currentTaskId) => currentTaskId !== taskId);
+    });
+  }
 
   function openCreateTaskModal() {
     setEditingTaskId(null);
@@ -102,7 +188,7 @@ export function useTasksPageModel() {
       priority: task.priority,
       dueDate: task.dueDate,
       tag: task.tag,
-      subtasks: task.subtasks.map((s) => s.title),
+      subtasks: task.subtasks.map((subtask) => subtask.title),
     });
     setFieldErrors({});
     setFormError(null);
@@ -118,12 +204,33 @@ export function useTasksPageModel() {
   }
 
   function openDeleteTaskModal(task: TaskDto) {
-    setTaskToDelete(task);
+    setDeleteTarget({
+      mode: "single",
+      task,
+    });
+    setDeleteError(null);
+  }
+
+  function openBulkDeleteModal() {
+    if (selectedTaskIds.length === 0) {
+      return;
+    }
+
+    setDeleteTarget({
+      mode: "bulk",
+      taskCount: selectedTaskIds.length,
+      taskIds: selectedTaskIds,
+      taskTitle: selectedTasks[0]?.title ?? "",
+    });
     setDeleteError(null);
   }
 
   function closeDeleteTaskModal() {
-    setTaskToDelete(null);
+    if (bulkAction === "delete") {
+      return;
+    }
+
+    setDeleteTarget(null);
     setDeleteError(null);
   }
 
@@ -157,7 +264,7 @@ export function useTasksPageModel() {
   function onSubtaskRemove(index: number) {
     setFormValues((currentValues) => ({
       ...currentValues,
-      subtasks: (currentValues.subtasks ?? []).filter((_, i) => i !== index),
+      subtasks: (currentValues.subtasks ?? []).filter((_, currentIndex) => currentIndex !== index),
     }));
   }
 
@@ -182,13 +289,14 @@ export function useTasksPageModel() {
 
         setTasks((currentTasks) => [...currentTasks, createdTask]);
       } else {
-        const existingTask = tasks.find((t) => t.id === editingTaskId);
+        const existingTask = tasks.find((task) => task.id === editingTaskId);
         const existingSubtasks: SubtaskDto[] = existingTask?.subtasks ?? [];
         const formSubtaskTitles = trimmedValues.subtasks ?? [];
 
         const updateSubtasks = formSubtaskTitles.map((title, index) => {
-          const existing = existingSubtasks[index];
-          return existing ? { id: existing.id, title } : { title };
+          const existingSubtask = existingSubtasks[index];
+
+          return existingSubtask ? { id: existingSubtask.id, title } : { title };
         });
 
         const updatedTask = await updateTask(editingTaskId, {
@@ -223,38 +331,22 @@ export function useTasksPageModel() {
     setTasks((currentTasks) =>
       currentTasks.map((task) => (task.id === taskId ? { ...task, completed } : task)),
     );
-    setPendingTaskIds((currentTaskIds) =>
-      currentTaskIds.includes(taskId) ? currentTaskIds : [...currentTaskIds, taskId],
-    );
+    addPendingTaskIds([taskId]);
 
     try {
       const updatedTask = await updateTaskCompletion(taskId, { completed });
 
       setTasks((currentTasks) =>
-        currentTasks.map((task) => {
-          if (task.id !== updatedTask.id) {
-            return task;
-          }
-
-          return updatedTask;
-        }),
+        currentTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)),
       );
       setCompletionError(null);
     } catch (err) {
       setTasks((currentTasks) =>
-        currentTasks.map((task) => {
-          if (task.id !== previousTask.id) {
-            return task;
-          }
-
-          return previousTask;
-        }),
+        currentTasks.map((task) => (task.id === previousTask.id ? previousTask : task)),
       );
       setCompletionError(err instanceof Error ? err.message : t("tasks.errors.updateTask"));
     } finally {
-      setPendingTaskIds((currentTaskIds) =>
-        currentTaskIds.filter((currentTaskId) => currentTaskId !== taskId),
-      );
+      removePendingTaskIds([taskId]);
     }
   }
 
@@ -267,39 +359,126 @@ export function useTasksPageModel() {
 
     setTasks((currentTasks) =>
       currentTasks.map((task) => {
-        if (task.id !== taskId) return task;
+        if (task.id !== taskId) {
+          return task;
+        }
+
         return {
           ...task,
-          subtasks: task.subtasks.map((s) =>
-            s.id === subtaskId ? { ...s, completed } : s,
+          subtasks: task.subtasks.map((subtask) =>
+            subtask.id === subtaskId ? { ...subtask, completed } : subtask,
           ),
         };
       }),
     );
-    setPendingTaskIds((currentTaskIds) =>
-      currentTaskIds.includes(taskId) ? currentTaskIds : [...currentTaskIds, taskId],
-    );
+    addPendingTaskIds([taskId]);
 
     try {
       const updatedTask = await apiToggleSubtaskCompletion(taskId, subtaskId, { completed });
 
       setTasks((currentTasks) =>
-        currentTasks.map((task) => (task.id !== updatedTask.id ? task : updatedTask)),
+        currentTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)),
       );
       setCompletionError(null);
     } catch (err) {
       setTasks((currentTasks) =>
-        currentTasks.map((task) => (task.id !== previousTask.id ? task : previousTask)),
+        currentTasks.map((task) => (task.id === previousTask.id ? previousTask : task)),
       );
       setCompletionError(err instanceof Error ? err.message : t("tasks.errors.updateSubtask"));
     } finally {
-      setPendingTaskIds((currentTaskIds) =>
-        currentTaskIds.filter((currentTaskId) => currentTaskId !== taskId),
-      );
+      removePendingTaskIds([taskId]);
     }
   }
 
+  async function runBulkTaskAction(
+    taskIds: number[],
+    action: Exclude<BulkAction, null>,
+    runTaskAction: (taskId: number) => Promise<unknown>,
+    partialFailureMessage: (failedCount: number) => string,
+  ) {
+    const nextTaskIds = dedupeTaskIds(taskIds);
 
+    if (nextTaskIds.length === 0) {
+      return true;
+    }
+
+    addPendingTaskIds(nextTaskIds);
+    setBulkAction(action);
+    setDeleteError(null);
+
+    try {
+      const results = await Promise.allSettled(
+        nextTaskIds.map((taskId) => runTaskAction(taskId)),
+      );
+      const failedTaskIds = getRejectedResultsTaskIds(nextTaskIds, results);
+
+      await reloadTasks();
+
+      if (failedTaskIds.length > 0) {
+        setSelectedTaskIds(failedTaskIds);
+        setCompletionError(partialFailureMessage(failedTaskIds.length));
+        return false;
+      }
+
+      clearTaskSelection();
+      setCompletionError(null);
+      return true;
+    } catch (err) {
+      setCompletionError(err instanceof Error ? err.message : t("tasks.errors.loadTasks"));
+      return false;
+    } finally {
+      removePendingTaskIds(nextTaskIds);
+      setBulkAction(null);
+    }
+  }
+
+  async function updateSelectedTasksCompletion() {
+    const taskIdsToUpdate = selectedTasks
+      .filter((task) => task.completed !== completionTarget)
+      .map((task) => task.id);
+
+    return runBulkTaskAction(
+      taskIdsToUpdate,
+      "complete",
+      (taskId) => updateTaskCompletion(taskId, { completed: completionTarget }),
+      (failedCount) =>
+        completionTarget
+          ? t("tasks.bulk.completePartialFailure", { count: failedCount })
+          : t("tasks.bulk.activatePartialFailure", { count: failedCount }),
+    );
+  }
+
+  async function updateSelectedTasksPriority(priority: Priority) {
+    const tasksById = new Map(tasks.map((task) => [task.id, task]));
+    const taskIdsToUpdate = selectedTasks
+      .filter((task) => task.priority !== priority)
+      .map((task) => task.id);
+
+    return runBulkTaskAction(
+      taskIdsToUpdate,
+      "priority",
+      async (taskId) => {
+        const task = tasksById.get(taskId);
+
+        if (!task) {
+          throw new Error(t("tasks.errors.updateTask"));
+        }
+
+        return updateTask(taskId, {
+          title: task.title,
+          description: task.description,
+          priority,
+          dueDate: task.dueDate,
+          tag: task.tag,
+          subtasks: task.subtasks.map((subtask) => ({
+            id: subtask.id,
+            title: subtask.title,
+          })),
+        });
+      },
+      (failedCount) => t("tasks.bulk.priorityPartialFailure", { count: failedCount }),
+    );
+  }
 
   async function copyShareLink(shareToken: string) {
     const shareUrl = `${window.location.origin}/shared/${shareToken}`;
@@ -313,9 +492,7 @@ export function useTasksPageModel() {
   }
 
   async function shareTask(task: TaskDto) {
-    setPendingTaskIds((currentTaskIds) =>
-      currentTaskIds.includes(task.id) ? currentTaskIds : [...currentTaskIds, task.id],
-    );
+    addPendingTaskIds([task.id]);
 
     try {
       const nextTask = task.shareToken ? task : await createShareLink(task.id);
@@ -335,9 +512,7 @@ export function useTasksPageModel() {
       setShareFeedbackMessage(null);
       setCompletionError(err instanceof Error ? err.message : t("tasks.errors.copyShareLink"));
     } finally {
-      setPendingTaskIds((currentTaskIds) =>
-        currentTaskIds.filter((currentTaskId) => currentTaskId !== task.id),
-      );
+      removePendingTaskIds([task.id]);
     }
   }
 
@@ -346,12 +521,11 @@ export function useTasksPageModel() {
       return;
     }
 
-    setPendingTaskIds((currentTaskIds) =>
-      currentTaskIds.includes(task.id) ? currentTaskIds : [...currentTaskIds, task.id],
-    );
+    addPendingTaskIds([task.id]);
 
     try {
       const nextTask = await revokeShareLink(task.id);
+
       setTasks((currentTasks) =>
         currentTasks.map((currentTask) => (currentTask.id === nextTask.id ? nextTask : currentTask)),
       );
@@ -359,38 +533,55 @@ export function useTasksPageModel() {
     } catch (err) {
       setCompletionError(err instanceof Error ? err.message : t("tasks.errors.revokeShareLink"));
     } finally {
-      setPendingTaskIds((currentTaskIds) =>
-        currentTaskIds.filter((currentTaskId) => currentTaskId !== task.id),
-      );
+      removePendingTaskIds([task.id]);
     }
   }
+
   async function confirmTaskDelete() {
-    if (!taskToDelete) {
+    if (!deleteTarget) {
       return;
     }
 
-    const { id: taskId } = taskToDelete;
+    if (deleteTarget.mode === "bulk") {
+      const taskIds = deleteTarget.taskIds;
 
-    setPendingTaskIds((currentTaskIds) =>
-      currentTaskIds.includes(taskId) ? currentTaskIds : [...currentTaskIds, taskId],
-    );
+      await runBulkTaskAction(
+        taskIds,
+        "delete",
+        (taskId) => deleteTask(taskId),
+        (failedCount) => t("tasks.bulk.deletePartialFailure", { count: failedCount }),
+      );
+
+      setDeleteTarget(null);
+      setDeleteError(null);
+
+      return;
+    }
+
+    const taskId = deleteTarget.task.id;
+
+    addPendingTaskIds([taskId]);
     setDeleteError(null);
 
     try {
       await deleteTask(taskId);
       setTasks((currentTasks) => currentTasks.filter((task) => task.id !== taskId));
-      closeDeleteTaskModal();
+      setDeleteTarget(null);
     } catch (err) {
       setDeleteError(err instanceof Error ? err.message : t("tasks.errors.deleteTask"));
     } finally {
-      setPendingTaskIds((currentTaskIds) =>
-        currentTaskIds.filter((currentTaskId) => currentTaskId !== taskId),
-      );
+      removePendingTaskIds([taskId]);
     }
   }
 
   const isDeletingTask =
-    taskToDelete !== null && pendingTaskIds.includes(taskToDelete.id);
+    deleteTarget?.mode === "bulk"
+      ? bulkAction === "delete"
+      : deleteTarget !== null && pendingTaskIds.includes(deleteTarget.task.id);
+  const deleteTaskCount =
+    deleteTarget?.mode === "bulk" ? deleteTarget.taskCount : deleteTarget ? 1 : 0;
+  const deleteTaskTitle =
+    deleteTarget?.mode === "bulk" ? deleteTarget.taskTitle : deleteTarget?.task.title ?? "";
 
   return {
     isLoading,
@@ -418,8 +609,19 @@ export function useTasksPageModel() {
       completedTasks: filteredTasks.filter((task) => task.completed),
       visibleCount: filteredTasks.length,
       pendingTaskIds,
+      selectedTaskIds,
+      selectedTasks,
+      selectedCount,
+      canUpdateCompletion,
+      completionAction,
+      isBulkActionPending: bulkAction !== null,
       toggleTaskCompletion,
       toggleSubtaskCompletion,
+      onTaskSelectionChange,
+      clearSelection: clearTaskSelection,
+      updateSelectedTasksCompletion,
+      openBulkDeleteModal,
+      updateSelectedTasksPriority,
       openEditTaskModal,
       openDeleteTaskModal,
       shareTask,
@@ -439,8 +641,9 @@ export function useTasksPageModel() {
       onSubmit: onTaskSubmit,
     },
     deleteTaskModal: {
-      isOpen: taskToDelete !== null,
-      taskTitle: taskToDelete?.title ?? "",
+      isOpen: deleteTarget !== null,
+      taskTitle: deleteTaskTitle,
+      taskCount: deleteTaskCount,
       error: deleteError,
       isDeleting: isDeletingTask,
       close: closeDeleteTaskModal,

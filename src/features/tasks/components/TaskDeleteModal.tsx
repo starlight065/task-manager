@@ -5,6 +5,7 @@ import type { TaskDeleteModalProps } from "../types/components";
 function TaskDeleteModal({
   isOpen,
   taskTitle,
+  taskCount,
   error,
   isDeleting,
   onClose,
@@ -34,12 +35,18 @@ function TaskDeleteModal({
       onClose={handleClose}
     >
       <DialogTitle className="app-dialog__title" id="delete-task-title">
-        {t("tasks.delete.title")}
+        {taskCount > 1 ? t("tasks.delete.bulkTitle") : t("tasks.delete.title")}
       </DialogTitle>
       <DialogContent className="app-dialog__content">
         <p className="app-dialog__copy task-modal__delete-copy">
-          {t("tasks.delete.confirmBefore")} <strong>{taskTitle}</strong>?{" "}
-          {t("tasks.delete.confirmAfter")}
+          {taskCount > 1 ? (
+            t("tasks.delete.confirmMany", { count: taskCount })
+          ) : (
+            <>
+              {t("tasks.delete.confirmBefore")} <strong>{taskTitle}</strong>?{" "}
+              {t("tasks.delete.confirmAfter")}
+            </>
+          )}
         </p>
         {error ? <Alert severity="error">{error}</Alert> : null}
       </DialogContent>
@@ -48,7 +55,13 @@ function TaskDeleteModal({
           {t("common.cancel")}
         </Button>
         <Button color="error" variant="contained" onClick={onConfirm} disabled={isDeleting}>
-          {isDeleting ? t("tasks.delete.deleting") : t("tasks.delete.delete")}
+          {isDeleting
+            ? taskCount > 1
+              ? t("tasks.delete.deletingSelected")
+              : t("tasks.delete.deleting")
+            : taskCount > 1
+              ? t("tasks.delete.deleteSelected")
+              : t("tasks.delete.delete")}
         </Button>
       </DialogActions>
     </Dialog>

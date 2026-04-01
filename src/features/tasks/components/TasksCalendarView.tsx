@@ -320,6 +320,7 @@ function TasksCalendarView({ model }: TasksCalendarViewProps) {
                 <TaskCard
                   key={task.id}
                   task={task}
+                  checkboxMode="complete"
                   isUpdating={model.taskLists.pendingTaskIds.includes(task.id)}
                   onCompletionChange={model.taskLists.toggleTaskCompletion}
                   onSubtaskCompletionChange={model.taskLists.toggleSubtaskCompletion}

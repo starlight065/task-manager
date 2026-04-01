@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { Checkbox } from "@mui/material";
 import editIcon from "../../../assets/icon-edit.svg";
 import trashIcon from "../../../assets/icon-trash.svg";
 import { useI18n } from "../../../shared/i18n/useI18n";
@@ -36,7 +37,10 @@ function dueDateClass(dateStr: string): string {
 function TaskCard({
   task,
   isUpdating,
+  checkboxMode,
+  isSelected = false,
   onCompletionChange,
+  onSelectionChange,
   onSubtaskCompletionChange,
   onEditClick,
   onDeleteClick,
@@ -51,25 +55,53 @@ function TaskCard({
   const hasTag = task.tag.trim().length > 0;
   const isShared = task.shareToken !== null;
   const { t } = useI18n();
+  const isSelectionMode = checkboxMode === "select";
+  const checkboxChecked = isSelectionMode ? isSelected : task.completed;
+  const checkboxAriaLabel = isSelectionMode
+    ? t("tasks.card.toggleSelectionAriaLabel", {
+        title: task.title,
+        selected: isSelected,
+      })
+    : t("tasks.card.markTaskAriaLabel", {
+        title: task.title,
+        completed: task.completed,
+      });
 
   return (
     <div
       className={classNames("task-card", {
+        "task-card--selected": isSelected,
         "task-card--updating": isUpdating,
       })}
     >
-      <input
-        type="checkbox"
+      <Checkbox
         className="task-card__checkbox"
-        checked={task.completed}
+        checked={checkboxChecked}
         disabled={isUpdating}
+        disableRipple
+        size="small"
         onChange={(event) => {
+          if (isSelectionMode) {
+            onSelectionChange?.(task.id, event.target.checked);
+            return;
+          }
+
           onCompletionChange(task.id, event.target.checked);
         }}
-        aria-label={t("tasks.card.markTaskAriaLabel", {
-          title: task.title,
-          completed: task.completed,
-        })}
+        inputProps={{ "aria-label": checkboxAriaLabel }}
+        sx={{
+          position: "absolute",
+          top: 12,
+          left: 12,
+          padding: "4px",
+          color: "rgba(58, 142, 246, 0.45)",
+          "&.Mui-checked": {
+            color: "#3a8ef6",
+          },
+          "&.Mui-disabled": {
+            color: "rgba(58, 142, 246, 0.28)",
+          },
+        }}
       />
       <div className="task-card__content">
         <div className="task-card__header">
@@ -81,46 +113,50 @@ function TaskCard({
             {task.title}
           </div>
           <div className="task-card__actions">
-            <button
-              type="button"
-              className="task-card__action task-card__action--share"
-              aria-label={
-                isShared ? t("tasks.card.copyLinkAriaLabel") : t("tasks.card.createLinkAriaLabel")
-              }
-              disabled={isUpdating}
-              onClick={() => onShareClick(task)}
-            >
-              {t("tasks.card.share")}
-            </button>
-            {isShared ? (
+            <div className="task-card__action-group">
               <button
                 type="button"
-                className="task-card__action task-card__action--revoke"
-                aria-label={t("tasks.card.revokeLinkAriaLabel")}
+                className="task-card__action task-card__action--share"
+                aria-label={
+                  isShared ? t("tasks.card.copyLinkAriaLabel") : t("tasks.card.createLinkAriaLabel")
+                }
                 disabled={isUpdating}
-                onClick={() => onShareRevokeClick(task)}
+                onClick={() => onShareClick(task)}
               >
-                {t("tasks.card.revoke")}
+                {t("tasks.card.share")}
               </button>
-            ) : null}
-            <button
-              type="button"
-              className="task-card__action"
-              aria-label={t("tasks.card.editTaskAriaLabel")}
-              disabled={isUpdating}
-              onClick={() => onEditClick(task)}
-            >
-              <img src={editIcon} alt="" width="16" height="16" />
-            </button>
-            <button
-              type="button"
-              className="task-card__action"
-              aria-label={t("tasks.card.deleteTaskAriaLabel")}
-              disabled={isUpdating}
-              onClick={() => onDeleteClick(task)}
-            >
-              <img src={trashIcon} alt="" width="16" height="16" />
-            </button>
+              {isShared ? (
+                <button
+                  type="button"
+                  className="task-card__action task-card__action--revoke"
+                  aria-label={t("tasks.card.revokeLinkAriaLabel")}
+                  disabled={isUpdating}
+                  onClick={() => onShareRevokeClick(task)}
+                >
+                  {t("tasks.card.revoke")}
+                </button>
+              ) : null}
+            </div>
+            <div className="task-card__icon-actions">
+              <button
+                type="button"
+                className="task-card__action task-card__action--icon"
+                aria-label={t("tasks.card.editTaskAriaLabel")}
+                disabled={isUpdating}
+                onClick={() => onEditClick(task)}
+              >
+                <img src={editIcon} alt="" width="16" height="16" />
+              </button>
+              <button
+                type="button"
+                className="task-card__action task-card__action--icon"
+                aria-label={t("tasks.card.deleteTaskAriaLabel")}
+                disabled={isUpdating}
+                onClick={() => onDeleteClick(task)}
+              >
+                <img src={trashIcon} alt="" width="16" height="16" />
+              </button>
+            </div>
           </div>
         </div>
         {hasDescription ? <div className="task-card__description">{task.description}</div> : null}

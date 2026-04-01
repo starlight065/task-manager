@@ -78,6 +78,7 @@ function TasksPage() {
       <TaskDeleteModal
         isOpen={model.deleteTaskModal.isOpen}
         taskTitle={model.deleteTaskModal.taskTitle}
+        taskCount={model.deleteTaskModal.taskCount}
         error={model.deleteTaskModal.error}
         isDeleting={model.deleteTaskModal.isDeleting}
         onClose={model.deleteTaskModal.close}

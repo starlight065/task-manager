@@ -1,4 +1,7 @@
+import { Box } from "@mui/material";
+import { useEffect, useEffectEvent } from "react";
 import TaskListSection from "./TaskListSection";
+import TasksBulkActionBar from "./TasksBulkActionBar";
 import TasksColumnHeaders from "./TasksColumnHeaders";
 import TasksProgress from "./TasksProgress";
 import TasksToolbar from "./TasksToolbar";
@@ -7,6 +10,15 @@ import type { TasksListViewProps } from "../types/components";
 
 function TasksListView({ model }: TasksListViewProps) {
   const { t } = useI18n();
+  const clearSelectionOnUnmount = useEffectEvent(() => {
+    model.taskLists.clearSelection();
+  });
+
+  useEffect(() => {
+    return () => {
+      clearSelectionOnUnmount();
+    };
+  }, []);
 
   return (
     <>
@@ -28,7 +40,9 @@ function TasksListView({ model }: TasksListViewProps) {
         title={t("common.active")}
         tasks={model.taskLists.activeTasks}
         pendingTaskIds={model.taskLists.pendingTaskIds}
+        selectedTaskIds={model.taskLists.selectedTaskIds}
         onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
+        onTaskSelectionChange={model.taskLists.onTaskSelectionChange}
         onSubtaskCompletionChange={model.taskLists.toggleSubtaskCompletion}
         onTaskEditClick={model.taskLists.openEditTaskModal}
         onTaskDeleteClick={model.taskLists.openDeleteTaskModal}
@@ -39,7 +53,9 @@ function TasksListView({ model }: TasksListViewProps) {
         title={t("common.completed")}
         tasks={model.taskLists.completedTasks}
         pendingTaskIds={model.taskLists.pendingTaskIds}
+        selectedTaskIds={model.taskLists.selectedTaskIds}
         onTaskCompletionChange={model.taskLists.toggleTaskCompletion}
+        onTaskSelectionChange={model.taskLists.onTaskSelectionChange}
         onSubtaskCompletionChange={model.taskLists.toggleSubtaskCompletion}
         onTaskEditClick={model.taskLists.openEditTaskModal}
         onTaskDeleteClick={model.taskLists.openDeleteTaskModal}
@@ -55,6 +71,23 @@ function TasksListView({ model }: TasksListViewProps) {
         done={model.summary.done}
         total={model.summary.total}
         progressPct={model.summary.progressPct}
+      />
+
+      {model.taskLists.selectedCount > 0 ? (
+        <Box aria-hidden="true" sx={{ height: { xs: 164, md: 112 } }} />
+      ) : null}
+
+      <TasksBulkActionBar
+        key={model.taskLists.selectedTaskIds.join(",")}
+        selectedCount={model.taskLists.selectedCount}
+        selectedTasks={model.taskLists.selectedTasks}
+        canUpdateCompletion={model.taskLists.canUpdateCompletion}
+        isPending={model.taskLists.isBulkActionPending}
+        completionAction={model.taskLists.completionAction}
+        onUpdateCompletion={model.taskLists.updateSelectedTasksCompletion}
+        onDelete={model.taskLists.openBulkDeleteModal}
+        onClearSelection={model.taskLists.clearSelection}
+        onApplyPriority={model.taskLists.updateSelectedTasksPriority}
       />
     </>
   );

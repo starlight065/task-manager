@@ -6,7 +6,9 @@ function TaskListSection({
   title,
   tasks,
   pendingTaskIds,
+  selectedTaskIds,
   onTaskCompletionChange,
+  onTaskSelectionChange,
   onSubtaskCompletionChange,
   onTaskEditClick,
   onTaskDeleteClick,
@@ -24,8 +26,11 @@ function TaskListSection({
         <TaskCard
           key={task.id}
           task={task}
+          checkboxMode="select"
           isUpdating={pendingTaskIds.includes(task.id)}
+          isSelected={selectedTaskIds.includes(task.id)}
           onCompletionChange={onTaskCompletionChange}
+          onSelectionChange={onTaskSelectionChange}
           onSubtaskCompletionChange={onSubtaskCompletionChange}
           onEditClick={onTaskEditClick}
           onDeleteClick={onTaskDeleteClick}

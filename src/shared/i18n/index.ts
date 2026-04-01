@@ -208,6 +208,8 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
         deleteTaskAriaLabel: "Delete task",
         markTaskAriaLabel: (params) =>
           `Mark ${getText(params, "title")} as ${params.completed ? "incomplete" : "completed"}`,
+        toggleSelectionAriaLabel: (params) =>
+          `${params.selected ? "Deselect" : "Select"} task "${getText(params, "title")}"`,
         markSubtaskAriaLabel: (params) =>
           `Mark subtask "${getText(params, "title")}" as ${
             params.completed ? "incomplete" : "completed"
@@ -228,10 +230,34 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
       },
       delete: {
         title: "Delete task?",
+        bulkTitle: "Delete tasks?",
         confirmBefore: "Are you sure you want to delete",
+        confirmMany: (params) =>
+          `Are you sure you want to delete ${pluralizeEnglish(getCount(params), "task", "tasks")}? This action cannot be undone.`,
         confirmAfter: "This action cannot be undone.",
         deleting: "Deleting...",
+        deletingSelected: "Deleting selected...",
         delete: "Delete",
+        deleteSelected: "Delete selected",
+      },
+      bulk: {
+        selectedCount: (params) =>
+          `${pluralizeEnglish(getCount(params), "task", "tasks")} selected`,
+        complete: "Complete",
+        activate: "Move to active",
+        delete: "Delete",
+        priority: "Priority",
+        choosePriority: "Choose priority",
+        applyPriority: "Apply priority",
+        clearSelection: "Clear selection",
+        completePartialFailure: (params) =>
+          `Failed to complete ${pluralizeEnglish(getCount(params), "task", "tasks")}.`,
+        activatePartialFailure: (params) =>
+          `Failed to move ${pluralizeEnglish(getCount(params), "task", "tasks")} to active.`,
+        priorityPartialFailure: (params) =>
+          `Failed to update priority for ${pluralizeEnglish(getCount(params), "task", "tasks")}.`,
+        deletePartialFailure: (params) =>
+          `Failed to delete ${pluralizeEnglish(getCount(params), "task", "tasks")}.`,
       },
       error: {
         title: "Could not update task",
@@ -428,7 +454,7 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
       },
       card: {
         share: "Поделиться",
-        revoke: "Отозвать",
+        revoke: "Удалить ",
         publicLinkEnabled: "Публичная ссылка включена",
         subtaskCompletion: "Прогресс подзадач",
         createLinkAriaLabel: "Создать общую ссылку на задачу",
@@ -440,6 +466,8 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
           `Отметить "${getText(params, "title")}" как ${
             params.completed ? "невыполненную" : "выполненную"
           }`,
+        toggleSelectionAriaLabel: (params) =>
+          `${params.selected ? "Снять выделение с задачи" : "Выбрать задачу"} "${getText(params, "title")}"`,
         markSubtaskAriaLabel: (params) =>
           `Отметить подзадачу "${getText(params, "title")}" как ${
             params.completed ? "невыполненную" : "выполненную"
@@ -460,10 +488,34 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
       },
       delete: {
         title: "Удалить задачу?",
+        bulkTitle: "Удалить задачи?",
         confirmBefore: "Вы уверены, что хотите удалить",
+        confirmMany: (params) =>
+          `Вы уверены, что хотите удалить ${pluralizeSlavic(getCount(params), "задачу", "задачи", "задач")}? Это действие нельзя отменить.`,
         confirmAfter: "Это действие нельзя отменить.",
         deleting: "Удаление...",
+        deletingSelected: "Удаление выбранного...",
         delete: "Удалить",
+        deleteSelected: "Удалить выбранное",
+      },
+      bulk: {
+        selectedCount: (params) =>
+          `Выбрано: ${pluralizeSlavic(getCount(params), "задача", "задачи", "задач")}`,
+        complete: "Завершить",
+        activate: "Вернуть в активные",
+        delete: "Удалить",
+        priority: "Приоритет",
+        choosePriority: "Выберите приоритет",
+        applyPriority: "Применить приоритет",
+        clearSelection: "Снять выделение",
+        completePartialFailure: (params) =>
+          `Не удалось отметить как выполненные: ${pluralizeSlavic(getCount(params), "задачу", "задачи", "задач")}.`,
+        activatePartialFailure: (params) =>
+          `Не удалось вернуть в активные ${pluralizeSlavic(getCount(params), "задачу", "задачи", "задач")}.`,
+        priorityPartialFailure: (params) =>
+          `Не удалось обновить приоритет для ${pluralizeSlavic(getCount(params), "задачи", "задач", "задач")}.`,
+        deletePartialFailure: (params) =>
+          `Не удалось удалить ${pluralizeSlavic(getCount(params), "задачу", "задачи", "задач")}.`,
       },
       error: {
         title: "Не удалось обновить задачу",
@@ -672,6 +724,8 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
           `Позначити "${getText(params, "title")}" як ${
             params.completed ? "невиконане" : "виконане"
           }`,
+        toggleSelectionAriaLabel: (params) =>
+          `${params.selected ? "Зняти вибір із завдання" : "Вибрати завдання"} "${getText(params, "title")}"`,
         markSubtaskAriaLabel: (params) =>
           `Позначити підзавдання "${getText(params, "title")}" як ${
             params.completed ? "невиконане" : "виконане"
@@ -692,10 +746,34 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
       },
       delete: {
         title: "Видалити завдання?",
+        bulkTitle: "Видалити завдання?",
         confirmBefore: "Ви впевнені, що хочете видалити",
+        confirmMany: (params) =>
+          `Ви впевнені, що хочете видалити ${pluralizeSlavic(getCount(params), "завдання", "завдання", "завдань")}? Цю дію неможливо скасувати.`,
         confirmAfter: "Цю дію неможливо скасувати.",
         deleting: "Видалення...",
+        deletingSelected: "Видалення вибраного...",
         delete: "Видалити",
+        deleteSelected: "Видалити вибране",
+      },
+      bulk: {
+        selectedCount: (params) =>
+          `Вибрано: ${pluralizeSlavic(getCount(params), "завдання", "завдання", "завдань")}`,
+        complete: "Завершити",
+        activate: "Повернути в активні",
+        delete: "Видалити",
+        priority: "Пріоритет",
+        choosePriority: "Оберіть пріоритет",
+        applyPriority: "Застосувати пріоритет",
+        clearSelection: "Очистити вибір",
+        completePartialFailure: (params) =>
+          `Не вдалося позначити як виконані ${pluralizeSlavic(getCount(params), "завдання", "завдання", "завдань")}.`,
+        activatePartialFailure: (params) =>
+          `Не вдалося повернути в активні ${pluralizeSlavic(getCount(params), "завдання", "завдання", "завдань")}.`,
+        priorityPartialFailure: (params) =>
+          `Не вдалося оновити пріоритет для ${pluralizeSlavic(getCount(params), "завдання", "завдань", "завдань")}.`,
+        deletePartialFailure: (params) =>
+          `Не вдалося видалити ${pluralizeSlavic(getCount(params), "завдання", "завдання", "завдань")}.`,
       },
       error: {
         title: "Не вдалося оновити завдання",
