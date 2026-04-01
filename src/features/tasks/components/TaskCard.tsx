@@ -1,6 +1,8 @@
 import classNames from "classnames";
 import { Checkbox } from "@mui/material";
 import editIcon from "../../../assets/icon-edit.svg";
+import sharePrivateIcon from "../../../assets/icon-share-private.svg";
+import sharePublicIcon from "../../../assets/icon-share-public.svg";
 import trashIcon from "../../../assets/icon-trash.svg";
 import { useI18n } from "../../../shared/i18n/useI18n";
 import { getTodayParts, parseIsoDate } from "../lib/calendarDate";
@@ -57,6 +59,10 @@ function TaskCard({
   const { t } = useI18n();
   const isSelectionMode = checkboxMode === "select";
   const checkboxChecked = isSelectionMode ? isSelected : task.completed;
+  const shareActionLabel = isShared
+    ? t("tasks.card.copyLinkAriaLabel")
+    : t("tasks.card.createLinkAriaLabel");
+  const revokeShareLabel = t("tasks.card.revokeLinkAriaLabel");
   const checkboxAriaLabel = isSelectionMode
     ? t("tasks.card.toggleSelectionAriaLabel", {
         title: task.title,
@@ -116,24 +122,29 @@ function TaskCard({
             <div className="task-card__action-group">
               <button
                 type="button"
-                className="task-card__action task-card__action--share"
-                aria-label={
-                  isShared ? t("tasks.card.copyLinkAriaLabel") : t("tasks.card.createLinkAriaLabel")
-                }
+                className={classNames(
+                  "task-card__action task-card__action--icon task-card__action--share-link",
+                  {
+                    "task-card__action--share-link-active": isShared,
+                  },
+                )}
+                aria-label={shareActionLabel}
+                title={shareActionLabel}
                 disabled={isUpdating}
                 onClick={() => onShareClick(task)}
               >
-                {t("tasks.card.share")}
+                <img src={sharePublicIcon} alt="" width="18" height="18" />
               </button>
               {isShared ? (
                 <button
                   type="button"
-                  className="task-card__action task-card__action--revoke"
-                  aria-label={t("tasks.card.revokeLinkAriaLabel")}
+                  className="task-card__action task-card__action--icon task-card__action--share-link-off"
+                  aria-label={revokeShareLabel}
+                  title={revokeShareLabel}
                   disabled={isUpdating}
                   onClick={() => onShareRevokeClick(task)}
                 >
-                  {t("tasks.card.revoke")}
+                  <img src={sharePrivateIcon} alt="" width="18" height="18" />
                 </button>
               ) : null}
             </div>
@@ -207,9 +218,6 @@ function TaskCard({
         <span className={classNames("priority-badge", `priority-badge--${task.priority}`)}>
           {t(`common.priorityLevels.${task.priority}`)}
         </span>
-        {isShared ? (
-          <span className="task-card__share-badge">{t("tasks.card.publicLinkEnabled")}</span>
-        ) : null}
         {hasDueDate ? (
           <span
             className={classNames(
