@@ -24,6 +24,24 @@ function getRejectedResultsTaskIds(
   return taskIds.filter((_, index) => results[index]?.status === "rejected");
 }
 
+function updateTaskSubtaskCompletion(
+  tasks: TaskDto[],
+  taskId: number,
+  subtaskId: number,
+  completed: boolean,
+): TaskDto[] {
+  return tasks.map((task) =>
+    task.id === taskId
+      ? {
+          ...task,
+          subtasks: task.subtasks.map((subtask) =>
+            subtask.id === subtaskId ? { ...subtask, completed } : subtask,
+          ),
+        }
+      : task,
+  );
+}
+
 interface TaskSelectionState {
   selectedTasks: TaskDto[];
   completionTarget: boolean;
@@ -180,18 +198,7 @@ export function useTaskMutations({
     }
 
     setTasks((currentTasks) =>
-      currentTasks.map((task) => {
-        if (task.id !== taskId) {
-          return task;
-        }
-
-        return {
-          ...task,
-          subtasks: task.subtasks.map((subtask) =>
-            subtask.id === subtaskId ? { ...subtask, completed } : subtask,
-          ),
-        };
-      }),
+      updateTaskSubtaskCompletion(currentTasks, taskId, subtaskId, completed),
     );
     addPendingTaskIds([taskId]);
 
