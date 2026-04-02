@@ -133,7 +133,7 @@ export function getFirstSelectableDate(
         parts !== null && parts.year === month.year && parts.month === month.month
       );
     })
-    .sort()[0];
+    .sort((left, right) => left.localeCompare(right))[0];
 
   if (firstDueDate) {
     return firstDueDate;

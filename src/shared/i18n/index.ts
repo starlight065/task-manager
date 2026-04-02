@@ -834,7 +834,7 @@ function getEntry(language: SupportedLanguage, key: string): TranslationEntry | 
 }
 
 function interpolate(template: string, params: TranslationParams) {
-  return template.replace(/\{\{(\w+)\}\}/g, (_, key: string) => String(params[key] ?? ""));
+  return template.replaceAll(/\{\{(\w+)\}\}/g, (_, key: string) => String(params[key] ?? ""));
 }
 
 export function isSupportedLanguage(value: string | null | undefined): value is SupportedLanguage {
