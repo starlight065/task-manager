@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
 export interface AppProvidersProps {
-  children: ReactNode;
+  readonly children: ReactNode;
 }
 
 export interface RouteGuardProps {
-  children: ReactNode;
+  readonly children: ReactNode;
 }

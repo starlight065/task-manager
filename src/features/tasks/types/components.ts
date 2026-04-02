@@ -9,17 +9,17 @@ import type {
 } from "./model";
 
 export interface CreateTaskModalProps {
-  isOpen: boolean;
-  mode: "create" | "edit";
-  formValues: CreateTaskDto;
-  fieldErrors: TaskFormErrors;
-  formError: string | null;
-  isSubmitting: boolean;
-  onClose: () => void;
-  onFieldChange: (field: keyof CreateTaskDto, value: string) => void;
-  onSubtaskAdd: (title: string) => void;
-  onSubtaskRemove: (index: number) => void;
-  onSubmit: (event: SubmitEvent<HTMLFormElement>) => void;
+  readonly isOpen: boolean;
+  readonly mode: "create" | "edit";
+  readonly formValues: CreateTaskDto;
+  readonly fieldErrors: TaskFormErrors;
+  readonly formError: string | null;
+  readonly isSubmitting: boolean;
+  readonly onClose: () => void;
+  readonly onFieldChange: (field: keyof CreateTaskDto, value: string) => void;
+  readonly onSubtaskAdd: (title: string) => void;
+  readonly onSubtaskRemove: (index: number) => void;
+  readonly onSubmit: (event: SubmitEvent<HTMLFormElement>) => void;
 }
 
 export type TaskCardCheckboxMode = "complete" | "select";

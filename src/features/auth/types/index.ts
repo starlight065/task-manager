@@ -18,10 +18,10 @@ export interface AuthResponse {
 export type AuthFormMode = "login" | "signup";
 
 export interface AuthFormProps {
-  mode: AuthFormMode;
-  onSubmit: (credentials: AuthCredentials) => Promise<void>;
+  readonly mode: AuthFormMode;
+  readonly onSubmit: (credentials: AuthCredentials) => Promise<void>;
 }
 
 export interface AuthProviderProps {
-  children: ReactNode;
+  readonly children: ReactNode;
 }

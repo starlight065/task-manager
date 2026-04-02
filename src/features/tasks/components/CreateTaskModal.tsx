@@ -10,7 +10,7 @@ import {
   TextField,
 } from "@mui/material";
 import closeIcon from "../../../assets/icon-close.svg";
-import { type ChangeEvent, type KeyboardEvent, useRef, useState } from "react";
+import { type ChangeEvent, type KeyboardEvent, useId, useRef, useState } from "react";
 import { useI18n } from "../../../shared/i18n/useI18n";
 import type { CreateTaskDto } from "../../../shared/types";
 import type { CreateTaskModalProps } from "../types/components";
@@ -37,16 +37,18 @@ function CreateTaskModal({
   ] satisfies ReadonlyArray<{ label: string; value: CreateTaskDto["priority"] }>;
   const modalTitle = mode === "create" ? t("tasks.modal.newTitle") : t("tasks.modal.editTitle");
   const closeLabel = mode === "create" ? t("tasks.modal.closeNew") : t("tasks.modal.closeEdit");
-  const submitLabel = isSubmitting
-    ? t("tasks.modal.saving")
-    : mode === "create"
-      ? t("tasks.modal.saveTask")
-      : t("tasks.modal.updateTask");
+  let submitLabel = t("tasks.modal.saving");
+
+  if (!isSubmitting) {
+    submitLabel = mode === "create" ? t("tasks.modal.saveTask") : t("tasks.modal.updateTask");
+  }
 
   const [subtaskInput, setSubtaskInput] = useState("");
+  const subtaskKeyPrefix = useId();
   const subtaskInputRef = useRef<HTMLInputElement>(null);
 
   const subtasks = formValues.subtasks ?? [];
+  const subtaskTitleCounts = new Map<string, number>();
 
   function handleCloseRequest() {
     if (isSubmitting) {
@@ -214,20 +216,26 @@ function CreateTaskModal({
 
               {subtasks.length > 0 && (
                 <ul className="task-modal__subtask-list">
-                  {subtasks.map((title, index) => (
-                    <li className="task-modal__subtask-item" key={index}>
-                      <span className="task-modal__subtask-title">{title}</span>
-                      <IconButton
-                        className="task-modal__subtask-remove"
-                        size="small"
-                        disabled={isSubmitting}
-                        onClick={() => onSubtaskRemove(index)}
-                        aria-label={t("tasks.modal.removeSubtask", { title })}
-                      >
-                        <img src={closeIcon} alt="" width="16" height="16" />
-                      </IconButton>
-                    </li>
-                  ))}
+                  {subtasks.map((title, index) => {
+                    const titleOccurrence = (subtaskTitleCounts.get(title) ?? 0) + 1;
+                    subtaskTitleCounts.set(title, titleOccurrence);
+                    const subtaskKey = `${subtaskKeyPrefix}-${title}-${titleOccurrence}`;
+
+                    return (
+                      <li className="task-modal__subtask-item" key={subtaskKey}>
+                        <span className="task-modal__subtask-title">{title}</span>
+                        <IconButton
+                          className="task-modal__subtask-remove"
+                          size="small"
+                          disabled={isSubmitting}
+                          onClick={() => onSubtaskRemove(index)}
+                          aria-label={t("tasks.modal.removeSubtask", { title })}
+                        >
+                          <img src={closeIcon} alt="" width="16" height="16" />
+                        </IconButton>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>
