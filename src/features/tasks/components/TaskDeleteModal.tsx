@@ -12,6 +12,17 @@ function TaskDeleteModal({
   onConfirm,
 }: TaskDeleteModalProps) {
   const { t } = useI18n();
+  const isBulkDelete = taskCount > 1;
+
+  let confirmButtonLabel: string;
+
+  if (isDeleting) {
+    confirmButtonLabel = isBulkDelete
+      ? t("tasks.delete.deletingSelected")
+      : t("tasks.delete.deleting");
+  } else {
+    confirmButtonLabel = isBulkDelete ? t("tasks.delete.deleteSelected") : t("tasks.delete.delete");
+  }
 
   function handleClose(_: object, reason: "backdropClick" | "escapeKeyDown") {
     if (isDeleting) {
@@ -35,11 +46,11 @@ function TaskDeleteModal({
       onClose={handleClose}
     >
       <DialogTitle className="app-dialog__title" id="delete-task-title">
-        {taskCount > 1 ? t("tasks.delete.bulkTitle") : t("tasks.delete.title")}
+        {isBulkDelete ? t("tasks.delete.bulkTitle") : t("tasks.delete.title")}
       </DialogTitle>
       <DialogContent className="app-dialog__content">
         <p className="app-dialog__copy task-modal__delete-copy">
-          {taskCount > 1 ? (
+          {isBulkDelete ? (
             t("tasks.delete.confirmMany", { count: taskCount })
           ) : (
             <>
@@ -55,13 +66,7 @@ function TaskDeleteModal({
           {t("common.cancel")}
         </Button>
         <Button color="error" variant="contained" onClick={onConfirm} disabled={isDeleting}>
-          {isDeleting
-            ? taskCount > 1
-              ? t("tasks.delete.deletingSelected")
-              : t("tasks.delete.deleting")
-            : taskCount > 1
-              ? t("tasks.delete.deleteSelected")
-              : t("tasks.delete.delete")}
+          {confirmButtonLabel}
         </Button>
       </DialogActions>
     </Dialog>

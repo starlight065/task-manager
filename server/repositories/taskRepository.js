@@ -51,10 +51,10 @@ async function updateTask(task, { title, description, priority, dueDate, tag, su
     });
 
     for (const subtask of subtasks) {
-      if (subtask.id != null) {
-        await Subtask.update({ title: subtask.title }, { where: { id: subtask.id, task_id: task.id } });
-      } else {
+      if (subtask.id == null) {
         await Subtask.create({ task_id: task.id, title: subtask.title });
+      } else {
+        await Subtask.update({ title: subtask.title }, { where: { id: subtask.id, task_id: task.id } });
       }
     }
 

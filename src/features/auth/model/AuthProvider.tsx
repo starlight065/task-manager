@@ -1,5 +1,7 @@
 import {
+  useCallback,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -65,23 +67,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [location.pathname, navigate]);
 
-  async function login(credentials: AuthCredentials) {
-    const authenticatedUser = await loginRequest(credentials);
+  const login = useCallback(
+    async (credentials: AuthCredentials) => {
+      const authenticatedUser = await loginRequest(credentials);
 
-    setUser(authenticatedUser);
-    setStatus("authenticated");
-    navigate("/tasks", { replace: true });
-  }
+      setUser(authenticatedUser);
+      setStatus("authenticated");
+      navigate("/tasks", { replace: true });
+    },
+    [navigate]
+  );
 
-  async function register(credentials: AuthCredentials) {
-    const authenticatedUser = await registerRequest(credentials);
+  const register = useCallback(
+    async (credentials: AuthCredentials) => {
+      const authenticatedUser = await registerRequest(credentials);
 
-    setUser(authenticatedUser);
-    setStatus("authenticated");
-    navigate("/tasks", { replace: true });
-  }
+      setUser(authenticatedUser);
+      setStatus("authenticated");
+      navigate("/tasks", { replace: true });
+    },
+    [navigate]
+  );
 
-  async function logout() {
+  const logout = useCallback(async () => {
     try {
       await logoutRequest();
     } finally {
@@ -89,10 +97,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setStatus("unauthenticated");
       navigate("/login", { replace: true });
     }
-  }
+  }, [navigate]);
+
+  const contextValue = useMemo(
+    () => ({ status, user, login, register, logout }),
+    [status, user, login, register, logout]
+  );
 
   return (
-    <AuthContext.Provider value={{ status, user, login, register, logout }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
