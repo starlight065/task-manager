@@ -42,6 +42,17 @@ function updateTaskSubtaskCompletion(
   );
 }
 
+async function copyShareLink(shareToken: string) {
+  const origin = globalThis.location?.origin;
+  const clipboard = globalThis.navigator?.clipboard;
+
+  if (!origin || !clipboard?.writeText) {
+    throw new Error(t("tasks.share.clipboardUnsupported"));
+  }
+
+  await clipboard.writeText(`${origin}/shared/${shareToken}`);
+}
+
 interface TaskSelectionState {
   selectedTasks: TaskDto[];
   completionTarget: boolean;
@@ -307,17 +318,6 @@ export function useTaskMutations({
       },
       (failedCount) => t("tasks.bulk.priorityPartialFailure", { count: failedCount }),
     );
-  }
-
-  async function copyShareLink(shareToken: string) {
-    const shareUrl = `${window.location.origin}/shared/${shareToken}`;
-
-    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(shareUrl);
-      return;
-    }
-
-    throw new Error(t("tasks.share.clipboardUnsupported"));
   }
 
   async function shareTask(task: TaskDto) {

@@ -1,4 +1,4 @@
-const ALLOWED_PRIORITIES = ["high", "medium", "low"];
+const ALLOWED_PRIORITIES = new Set(["high", "medium", "low"]);
 const DUE_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 function validateCreateTaskPayload(payload) {
@@ -14,7 +14,7 @@ function validateCreateTaskPayload(payload) {
     return { error: "Title is required" };
   }
 
-  if (!ALLOWED_PRIORITIES.includes(priority)) {
+  if (!ALLOWED_PRIORITIES.has(priority)) {
     return { error: "Priority must be high, medium, or low" };
   }
 
