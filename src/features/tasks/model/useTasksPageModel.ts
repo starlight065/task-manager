@@ -57,7 +57,14 @@ export function useTasksPageModel() {
     deleteTarget?.mode === "bulk"
       ? mutations.bulkAction === "delete"
       : deleteTarget !== null && mutations.pendingTaskIds.includes(deleteTarget.task.id);
-  const deleteTaskCount = deleteTarget?.mode === "bulk" ? deleteTarget.taskCount : deleteTarget ? 1 : 0;
+  let deleteTaskCount = 0;
+
+  if (deleteTarget?.mode === "bulk") {
+    deleteTaskCount = deleteTarget.taskCount;
+  } else if (deleteTarget !== null) {
+    deleteTaskCount = 1;
+  }
+
   const deleteTaskTitle =
     deleteTarget?.mode === "bulk" ? deleteTarget.taskTitle : deleteTarget?.task.title ?? "";
 

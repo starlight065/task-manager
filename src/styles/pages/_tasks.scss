@@ -786,6 +786,47 @@
     }
   }
 
+  &__action--share {
+    padding: 0.42rem 0.78rem;
+    border-color: #dbe7f8;
+    background: #ffffff;
+    color: palette(text-deep);
+    font-size: 0.72rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(58, 142, 246, 0.08);
+
+    &:hover {
+      border-color: #bfd4f6;
+      background: #f3f8ff;
+      color: palette(focus-strong);
+    }
+  }
+
+  &__action--revoke {
+    padding: 0.42rem 0.78rem;
+    border-color: #f1ddca;
+    background: #fff8f1;
+    color: #9c6432;
+    font-size: 0.72rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(224, 92, 0, 0.08);
+
+    &:hover {
+      border-color: #e8c7aa;
+      background: #ffefe1;
+      color: #7d4d25;
+    }
+  }
+
+  &__share-badge {
+    @include pill(0.22rem, 0.7rem);
+    border: 1px solid #9bc2f6;
+    background: #eff6ff;
+    color: #1a65d6;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
   &__subtasks {
     margin-top: 0.6rem;
   }
@@ -1402,48 +1443,5 @@
     color: palette(surface);
     font-weight: 600;
     text-decoration: none;
-  }
-}
-
-.task-card {
-  &__action--share {
-    padding: 0.42rem 0.78rem;
-    border-color: #dbe7f8;
-    background: #ffffff;
-    color: palette(text-deep);
-    font-size: 0.72rem;
-    font-weight: 700;
-    box-shadow: 0 2px 8px rgba(58, 142, 246, 0.08);
-
-    &:hover {
-      border-color: #bfd4f6;
-      background: #f3f8ff;
-      color: palette(focus-strong);
-    }
-  }
-
-  &__action--revoke {
-    padding: 0.42rem 0.78rem;
-    border-color: #f1ddca;
-    background: #fff8f1;
-    color: #9c6432;
-    font-size: 0.72rem;
-    font-weight: 700;
-    box-shadow: 0 2px 8px rgba(224, 92, 0, 0.08);
-
-    &:hover {
-      border-color: #e8c7aa;
-      background: #ffefe1;
-      color: #7d4d25;
-    }
-  }
-
-  &__share-badge {
-    @include pill(0.22rem, 0.7rem);
-    border: 1px solid #9bc2f6;
-    background: #eff6ff;
-    color: #1a65d6;
-    font-size: 0.72rem;
-    font-weight: 700;
   }
 }

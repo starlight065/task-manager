@@ -12,11 +12,13 @@ export const store = configureStore({
 });
 
 function persistLanguage(language: SupportedLanguage) {
-  if (typeof window === "undefined") {
+  const storage = globalThis.window?.localStorage;
+
+  if (!storage) {
     return;
   }
 
-  window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  storage.setItem(LANGUAGE_STORAGE_KEY, language);
 }
 
 setI18nLanguage(store.getState().language.current);

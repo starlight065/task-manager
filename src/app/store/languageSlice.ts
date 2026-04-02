@@ -8,11 +8,13 @@ interface LanguageState {
 }
 
 function getInitialLanguage(): SupportedLanguage {
-  if (typeof window === "undefined") {
+  const storage = globalThis.window?.localStorage;
+
+  if (!storage) {
     return "en";
   }
 
-  const storedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  const storedLanguage = storage.getItem(LANGUAGE_STORAGE_KEY);
 
   return isSupportedLanguage(storedLanguage) ? storedLanguage : "en";
 }
