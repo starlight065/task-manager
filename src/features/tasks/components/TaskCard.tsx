@@ -50,8 +50,6 @@ function TaskCard({
   onShareRevokeClick,
 }: TaskCardProps) {
   const subtaskTotal = task.subtasks.length;
-  const subtaskDone = task.subtasks.filter((s) => s.completed).length;
-  const subtaskPct = subtaskTotal === 0 ? 0 : Math.round((subtaskDone / subtaskTotal) * 100);
   const hasDescription = task.description.trim().length > 0;
   const hasDueDate = task.dueDate.trim().length > 0;
   const hasTag = task.tag.trim().length > 0;
@@ -174,17 +172,6 @@ function TaskCard({
 
         {subtaskTotal > 0 && (
           <div className="task-card__subtasks">
-            <div className="task-card__subtask-progress">
-              <progress
-                aria-label={t("tasks.card.subtaskCompletion")}
-                className="task-card__subtask-progress-bar"
-                max={100}
-                value={subtaskPct}
-              />
-              <span className="task-card__subtask-progress-label">
-                {subtaskDone}/{subtaskTotal}
-              </span>
-            </div>
             <ul className="task-card__subtask-list">
               {task.subtasks.map((subtask) => (
                 <li key={subtask.id} className="task-card__subtask">

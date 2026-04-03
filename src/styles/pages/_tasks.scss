@@ -831,25 +831,6 @@
     margin-top: 0.6rem;
   }
 
-  &__subtask-progress {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.4rem;
-  }
-
-  &__subtask-progress-bar {
-    flex: 1;
-    max-width: 120px;
-    @include progress(4px, palette(progress-track), palette(progress-fill));
-  }
-
-  &__subtask-progress-label {
-    color: palette(subtask-text);
-    font-size: 0.72rem;
-    white-space: nowrap;
-  }
-
   &__subtask-list {
     @include list-reset;
     display: flex;
@@ -1072,13 +1053,21 @@
   }
 
   .task-card {
+    &__content {
+      position: relative;
+      min-height: 4.9rem;
+      padding-right: 5.15rem;
+    }
+
     &__header {
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: start;
-      gap: 0.3rem 0.6rem;
+      display: block;
+      margin-bottom: 0.1rem;
     }
 
     &__controls {
+      position: absolute;
+      top: 0;
+      right: 0;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
@@ -1091,8 +1080,11 @@
       box-shadow: none;
     }
 
-    &__icon-actions,
-    &__action-group--share {
+    &__subtasks {
+      margin-top: 0.4rem;
+    }
+
+    &__icon-actions {
       padding: 0.25rem;
       border: 1px solid #e3ebf8;
       border-radius: radius(xl);
@@ -1106,6 +1098,13 @@
 
     &__icon-actions {
       order: 1;
+    }
+
+    &__action-group--share {
+      padding: 0;
+      border: 0;
+      background: none;
+      box-shadow: none;
     }
 
     &__action-group--share {
