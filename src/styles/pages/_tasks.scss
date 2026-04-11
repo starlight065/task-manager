@@ -653,6 +653,7 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
 
     &--completed {
       color: palette(text-disabled);
@@ -1090,6 +1091,7 @@
     }
 
     &__icon-actions {
+      order: 1;
       padding: 0.25rem;
       border: 1px solid #e3ebf8;
       border-radius: radius(xl);
@@ -1101,20 +1103,13 @@
       box-shadow: 0 10px 22px rgba(30, 41, 59, 0.06);
     }
 
-    &__icon-actions {
-      order: 1;
-    }
-
     &__action-group--share {
+      order: 2;
+      justify-content: flex-end;
       padding: 0;
       border: 0;
       background: none;
       box-shadow: none;
-    }
-
-    &__action-group--share {
-      order: 2;
-      justify-content: flex-end;
     }
 
     &__meta {

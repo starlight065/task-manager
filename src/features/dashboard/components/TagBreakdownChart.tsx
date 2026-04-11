@@ -17,7 +17,7 @@ interface TagBreakdownChartProps {
 }
 
 function CustomTooltip({ active, payload, label }: TooltipContentProps<ValueType, NameType>) {
-  if (active && payload && payload.length) {
+  if (active && payload?.length) {
     const { value, total } = payload[0].payload as { value: number; total: number };
     return (
       <div className="dashboard-chart__tooltip">
