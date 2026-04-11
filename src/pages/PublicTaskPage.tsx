@@ -76,7 +76,13 @@ function PublicTaskPage() {
             {t(`common.priorityLevels.${task.priority}`)}
           </span>
         </div>
-        {task.description ? <p className="public-task-page__description">{task.description}</p> : null}
+        {task.description ? (
+          <p className="public-task-page__description">{task.description}</p>
+        ) : (
+          <p className="public-task-page__description public-task-page__description--placeholder">
+            {t("tasks.card.noDescription")}
+          </p>
+        )}
         <dl className="public-task-page__meta">
           <div>
             <dt>{t("common.status")}</dt>

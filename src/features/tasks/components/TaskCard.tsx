@@ -168,7 +168,13 @@ function TaskCard({
             </div>
           </div>
         </div>
-        {hasDescription ? <div className="task-card__description">{task.description}</div> : null}
+        <div
+          className={classNames("task-card__description", {
+            "task-card__description--placeholder": !hasDescription,
+          })}
+        >
+          {hasDescription ? task.description : t("tasks.card.noDescription")}
+        </div>
 
         {subtaskTotal > 0 && (
           <div className="task-card__subtasks">

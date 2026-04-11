@@ -667,6 +667,11 @@
     font-size: 0.75rem;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    &--placeholder {
+      font-style: italic;
+      opacity: 0.6;
+    }
   }
 
   &__meta {
@@ -1392,6 +1397,11 @@
     margin: 0;
     color: palette(text-muted);
     line-height: 1.55;
+
+    &--placeholder {
+      font-style: italic;
+      opacity: 0.6;
+    }
   }
 
   &__meta {

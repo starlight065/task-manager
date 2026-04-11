@@ -215,6 +215,7 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
             params.completed ? "incomplete" : "completed"
           }`,
         moreCount: (params) => `+${getCount(params)} more`,
+        noDescription: "No description",
       },
       modal: {
         newTitle: "New task",
@@ -473,6 +474,7 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
             params.completed ? "невыполненную" : "выполненную"
           }`,
         moreCount: (params) => `+еще ${getCount(params)}`,
+        noDescription: "Нет описания",
       },
       modal: {
         newTitle: "Новая задача",
@@ -731,6 +733,7 @@ const resources: Record<SupportedLanguage, TranslationMap> = {
             params.completed ? "невиконане" : "виконане"
           }`,
         moreCount: (params) => `+ще ${getCount(params)}`,
+        noDescription: "Без опису",
       },
       modal: {
         newTitle: "Нове завдання",
