@@ -6,6 +6,7 @@ import TasksCalendarPage from "../../pages/TasksCalendarPage";
 import TasksListPage from "../../pages/TasksListPage";
 import TasksPage from "../../pages/TasksPage";
 import PublicTaskPage from "../../pages/PublicTaskPage";
+import TasksDashboardPage from "../../pages/TasksDashboardPage";
 import { ProtectedRoute, PublicRoute } from "./RouteGuards";
 
 function AppRouter() {
@@ -39,6 +40,7 @@ function AppRouter() {
       >
         <Route index element={<TasksListPage />} />
         <Route path="calendar" element={<TasksCalendarPage />} />
+        <Route path="dashboard" element={<TasksDashboardPage />} />
       </Route>
     </Routes>
   );

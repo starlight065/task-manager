@@ -51,12 +51,6 @@ const Task = sequelize.define(
     tableName: "tasks",
     createdAt: "created_at",
     updatedAt: false,
-    indexes: [
-      {
-        unique: true,
-        fields: ["share_token"],
-      },
-    ],
   }
 );
 

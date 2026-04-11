@@ -24,6 +24,14 @@ function TasksViewTabs() {
       >
         {t("common.calendar")}
       </NavLink>
+      <NavLink
+        to="/tasks/dashboard"
+        className={({ isActive }) =>
+          classNames("tasks-page__tab", { "tasks-page__tab--active": isActive })
+        }
+      >
+        {t("common.dashboard")}
+      </NavLink>
     </nav>
   );
 }
