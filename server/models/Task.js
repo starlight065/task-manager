@@ -6,12 +6,12 @@ const Task = sequelize.define(
   "Task",
   {
     id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
     user_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     title: {
@@ -23,8 +23,11 @@ const Task = sequelize.define(
       allowNull: true,
     },
     priority: {
-      type: DataTypes.ENUM("high", "medium", "low"),
+      type: DataTypes.STRING(6),
       allowNull: false,
+      validate: {
+        isIn: [["high", "medium", "low"]],
+      },
     },
     due_date: {
       type: DataTypes.DATEONLY,
