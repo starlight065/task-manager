@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -26,6 +26,12 @@ function TasksBulkActionBar({
 }: TasksBulkActionBarProps) {
   const { t } = useI18n();
   const [priority, setPriority] = useState<Priority | "">("");
+
+  useEffect(() => {
+    if (selectedCount === 0) {
+      setPriority("");
+    }
+  }, [selectedCount]);
   const canApplyPriority =
     priority !== "" && selectedTasks.some((task) => task.priority !== priority);
 

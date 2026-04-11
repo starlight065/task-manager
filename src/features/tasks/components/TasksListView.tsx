@@ -78,7 +78,6 @@ function TasksListView({ model }: TasksListViewProps) {
       ) : null}
 
       <TasksBulkActionBar
-        key={model.taskLists.selectedTaskIds.join(",")}
         selectedCount={model.taskLists.selectedCount}
         selectedTasks={model.taskLists.selectedTasks}
         canUpdateCompletion={model.taskLists.canUpdateCompletion}
