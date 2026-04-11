@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -13,7 +13,7 @@ import { useI18n } from "../../../shared/i18n/useI18n";
 import type { TaskDto } from "../../../shared/types";
 
 interface TagBreakdownChartProps {
-  tasks: TaskDto[];
+  readonly tasks: readonly TaskDto[];
 }
 
 function CustomTooltip({ active, payload, label }: TooltipContentProps<ValueType, NameType>) {

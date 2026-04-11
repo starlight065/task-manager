@@ -1,9 +1,8 @@
-import React from "react";
 import { useI18n } from "../../../shared/i18n/useI18n";
 import type { TaskDto } from "../../../shared/types";
 
 interface SummaryCardsProps {
-  tasks: TaskDto[];
+  readonly tasks: readonly TaskDto[];
 }
 
 function SummaryCards({ tasks }: SummaryCardsProps) {

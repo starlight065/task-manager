@@ -1,5 +1,3 @@
-import React from "react";
-
 import type { TasksPageModel } from "../../tasks/types/model";
 import SummaryCards from "./SummaryCards";
 import PriorityBreakdownChart from "./PriorityBreakdownChart";
@@ -8,7 +6,7 @@ import TagBreakdownChart from "./TagBreakdownChart";
 import "../styles/dashboard.scss";
 
 interface TasksDashboardViewProps {
-  model: TasksPageModel;
+  readonly model: TasksPageModel;
 }
 
 function TasksDashboardView({ model }: TasksDashboardViewProps) {

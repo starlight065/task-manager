@@ -1,4 +1,3 @@
-import React from "react";
 import {
   PieChart,
   Pie,
@@ -11,7 +10,7 @@ import { useI18n } from "../../../shared/i18n/useI18n";
 import type { TaskDto } from "../../../shared/types";
 
 interface PriorityBreakdownChartProps {
-  tasks: TaskDto[];
+  readonly tasks: readonly TaskDto[];
 }
 
 const COLORS = {
@@ -57,8 +56,8 @@ function PriorityBreakdownChart({ tasks }: PriorityBreakdownChartProps) {
               dataKey="value"
               stroke="none"
             >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[entry.key as keyof typeof COLORS]} />
+              {data.map((entry) => (
+                <Cell key={entry.key} fill={COLORS[entry.key as keyof typeof COLORS]} />
               ))}
             </Pie>
             <Tooltip 

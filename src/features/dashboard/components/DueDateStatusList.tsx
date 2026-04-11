@@ -1,10 +1,9 @@
-import React from "react";
 import classNames from "classnames";
 import { useI18n } from "../../../shared/i18n/useI18n";
 import type { TaskDto } from "../../../shared/types";
 
 interface DueDateStatusListProps {
-  tasks: TaskDto[];
+  readonly tasks: readonly TaskDto[];
 }
 
 function calculateDueStatus(task: TaskDto) {
