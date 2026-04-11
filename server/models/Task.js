@@ -45,13 +45,18 @@ const Task = sequelize.define(
     share_token: {
       type: DataTypes.STRING(64),
       allowNull: true,
-      unique: true,
     },
   },
   {
     tableName: "tasks",
     createdAt: "created_at",
     updatedAt: false,
+    indexes: [
+      {
+        unique: true,
+        fields: ["share_token"],
+      },
+    ],
   }
 );
 

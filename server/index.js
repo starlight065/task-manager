@@ -7,11 +7,11 @@ const { createApp } = require("./app");
 
 sequelize
   .authenticate()
-  .then(() => sequelize.sync({ alter: true }))
+  .then(() => sequelize.sync())
   .then(() => {
     const sessionStore = createSessionStore(sequelize);
 
-    return sessionStore.sync({ alter: true }).then(() => sessionStore);
+    return sessionStore.sync().then(() => sessionStore);
   })
   .then((sessionStore) => {
     const app = createApp({ sessionStore });
